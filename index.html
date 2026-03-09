@@ -87,20 +87,61 @@
           </div>
         </div>
 
-        <div class="project-card">
+        <div class="project-card project-card-featured">
           <div class="project-header">
-            <h3>Quantitative Trading</h3>
+            <h3>Algorithmic Trading System</h3>
           </div>
-          <p class="project-subtitle">ML-Driven Market Analysis</p>
+          <p class="project-subtitle">US Equities &mdash; Live Trading via Alpaca API</p>
+
+          <div class="trading-stats">
+            <div class="stat">
+              <span class="stat-value">+16.8%</span>
+              <span class="stat-label">OOS Portfolio Return</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">+4.5 bps</span>
+              <span class="stat-label">Net EV / Trade</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">~4,200</span>
+              <span class="stat-label">OOS Trades</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">10</span>
+              <span class="stat-label">Strategies Tested</span>
+            </div>
+          </div>
+
           <p>
-            Data collection pipelines, feature engineering, and machine learning models for
-            equities and crypto markets. Includes live trade simulation and API-based execution.
+            End-to-end algorithmic trading research platform spanning data collection, feature
+            engineering, strategy research, backtesting, and live execution. Tested 10 distinct
+            intraday strategies across a 99-ticker universe (2016&ndash;2026), applying rigorous
+            statistical filtering to separate signal from noise.
           </p>
+          <p>
+            Selected strategies survive bootstrap 95% confidence interval filtering, outlier-dependence
+            analysis, and walk-forward validation with realistic transaction costs. Currently deployed
+            and trading live.
+          </p>
+
+          <div class="figure-gallery">
+            <figure>
+              <img src="assets/trading/portfolio_summary.png" alt="Portfolio performance dashboard showing cumulative PnL, monthly returns, and per-config comparison across 11 robust strategies">
+              <figcaption>Portfolio dashboard &mdash; cumulative PnL (gross vs net), monthly returns, and per-config EV comparison on out-of-sample data (2023&ndash;present)</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/trading/cumulative_pnl_example.png" alt="Example cumulative PnL curve showing consistent upward trend across train and test periods">
+              <figcaption>Example config equity curve &mdash; gross (blue) vs net after costs (orange), with train/test split indicated</figcaption>
+            </figure>
+          </div>
+
           <div class="tags">
             <span>Python</span>
-            <span>ML</span>
-            <span>API Trading</span>
-            <span>Data Engineering</span>
+            <span>XGBoost</span>
+            <span>CMA-ES</span>
+            <span>Bootstrap CI</span>
+            <span>Alpaca API</span>
+            <span>Live Trading</span>
           </div>
         </div>
 
