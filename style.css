@@ -549,6 +549,68 @@ section h2 {
   font-size: 0.95rem;
 }
 
+/* ── News ── */
+.news-list {
+  list-style: none;
+  padding: 0;
+}
+
+.news-list li {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.news-date {
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* ── Publications ── */
+.pub-list {
+  list-style: none;
+  padding: 0;
+  counter-reset: pub;
+}
+
+.pub-list li {
+  margin-bottom: 1.25rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.pub-authors {
+  color: var(--text-muted);
+}
+
+.pub-venue {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.pub-links {
+  font-size: 0.85rem;
+}
+
+/* ── Service / Teaching / Mentoring ── */
+.subsection-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 1.25rem 0 0.5rem;
+  color: var(--text);
+}
+
+.service-list {
+  list-style: disc;
+  padding-left: 1.25rem;
+}
+
+.service-list li {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 0.35rem;
+}
+
 /* ── Contact ── */
 #contact {
   text-align: center;
