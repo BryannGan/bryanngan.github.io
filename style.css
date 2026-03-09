@@ -167,13 +167,13 @@ a:hover {
 
 /* ── Sections ── */
 section {
-  padding: 5rem 0;
+  padding: 2rem 0;
 }
 
 section h2 {
-  font-size: 2rem;
+  font-size: 1.3rem;
   font-weight: 700;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.75rem;
   letter-spacing: -0.01em;
 }
 
