@@ -163,33 +163,35 @@ section h2 {
   gap: 1.5rem;
 }
 
+/* Project cards as clickable covers */
 .project-card {
+  display: block;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 1.75rem;
   transition: border-color 0.2s, transform 0.2s;
+  cursor: pointer;
+  color: var(--text);
 }
 .project-card:hover {
   border-color: var(--accent);
   transform: translateY(-2px);
+  color: var(--text);
 }
-
-.project-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0.25rem;
-}
-
-.project-header h3 {
-  font-size: 1.25rem;
-  font-weight: 700;
-}
-
-.project-link {
+.project-card::after {
+  content: "View details \2192";
+  display: block;
+  margin-top: 1rem;
   font-size: 0.85rem;
   font-weight: 600;
+  color: var(--accent);
+}
+
+.project-card h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
 }
 
 .project-subtitle {
@@ -203,6 +205,80 @@ section h2 {
   color: var(--text-muted);
   font-size: 0.95rem;
   margin-bottom: 1rem;
+}
+
+/* ── Project Detail Sections ── */
+.project-detail {
+  border-top: 1px solid var(--border);
+}
+
+.project-detail > .container > p {
+  color: var(--text-muted);
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  max-width: 750px;
+}
+
+.back-link {
+  display: inline-block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--text-muted);
+}
+.back-link:hover {
+  color: var(--accent);
+}
+
+/* Table of Contents */
+.toc {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  margin: 1.5rem 0 2rem;
+}
+
+.toc h4 {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.toc ol, .toc ul {
+  padding-left: 1.25rem;
+}
+
+.toc li {
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.toc li a {
+  font-weight: 500;
+}
+
+.toc-badge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  vertical-align: middle;
+  margin-left: 0.35rem;
+}
+
+.toc-pass {
+  background: rgba(52, 211, 153, 0.15);
+  color: #34d399;
+}
+
+.toc-fail {
+  background: rgba(107, 114, 128, 0.2);
+  color: #9ca3af;
 }
 
 .tags {

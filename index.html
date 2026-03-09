@@ -42,42 +42,41 @@
     </div>
   </section>
 
+  <!-- ── Project Cards (covers) ── -->
   <section id="projects">
     <div class="container">
       <h2>Projects</h2>
       <div class="project-grid">
 
-        <div class="project-card">
-          <div class="project-header">
-            <h3>MIROS</h3>
-            <a href="https://github.com/BryannGan/MIROS" target="_blank" class="project-link">GitHub &rarr;</a>
+        <a href="#detail-trading" class="project-card project-card-featured">
+          <h3>Algorithmic Trading System</h3>
+          <p class="project-subtitle">US Equities &mdash; Live Trading via Alpaca API</p>
+          <p>10 strategies tested &bull; +16.8% OOS return &bull; Currently live</p>
+          <div class="tags">
+            <span>Python</span>
+            <span>XGBoost</span>
+            <span>CMA-ES</span>
+            <span>Bootstrap CI</span>
+            <span>Alpaca API</span>
           </div>
+        </a>
+
+        <a href="#detail-miros" class="project-card">
+          <h3>MIROS</h3>
           <p class="project-subtitle">Medical Image to Reduced-Order Simulation</p>
-          <p>
-            End-to-end pipeline that produces patient-specific hemodynamic simulations directly from
-            volumetric angiography in minutes. Integrates ML-based segmentation (SeqSeg) with 0D/1D
-            Navier&ndash;Stokes solvers in SimVascular, including automatic boundary condition tuning
-            via CMA-ES optimization.
-          </p>
+          <p>Image-to-simulation in minutes &bull; 0D/1D hemodynamic solvers &bull; Open source</p>
           <div class="tags">
             <span>Python</span>
             <span>SimVascular</span>
             <span>Hemodynamics</span>
-            <span>ML Segmentation</span>
             <span>Optimization</span>
           </div>
-        </div>
+        </a>
 
-        <div class="project-card">
-          <div class="project-header">
-            <h3>Cardiovascular Research</h3>
-          </div>
+        <a href="#detail-cvresearch" class="project-card">
+          <h3>Cardiovascular Research</h3>
           <p class="project-subtitle">Multiphysics Simulation &amp; Physics-Informed ML</p>
-          <p>
-            Research in finite element analysis of cardiovascular systems using svFSI and FEBio,
-            physics-informed graph neural networks, and MCMC-based parameter estimation for
-            patient-specific modeling.
-          </p>
+          <p>FEA &bull; Physics-informed GNNs &bull; MCMC parameter estimation</p>
           <div class="tags">
             <span>FEA</span>
             <span>svFSI</span>
@@ -85,207 +84,270 @@
             <span>MCMC</span>
             <span>HPC</span>
           </div>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- ── Project Detail: Algo Trading ──── -->
+  <!-- ══════════════════════════════════════ -->
+  <section id="detail-trading" class="project-detail">
+    <div class="container">
+      <a href="#projects" class="back-link">&larr; All Projects</a>
+      <h2>Algorithmic Trading System</h2>
+      <p class="project-subtitle">US Equities &mdash; Live Trading via Alpaca API</p>
+
+      <div class="trading-stats">
+        <div class="stat">
+          <span class="stat-value">+16.8%</span>
+          <span class="stat-label">OOS Portfolio Return</span>
         </div>
+        <div class="stat">
+          <span class="stat-value">+4.5 bps</span>
+          <span class="stat-label">Net EV / Trade</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">~4,200</span>
+          <span class="stat-label">OOS Trades</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">10</span>
+          <span class="stat-label">Strategies Tested</span>
+        </div>
+      </div>
 
-        <div class="project-card project-card-featured">
-          <div class="project-header">
-            <h3>Algorithmic Trading System</h3>
+      <p>
+        End-to-end algorithmic trading research platform spanning data collection, feature
+        engineering, strategy research, backtesting, and live execution. Tested 10 distinct
+        intraday strategies across a 99-ticker universe (2016&ndash;2026), applying rigorous
+        statistical filtering to separate signal from noise. Currently deployed and trading live.
+      </p>
+
+      <div class="toc">
+        <h4>Table of Contents</h4>
+        <ol>
+          <li><a href="#strat-opening-range">Opening Range Momentum / Reversal</a> <span class="toc-badge toc-pass">Deployed</span></li>
+          <li><a href="#strat-rejection-rsi">Rejection Candle + RSI Extremes</a> <span class="toc-badge toc-pass">Edge Found</span></li>
+          <li><a href="#strat-rejection-candle">Rejection Candle (Standalone)</a> <span class="toc-badge toc-fail">No Edge</span></li>
+          <li><a href="#strat-dip">Mean-Reversion Dip</a> <span class="toc-badge toc-fail">No Edge</span></li>
+          <li><a href="#strat-fvg">Fair Value Gap Pairs</a> <span class="toc-badge toc-fail">No Edge</span></li>
+          <li><a href="#strat-sweep">Liquidity Sweep</a> <span class="toc-badge toc-fail">No Edge</span></li>
+          <li><a href="#strat-ou">OU Mean-Reversion Rules</a> <span class="toc-badge toc-fail">No Edge</span></li>
+          <li><a href="#strat-vwap">VWAP Crossover</a> <span class="toc-badge toc-fail">No Edge</span></li>
+        </ol>
+      </div>
+
+      <!-- Strategies -->
+      <div class="strategy-list">
+
+        <div id="strat-opening-range" class="strategy-item strategy-pass">
+          <div class="strategy-header">
+            <h4>Opening Range Momentum / Reversal</h4>
+            <span class="strategy-badge badge-pass">Deployed</span>
           </div>
-          <p class="project-subtitle">US Equities &mdash; Live Trading via Alpaca API</p>
-
-          <div class="trading-stats">
-            <div class="stat">
-              <span class="stat-value">+16.8%</span>
-              <span class="stat-label">OOS Portfolio Return</span>
-            </div>
-            <div class="stat">
-              <span class="stat-value">+4.5 bps</span>
-              <span class="stat-label">Net EV / Trade</span>
-            </div>
-            <div class="stat">
-              <span class="stat-value">~4,200</span>
-              <span class="stat-label">OOS Trades</span>
-            </div>
-            <div class="stat">
-              <span class="stat-value">10</span>
-              <span class="stat-label">Strategies Tested</span>
-            </div>
-          </div>
-
           <p>
-            End-to-end algorithmic trading research platform spanning data collection, feature
-            engineering, strategy research, backtesting, and live execution. Tested 10 distinct
-            intraday strategies across a 99-ticker universe (2016&ndash;2026), applying rigorous
-            statistical filtering to separate signal from noise.
+            Exploits directional bias in the first intraday bar across two timeframes.
+            Brute-force grid search over 3.4M+ trade events, narrowed to 11 statistically
+            robust configs via bootstrap CI filtering and outlier-dependence analysis.
+            Currently trading live.
           </p>
-          <p>
-            Selected strategies survive bootstrap 95% confidence interval filtering, outlier-dependence
-            analysis, and walk-forward validation with realistic transaction costs. Currently deployed
-            and trading live.
-          </p>
-
-          <h4 class="strategy-section-title">Strategies Explored</h4>
-
-          <div class="strategy-list">
-
-            <div class="strategy-item strategy-pass">
-              <div class="strategy-header">
-                <h4>Opening Range Momentum / Reversal</h4>
-                <span class="strategy-badge badge-pass">Deployed</span>
-              </div>
-              <p>
-                Exploits directional bias in the first intraday bar across two timeframes.
-                Brute-force grid search over 3.4M+ trade events, narrowed to 11 statistically
-                robust configs via bootstrap CI filtering and outlier-dependence analysis.
-                Currently trading live.
-              </p>
-              <div class="figure-gallery">
-                <figure>
-                  <img src="assets/trading/portfolio_summary.png" alt="Portfolio performance dashboard">
-                  <figcaption>Portfolio dashboard &mdash; cumulative PnL, monthly returns, and per-config EV on OOS data (2023&ndash;present)</figcaption>
-                </figure>
-                <figure>
-                  <img src="assets/trading/cumulative_pnl_example.png" alt="Example equity curve">
-                  <figcaption>Example config equity curve &mdash; gross vs net after costs, with train/test split</figcaption>
-                </figure>
-              </div>
-            </div>
-
-            <div class="strategy-item strategy-pass">
-              <div class="strategy-header">
-                <h4>Rejection Candle + RSI Extremes</h4>
-                <span class="strategy-badge badge-pass">Edge Found</span>
-              </div>
-              <p>
-                Combines candlestick rejection patterns with RSI extreme readings as a
-                mean-reversion signal. 9 tickers pass across 97 tested, with +9.1 bps net EV
-                (p&nbsp;=&nbsp;0.0001) and 57% win rate on out-of-sample data.
-              </p>
-              <div class="figure-gallery">
-                <figure>
-                  <img src="assets/trading/rejection_rsi_verdict.png" alt="Rejection RSI verdict distribution">
-                  <figcaption>Phase 2 verdict distribution across 97 tickers &mdash; 9 PASS, 41 CAUTION, 47 FAIL</figcaption>
-                </figure>
-              </div>
-            </div>
-
-            <div class="strategy-item strategy-fail">
-              <div class="strategy-header">
-                <h4>Rejection Candle (Standalone)</h4>
-                <span class="strategy-badge badge-fail">No Edge</span>
-              </div>
-              <p>
-                Tests whether dominant-wick candles (institutional rejection) predict direction.
-                Scanned 3,600+ gate combinations across 99 tickers. Mean test EV = &minus;0.04R;
-                96% of configs fail. The signal lacks directional content without additional context.
-              </p>
-              <div class="figure-gallery">
-                <figure>
-                  <img src="assets/trading/rejection_candle_heatmap.png" alt="Rejection candle verdict heatmap">
-                  <figcaption>Verdict heatmap across 99 tickers &times; 2 directions &mdash; overwhelmingly red (FAIL)</figcaption>
-                </figure>
-              </div>
-            </div>
-
-            <div class="strategy-item strategy-fail">
-              <div class="strategy-header">
-                <h4>Mean-Reversion Dip</h4>
-                <span class="strategy-badge badge-fail">No Edge</span>
-              </div>
-              <p>
-                Detects price pullbacks from recent highs at various lookback windows and
-                reversion thresholds. 95% of configs fail across 99 tickers; transaction
-                costs kill the marginal mean-reversion signal.
-              </p>
-              <div class="figure-gallery">
-                <figure>
-                  <img src="assets/trading/rejection_dip_heatmap.png" alt="Rejection dip verdict heatmap">
-                  <figcaption>Verdict + test EV (bps) across 99 tickers &mdash; only 3 survive cost</figcaption>
-                </figure>
-              </div>
-            </div>
-
-            <div class="strategy-item strategy-fail">
-              <div class="strategy-header">
-                <h4>Fair Value Gap Pairs</h4>
-                <span class="strategy-badge badge-fail">No Edge</span>
-              </div>
-              <p>
-                Tests whether consecutive fair value gaps (same or opposite direction) predict
-                price continuation or reversal. Analyzed 25.8M FVG pairs across 41 tickers.
-                MFE/MAE ratio = 0.999 &mdash; perfectly symmetric, zero directional content.
-              </p>
-              <div class="figure-gallery">
-                <figure>
-                  <img src="assets/trading/fvg_heatmap.png" alt="FVG pair ticker heatmap">
-                  <figcaption>Mean return by ticker and pair type &mdash; near-zero across the board</figcaption>
-                </figure>
-              </div>
-            </div>
-
-            <div class="strategy-item strategy-fail">
-              <div class="strategy-header">
-                <h4>Liquidity Sweep</h4>
-                <span class="strategy-badge badge-fail">No Edge</span>
-              </div>
-              <p>
-                Tests wick sweeps at structural price levels (prior-day high/low, opening range)
-                using a paired-delta methodology against matched controls. 2.5M+ large-cap observations
-                yield zero statistical significance &mdash; sweeps are real events but not directionally predictive.
-              </p>
-              <div class="figure-gallery">
-                <figure>
-                  <img src="assets/trading/sweep_returns.png" alt="Sweep paired delta returns">
-                  <figcaption>Paired delta (sweep edge vs controls) across horizons &mdash; confidence intervals span zero</figcaption>
-                </figure>
-                <figure>
-                  <img src="assets/trading/sweep_heatmap.png" alt="Sweep ticker x level heatmap">
-                  <figcaption>Mean return by ticker and structural level &mdash; no consistent pattern</figcaption>
-                </figure>
-              </div>
-            </div>
-
-            <div class="strategy-item strategy-fail">
-              <div class="strategy-header">
-                <h4>OU Mean-Reversion Rules</h4>
-                <span class="strategy-badge badge-fail">No Edge</span>
-              </div>
-              <p>
-                Rule-based mean-reversion inspired by Ornstein&ndash;Uhlenbeck processes. Iterated through
-                3+ research phases with progressively refined entry gates and exit logic. All configs
-                are negative EV at realistic transaction costs.
-              </p>
-              <div class="figure-gallery">
-                <figure>
-                  <img src="assets/trading/ou_diagnostics.png" alt="OU diagnostics dashboard">
-                  <figcaption>TSLA diagnostics &mdash; z-score vs price change, hit rate by bin, and return distribution</figcaption>
-                </figure>
-              </div>
-            </div>
-
-            <div class="strategy-item strategy-fail">
-              <div class="strategy-header">
-                <h4>VWAP Crossover</h4>
-                <span class="strategy-badge badge-fail">No Edge</span>
-              </div>
-              <p>
-                Tests VWAP crossing signals with divergence thresholds. Full grid of 468 signal
-                configurations &times; 1,344 exit parameters across 41 tickers. No post-cost edge found.
-              </p>
-            </div>
-
-          </div>
-
-          <div class="tags">
-            <span>Python</span>
-            <span>XGBoost</span>
-            <span>CMA-ES</span>
-            <span>Bootstrap CI</span>
-            <span>Alpaca API</span>
-            <span>Live Trading</span>
+          <div class="figure-gallery">
+            <figure>
+              <img src="assets/trading/portfolio_summary.png" alt="Portfolio performance dashboard">
+              <figcaption>Portfolio dashboard &mdash; cumulative PnL, monthly returns, and per-config EV on OOS data (2023&ndash;present)</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/trading/cumulative_pnl_example.png" alt="Example equity curve">
+              <figcaption>Example config equity curve &mdash; gross vs net after costs, with train/test split</figcaption>
+            </figure>
           </div>
         </div>
 
+        <div id="strat-rejection-rsi" class="strategy-item strategy-pass">
+          <div class="strategy-header">
+            <h4>Rejection Candle + RSI Extremes</h4>
+            <span class="strategy-badge badge-pass">Edge Found</span>
+          </div>
+          <p>
+            Combines candlestick rejection patterns with RSI extreme readings as a
+            mean-reversion signal. 9 tickers pass across 97 tested, with +9.1 bps net EV
+            (p&nbsp;=&nbsp;0.0001) and 57% win rate on out-of-sample data.
+          </p>
+          <div class="figure-gallery">
+            <figure>
+              <img src="assets/trading/rejection_rsi_verdict.png" alt="Rejection RSI verdict distribution">
+              <figcaption>Verdict distribution across 97 tickers &mdash; 9 PASS, 41 CAUTION, 47 FAIL</figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <div id="strat-rejection-candle" class="strategy-item strategy-fail">
+          <div class="strategy-header">
+            <h4>Rejection Candle (Standalone)</h4>
+            <span class="strategy-badge badge-fail">No Edge</span>
+          </div>
+          <p>
+            Tests whether dominant-wick candles (institutional rejection) predict direction.
+            Scanned 3,600+ gate combinations across 99 tickers. Mean test EV = &minus;0.04R;
+            96% of configs fail. The signal lacks directional content without additional context.
+          </p>
+          <div class="figure-gallery">
+            <figure>
+              <img src="assets/trading/rejection_candle_heatmap.png" alt="Rejection candle verdict heatmap">
+              <figcaption>Verdict heatmap across 99 tickers &times; 2 directions &mdash; overwhelmingly red (FAIL)</figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <div id="strat-dip" class="strategy-item strategy-fail">
+          <div class="strategy-header">
+            <h4>Mean-Reversion Dip</h4>
+            <span class="strategy-badge badge-fail">No Edge</span>
+          </div>
+          <p>
+            Detects price pullbacks from recent highs at various lookback windows and
+            reversion thresholds. 95% of configs fail across 99 tickers; transaction
+            costs kill the marginal mean-reversion signal.
+          </p>
+          <div class="figure-gallery">
+            <figure>
+              <img src="assets/trading/rejection_dip_heatmap.png" alt="Rejection dip verdict heatmap">
+              <figcaption>Verdict + test EV (bps) across 99 tickers &mdash; only 3 survive cost</figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <div id="strat-fvg" class="strategy-item strategy-fail">
+          <div class="strategy-header">
+            <h4>Fair Value Gap Pairs</h4>
+            <span class="strategy-badge badge-fail">No Edge</span>
+          </div>
+          <p>
+            Tests whether consecutive fair value gaps (same or opposite direction) predict
+            price continuation or reversal. Analyzed 25.8M FVG pairs across 41 tickers.
+            MFE/MAE ratio = 0.999 &mdash; perfectly symmetric, zero directional content.
+          </p>
+          <div class="figure-gallery">
+            <figure>
+              <img src="assets/trading/fvg_heatmap.png" alt="FVG pair ticker heatmap">
+              <figcaption>Mean return by ticker and pair type &mdash; near-zero across the board</figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <div id="strat-sweep" class="strategy-item strategy-fail">
+          <div class="strategy-header">
+            <h4>Liquidity Sweep</h4>
+            <span class="strategy-badge badge-fail">No Edge</span>
+          </div>
+          <p>
+            Tests wick sweeps at structural price levels (prior-day high/low, opening range)
+            using a paired-delta methodology against matched controls. 2.5M+ large-cap observations
+            yield zero statistical significance &mdash; sweeps are real events but not directionally predictive.
+          </p>
+          <div class="figure-gallery">
+            <figure>
+              <img src="assets/trading/sweep_returns.png" alt="Sweep paired delta returns">
+              <figcaption>Paired delta (sweep edge vs controls) across horizons &mdash; confidence intervals span zero</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/trading/sweep_heatmap.png" alt="Sweep ticker x level heatmap">
+              <figcaption>Mean return by ticker and structural level &mdash; no consistent pattern</figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <div id="strat-ou" class="strategy-item strategy-fail">
+          <div class="strategy-header">
+            <h4>OU Mean-Reversion Rules</h4>
+            <span class="strategy-badge badge-fail">No Edge</span>
+          </div>
+          <p>
+            Rule-based mean-reversion inspired by Ornstein&ndash;Uhlenbeck processes. Iterated through
+            3+ research phases with progressively refined entry gates and exit logic. All configs
+            are negative EV at realistic transaction costs.
+          </p>
+          <div class="figure-gallery">
+            <figure>
+              <img src="assets/trading/ou_diagnostics.png" alt="OU diagnostics dashboard">
+              <figcaption>Diagnostics &mdash; z-score vs price change, hit rate by bin, and return distribution</figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <div id="strat-vwap" class="strategy-item strategy-fail">
+          <div class="strategy-header">
+            <h4>VWAP Crossover</h4>
+            <span class="strategy-badge badge-fail">No Edge</span>
+          </div>
+          <p>
+            Tests VWAP crossing signals with divergence thresholds. Full grid of 468 signal
+            configurations &times; 1,344 exit parameters across 41 tickers. No post-cost edge found.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- ── Project Detail: MIROS ──────────── -->
+  <!-- ══════════════════════════════════════ -->
+  <section id="detail-miros" class="project-detail">
+    <div class="container">
+      <a href="#projects" class="back-link">&larr; All Projects</a>
+      <h2>MIROS</h2>
+      <p class="project-subtitle">Medical Image to Reduced-Order Simulation</p>
+
+      <p>
+        End-to-end pipeline that produces patient-specific hemodynamic simulations directly from
+        volumetric angiography in minutes. Integrates ML-based segmentation (SeqSeg) with 0D/1D
+        Navier&ndash;Stokes solvers in SimVascular, including automatic boundary condition tuning
+        via CMA-ES optimization.
+      </p>
+
+      <div class="toc">
+        <h4>Highlights</h4>
+        <ul>
+          <li>Automated pipeline from medical images to blood flow simulation results</li>
+          <li>Automatic boundary condition tuning via CMA-ES optimization</li>
+          <li>1D Navier&ndash;Stokes + 0D lumped-parameter solvers</li>
+          <li>Interactive GUI for cardiac inflow waveform design</li>
+          <li>Cross-platform support (Windows, Linux, macOS)</li>
+        </ul>
+      </div>
+
+      <p>
+        <a href="https://github.com/BryannGan/MIROS" target="_blank" class="btn">View on GitHub &rarr;</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- ── Project Detail: CV Research ────── -->
+  <!-- ══════════════════════════════════════ -->
+  <section id="detail-cvresearch" class="project-detail">
+    <div class="container">
+      <a href="#projects" class="back-link">&larr; All Projects</a>
+      <h2>Cardiovascular Research</h2>
+      <p class="project-subtitle">Multiphysics Simulation &amp; Physics-Informed ML</p>
+
+      <p>
+        Research in finite element analysis of cardiovascular systems using svFSI and FEBio,
+        physics-informed graph neural networks, and MCMC-based parameter estimation for
+        patient-specific modeling.
+      </p>
+
+      <div class="toc">
+        <h4>Research Areas</h4>
+        <ul>
+          <li>Finite element simulation of cardiac and vascular mechanics (svFSI, FEBio)</li>
+          <li>Physics-informed graph neural networks for hemodynamic surrogate modeling</li>
+          <li>MCMC-based parameter estimation for patient-specific calibration</li>
+          <li>High-performance computing for large-scale multiphysics simulations</li>
+        </ul>
       </div>
     </div>
   </section>
