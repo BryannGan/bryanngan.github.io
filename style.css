@@ -100,11 +100,10 @@ a:hover {
 }
 
 .profile-photo {
-  width: 200px;
-  height: 200px;
-  border-radius: 12px;
+  width: 150px;
+  height: auto;
+  border-radius: 10px;
   object-fit: cover;
-  border: 1px solid var(--border);
 }
 
 .profile-info h1 {
@@ -594,8 +593,7 @@ footer {
     justify-content: center;
   }
   .profile-photo {
-    width: 160px;
-    height: 160px;
+    width: 130px;
   }
   section {
     padding: 3.5rem 0;
