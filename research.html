@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cardiovascular Research | Bryan Gan</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <nav id="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">BG</a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="index.html#projects">Research</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="project-detail trading-page">
+    <div class="container">
+      <a href="index.html" class="back-link">&larr; Back to Home</a>
+      <h2>Cardiovascular Research</h2>
+      <p class="project-subtitle">Multiphysics Simulation &bull; Patient-Specific Modeling &bull; Physics-Informed ML</p>
+
+      <p>
+        Research centered on computational modeling of the cardiovascular system across scales&mdash;from
+        tissue-level finite element analysis to reduced-order hemodynamic simulations&mdash;with the goal
+        of enabling patient-specific digital twins of the heart.
+      </p>
+
+      <div class="toc">
+        <h4>Projects</h4>
+        <ol>
+          <li><a href="#proj-miros">MIROS</a> <span class="toc-badge toc-pass">Open Source</span></li>
+          <li><a href="#proj-fea">Cardiac &amp; Vascular FEA</a></li>
+          <li><a href="#proj-gnn">Physics-Informed Graph Neural Networks</a></li>
+          <li><a href="#proj-mcmc">MCMC Parameter Estimation</a></li>
+        </ol>
+      </div>
+
+      <div class="strategy-list">
+
+        <div id="proj-miros" class="strategy-item strategy-pass">
+          <div class="strategy-header">
+            <h4>MIROS &mdash; Medical Image to Reduced-Order Simulation</h4>
+            <span class="strategy-badge badge-pass">Open Source</span>
+          </div>
+          <p>
+            End-to-end pipeline that produces patient-specific hemodynamic simulations directly from
+            volumetric angiography in minutes. Integrates ML-based segmentation with 0D/1D
+            Navier&ndash;Stokes solvers in SimVascular.
+          </p>
+          <ul>
+            <li>Automated pipeline from medical images to blood flow simulation results</li>
+            <li>Automatic boundary condition tuning via CMA-ES optimization</li>
+            <li>1D Navier&ndash;Stokes + 0D lumped-parameter solvers</li>
+            <li>Interactive GUI for cardiac inflow waveform design</li>
+            <li>Cross-platform support (Windows, Linux, macOS)</li>
+          </ul>
+          <p>
+            <a href="https://github.com/BryannGan/MIROS" target="_blank" class="btn">View on GitHub &rarr;</a>
+          </p>
+        </div>
+
+        <div id="proj-fea" class="strategy-item">
+          <div class="strategy-header">
+            <h4>Cardiac &amp; Vascular Finite Element Analysis</h4>
+          </div>
+          <p>
+            Finite element simulation of cardiac and vascular mechanics using svFSI and FEBio,
+            including fluid&ndash;structure interaction and nonlinear tissue constitutive models.
+          </p>
+          <ul>
+            <li>Patient-specific cardiac mechanics simulations (svFSI, FEBio)</li>
+            <li>Fluid&ndash;structure interaction in large arteries</li>
+            <li>High-performance computing for large-scale multiphysics problems</li>
+          </ul>
+        </div>
+
+        <div id="proj-gnn" class="strategy-item">
+          <div class="strategy-header">
+            <h4>Physics-Informed Graph Neural Networks</h4>
+          </div>
+          <p>
+            Surrogate modeling of hemodynamic fields using graph neural networks that encode
+            physical constraints, enabling fast inference on patient-specific vascular geometries.
+          </p>
+          <ul>
+            <li>GNN-based surrogate for 3D hemodynamic prediction</li>
+            <li>Physics-informed loss functions encoding conservation laws</li>
+            <li>Generalization across patient-specific anatomies</li>
+          </ul>
+        </div>
+
+        <div id="proj-mcmc" class="strategy-item">
+          <div class="strategy-header">
+            <h4>MCMC Parameter Estimation</h4>
+          </div>
+          <p>
+            Bayesian parameter estimation for patient-specific calibration of cardiovascular models,
+            quantifying uncertainty in material properties and boundary conditions.
+          </p>
+          <ul>
+            <li>MCMC-based inference for tissue material parameters</li>
+            <li>Uncertainty quantification for boundary condition calibration</li>
+            <li>Integration with reduced-order models for computational efficiency</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="tags">
+        <span>Python</span>
+        <span>SimVascular</span>
+        <span>svFSI</span>
+        <span>FEBio</span>
+        <span>PyTorch</span>
+        <span>GNN</span>
+        <span>MCMC</span>
+        <span>HPC</span>
+        <span>VTK</span>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2026 Bryan Gan</p>
+  </footer>
+
+</body>
+</html>
