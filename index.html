@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bryan Gan | Engineering Portfolio</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <nav id="navbar">
+    <div class="nav-container">
+      <a href="#hero" class="nav-logo">BG</a>
+      <ul class="nav-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section id="hero">
+    <div class="hero-content">
+      <h1>Bryan Gan</h1>
+      <p class="tagline">Biomedical Engineer &bull; Computational Modeling &bull; Machine Learning</p>
+      <div class="hero-links">
+        <a href="https://github.com/BryannGan" class="btn" target="_blank">GitHub</a>
+        <a href="#projects" class="btn btn-outline">View Projects</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="about">
+    <div class="container">
+      <h2>About</h2>
+      <p>
+        I'm a biomedical engineer focused on computational hemodynamics, patient-specific modeling,
+        and machine learning. My work bridges medical imaging, numerical simulation, and data-driven
+        methods to advance cardiovascular research and clinical tools.
+      </p>
+    </div>
+  </section>
+
+  <section id="projects">
+    <div class="container">
+      <h2>Projects</h2>
+      <div class="project-grid">
+
+        <div class="project-card">
+          <div class="project-header">
+            <h3>MIROS</h3>
+            <a href="https://github.com/BryannGan/MIROS" target="_blank" class="project-link">GitHub &rarr;</a>
+          </div>
+          <p class="project-subtitle">Medical Image to Reduced-Order Simulation</p>
+          <p>
+            End-to-end pipeline that produces patient-specific hemodynamic simulations directly from
+            volumetric angiography in minutes. Integrates ML-based segmentation (SeqSeg) with 0D/1D
+            Navier&ndash;Stokes solvers in SimVascular, including automatic boundary condition tuning
+            via CMA-ES optimization.
+          </p>
+          <div class="tags">
+            <span>Python</span>
+            <span>SimVascular</span>
+            <span>Hemodynamics</span>
+            <span>ML Segmentation</span>
+            <span>Optimization</span>
+          </div>
+        </div>
+
+        <div class="project-card">
+          <div class="project-header">
+            <h3>Cardiovascular Research</h3>
+          </div>
+          <p class="project-subtitle">Multiphysics Simulation &amp; Physics-Informed ML</p>
+          <p>
+            Research in finite element analysis of cardiovascular systems using svFSI and FEBio,
+            physics-informed graph neural networks, and MCMC-based parameter estimation for
+            patient-specific modeling.
+          </p>
+          <div class="tags">
+            <span>FEA</span>
+            <span>svFSI</span>
+            <span>GNN</span>
+            <span>MCMC</span>
+            <span>HPC</span>
+          </div>
+        </div>
+
+        <div class="project-card">
+          <div class="project-header">
+            <h3>Quantitative Trading</h3>
+          </div>
+          <p class="project-subtitle">ML-Driven Market Analysis</p>
+          <p>
+            Data collection pipelines, feature engineering, and machine learning models for
+            equities and crypto markets. Includes live trade simulation and API-based execution.
+          </p>
+          <div class="tags">
+            <span>Python</span>
+            <span>ML</span>
+            <span>API Trading</span>
+            <span>Data Engineering</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section id="skills">
+    <div class="container">
+      <h2>Skills &amp; Tools</h2>
+      <div class="skills-grid">
+        <div class="skill-group">
+          <h3>Languages</h3>
+          <p>Python, MATLAB, C/C++</p>
+        </div>
+        <div class="skill-group">
+          <h3>Simulation</h3>
+          <p>SimVascular, FEBio, svFSI, OpenFOAM</p>
+        </div>
+        <div class="skill-group">
+          <h3>ML / Data</h3>
+          <p>PyTorch, scikit-learn, pandas, NumPy</p>
+        </div>
+        <div class="skill-group">
+          <h3>Computing</h3>
+          <p>HPC (Slurm), Linux, Git, Docker</p>
+        </div>
+        <div class="skill-group">
+          <h3>Visualization</h3>
+          <p>VTK, ParaView, Matplotlib</p>
+        </div>
+        <div class="skill-group">
+          <h3>Methods</h3>
+          <p>FEA, CFD, Optimization, Bayesian Inference</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="container">
+      <h2>Contact</h2>
+      <p>Interested in collaborating or learning more about my work?</p>
+      <div class="contact-links">
+        <a href="https://github.com/BryannGan" target="_blank">GitHub</a>
+        <a href="https://linkedin.com/in/" target="_blank">LinkedIn</a>
+        <a href="mailto:your@email.com">Email</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2026 Bryan Gan</p>
+  </footer>
+
+</body>
+</html>
