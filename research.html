@@ -34,14 +34,73 @@
       <div class="toc">
         <h4>Projects</h4>
         <ol>
+          <li><a href="#proj-ifea">Inverse Parameter Estimation of Cardiac Tissue</a></li>
+          <li><a href="#proj-cfd">Image-Based Blood Flow Modeling of the Left Atrium</a></li>
+          <li><a href="#proj-gnn">Electrical Activation Mapping via Graph Neural Network</a></li>
+          <li><a href="#proj-lpn">Lumped-Parameter Network Calibration</a></li>
           <li><a href="#proj-miros">MIROS</a> <span class="toc-badge toc-pass">Open Source</span></li>
-          <li><a href="#proj-fea">Cardiac &amp; Vascular FEA</a></li>
-          <li><a href="#proj-gnn">Physics-Informed Graph Neural Networks</a></li>
-          <li><a href="#proj-mcmc">MCMC Parameter Estimation</a></li>
         </ol>
       </div>
 
       <div class="strategy-list">
+
+        <div id="proj-ifea" class="strategy-item">
+          <div class="strategy-header">
+            <h4>Inverse Parameter Estimation of Cardiac Tissue</h4>
+          </div>
+          <p>
+            Developed an inverse finite element analysis (IFEA) framework to personalize cardiac
+            tissue material parameters from CT imaging data.
+          </p>
+          <ul>
+            <li>Nested optimization combining genetic algorithm with Sellier&rsquo;s method to calibrate Holzapfel&ndash;Ogden constitutive model</li>
+            <li>Quantified the impact of variable vs uniform wall thickness on left atrial stress distribution and wall motion</li>
+          </ul>
+        </div>
+
+        <div id="proj-cfd" class="strategy-item">
+          <div class="strategy-header">
+            <h4>Image-Based Blood Flow Modeling of the Left Atrium</h4>
+          </div>
+          <p>
+            Developed an end-to-end workflow for image-based hemodynamic modeling of the left atrium
+            with imposed wall motion.
+          </p>
+          <ul>
+            <li>Extracted wall kinematics from time-resolved cine CT segmentations (10 phases per cardiac cycle) via image registration</li>
+            <li>Applied Fourier-interpolated wall motion as boundary conditions with patient-specific contrast agent inflow profiles</li>
+            <li>Evaluated wall shear stress, velocity, and concentration across the LA body and left atrial appendage</li>
+          </ul>
+        </div>
+
+        <div id="proj-gnn" class="strategy-item">
+          <div class="strategy-header">
+            <h4>Electrical Activation Mapping via Graph Neural Network</h4>
+          </div>
+          <p>
+            Attention-enhanced GraphSAGE architecture for predicting cardiac activation times as a
+            surrogate for finite element simulations.
+          </p>
+          <ul>
+            <li>Laplace&ndash;Dirichlet geometry encoding, multi-head attention, distance-based edge generation</li>
+            <li>Currently implemented for structural mechanics; planned extension to electrophysiology and activation mapping</li>
+          </ul>
+        </div>
+
+        <div id="proj-lpn" class="strategy-item">
+          <div class="strategy-header">
+            <h4>Lumped-Parameter Network Calibration</h4>
+          </div>
+          <p>
+            Calibrated full-circulation lumped-parameter network models to match 13 clinical
+            hemodynamic targets using complementary optimization and inference strategies.
+          </p>
+          <ul>
+            <li>CMA-ES optimization for point estimates across single-fiber and time-varying elastance chamber models</li>
+            <li>DREAM MCMC for Bayesian posterior distributions and uncertainty quantification</li>
+            <li>Tuned ~18 parameters spanning chamber geometry, vascular resistance/compliance, and active/passive tissue properties</li>
+          </ul>
+        </div>
 
         <div id="proj-miros" class="strategy-item strategy-pass">
           <div class="strategy-header">
@@ -65,60 +124,16 @@
           </p>
         </div>
 
-        <div id="proj-fea" class="strategy-item">
-          <div class="strategy-header">
-            <h4>Cardiac &amp; Vascular Finite Element Analysis</h4>
-          </div>
-          <p>
-            Finite element simulation of cardiac and vascular mechanics using svFSI and FEBio,
-            including fluid&ndash;structure interaction and nonlinear tissue constitutive models.
-          </p>
-          <ul>
-            <li>Patient-specific cardiac mechanics simulations (svFSI, FEBio)</li>
-            <li>Fluid&ndash;structure interaction in large arteries</li>
-            <li>High-performance computing for large-scale multiphysics problems</li>
-          </ul>
-        </div>
-
-        <div id="proj-gnn" class="strategy-item">
-          <div class="strategy-header">
-            <h4>Physics-Informed Graph Neural Networks</h4>
-          </div>
-          <p>
-            Surrogate modeling of hemodynamic fields using graph neural networks that encode
-            physical constraints, enabling fast inference on patient-specific vascular geometries.
-          </p>
-          <ul>
-            <li>GNN-based surrogate for 3D hemodynamic prediction</li>
-            <li>Physics-informed loss functions encoding conservation laws</li>
-            <li>Generalization across patient-specific anatomies</li>
-          </ul>
-        </div>
-
-        <div id="proj-mcmc" class="strategy-item">
-          <div class="strategy-header">
-            <h4>MCMC Parameter Estimation</h4>
-          </div>
-          <p>
-            Bayesian parameter estimation for patient-specific calibration of cardiovascular models,
-            quantifying uncertainty in material properties and boundary conditions.
-          </p>
-          <ul>
-            <li>MCMC-based inference for tissue material parameters</li>
-            <li>Uncertainty quantification for boundary condition calibration</li>
-            <li>Integration with reduced-order models for computational efficiency</li>
-          </ul>
-        </div>
-
       </div>
 
       <div class="tags">
         <span>Python</span>
+        <span>Fortran</span>
         <span>SimVascular</span>
         <span>svFSI</span>
-        <span>FEBio</span>
         <span>PyTorch</span>
         <span>GNN</span>
+        <span>CMA-ES</span>
         <span>MCMC</span>
         <span>HPC</span>
         <span>VTK</span>
