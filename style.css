@@ -6,13 +6,13 @@
 }
 
 :root {
-  --bg: #0f1117;
-  --bg-card: #181b23;
-  --text: #e4e4e7;
-  --text-muted: #9ca3af;
-  --accent: #60a5fa;
-  --accent-hover: #93bbfd;
-  --border: #2a2d38;
+  --bg: #ffffff;
+  --bg-card: #f9fafb;
+  --text: #1a1a1a;
+  --text-muted: #6b7280;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --border: #e5e7eb;
 }
 
 html {
@@ -46,7 +46,7 @@ a:hover {
   position: fixed;
   top: 0;
   width: 100%;
-  background: rgba(15, 17, 23, 0.85);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
   z-index: 100;
@@ -83,34 +83,60 @@ a:hover {
   color: var(--text);
 }
 
-/* ── Hero ── */
-#hero {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 2rem 1.5rem;
+/* ── Profile / About ── */
+#about {
+  padding-top: 6rem;
+  padding-bottom: 3rem;
 }
 
-.hero-content h1 {
-  font-size: 3.5rem;
+.profile-row {
+  display: flex;
+  gap: 2.5rem;
+  align-items: flex-start;
+}
+
+.profile-photo-wrap {
+  flex-shrink: 0;
+}
+
+.profile-photo {
+  width: 200px;
+  height: 200px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+}
+
+.profile-info h1 {
+  font-size: 2.25rem;
   font-weight: 800;
   letter-spacing: -0.02em;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.25rem;
 }
 
-.tagline {
-  font-size: 1.15rem;
+.profile-affiliation {
+  font-size: 1rem;
   color: var(--text-muted);
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 
-.hero-links {
+.profile-bio {
+  font-size: 1rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+  max-width: 550px;
+  margin-bottom: 1rem;
+}
+
+.profile-links {
   display: flex;
-  gap: 1rem;
-  justify-content: center;
+  gap: 1.25rem;
   flex-wrap: wrap;
+}
+
+.profile-links a {
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
 .btn {
@@ -151,11 +177,7 @@ section h2 {
   letter-spacing: -0.01em;
 }
 
-#about p {
-  font-size: 1.1rem;
-  color: var(--text-muted);
-  max-width: 700px;
-}
+/* (profile-bio replaces old #about p) */
 
 /* ── Projects ── */
 .project-grid {
@@ -272,8 +294,8 @@ section h2 {
 }
 
 .toc-pass {
-  background: rgba(52, 211, 153, 0.15);
-  color: #34d399;
+  background: rgba(5, 150, 105, 0.1);
+  color: #059669;
 }
 
 .toc-fail {
@@ -319,7 +341,7 @@ section h2 {
   display: block;
   font-size: 1.5rem;
   font-weight: 800;
-  color: #34d399;
+  color: #059669;
   letter-spacing: -0.02em;
 }
 
@@ -381,7 +403,7 @@ section h2 {
 }
 
 .strategy-item.strategy-pass {
-  border-left-color: #34d399;
+  border-left-color: #059669;
 }
 
 .strategy-item.strategy-fail {
@@ -413,8 +435,8 @@ section h2 {
 }
 
 .badge-pass {
-  background: rgba(52, 211, 153, 0.15);
-  color: #34d399;
+  background: rgba(5, 150, 105, 0.1);
+  color: #059669;
 }
 
 .badge-fail {
@@ -560,11 +582,20 @@ footer {
 
 /* ── Responsive ── */
 @media (max-width: 600px) {
-  .hero-content h1 {
-    font-size: 2.25rem;
+  .profile-row {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
   }
-  .tagline {
-    font-size: 1rem;
+  .profile-info h1 {
+    font-size: 1.75rem;
+  }
+  .profile-links {
+    justify-content: center;
+  }
+  .profile-photo {
+    width: 160px;
+    height: 160px;
   }
   section {
     padding: 3.5rem 0;
