@@ -45,17 +45,11 @@
       </div>
 
       <p>
-        A personal research project in systematic trading, built from scratch as a solo effort.
-        I designed the full pipeline&mdash;from hypothesis generation and data infrastructure
-        to statistical validation and live deployment&mdash;treating each strategy as an
-        empirical research question: formulate a thesis, design a fair test, and accept the
-        result regardless of outcome.
-      </p>
-      <p>
-        Of 10 strategies investigated across a 99-ticker universe, most were rejected after
-        rigorous out-of-sample testing. The two that survived were validated through bootstrap
-        confidence intervals, outlier-dependence analysis, and walk-forward evaluation with
-        realistic transaction costs before being deployed to live trading.
+        A solo research project in systematic intraday trading. Bryan designed the full
+        pipeline&mdash;from hypothesis generation and data infrastructure to statistical
+        validation and live deployment&mdash;treating each strategy as an empirical question
+        with strict out-of-sample evaluation. Of 10 strategies investigated across 99 tickers,
+        2 survived validation and are currently trading live.
       </p>
 
       <div class="toc">
@@ -72,7 +66,6 @@
         </ol>
       </div>
 
-      <!-- Strategies -->
       <div class="strategy-list">
 
         <div id="strat-opening-range" class="strategy-item strategy-pass">
@@ -81,31 +74,25 @@
             <span class="strategy-badge badge-pass">Deployed</span>
           </div>
           <p>
-            <strong>Thesis:</strong> The opening bar carries a directional signal that can be
-            traded as either momentum or reversal, depending on the ticker and regime.
+            Bryan investigated whether the first intraday bar carries a tradeable directional
+            signal across two timeframes. A multi-phase validation pipeline was designed to
+            control for overfitting and select only statistically robust configurations.
           </p>
-          <p>
-            I designed a systematic search across two intraday timeframes, then applied a
-            multi-phase validation pipeline to control for overfitting: nested train/validation
-            splits, bootstrap confidence interval filtering (95% CI excluding zero), winsorized
-            outlier-dependence checks, and rolling stability tests. Of 49 initial candidates,
-            11 survived all filters&mdash;these are the configs currently trading live.
-          </p>
-          <p>
-            A key finding was that the signal contains genuine directional content (97% of
-            losing trades moved favorably before exit), identifying exit engineering as the
-            primary research frontier. I also showed that adaptive config selection
-            (re-optimizing monthly) destroys edge vs. holding fixed configs&mdash;a non-obvious
-            result that shaped the deployment strategy.
-          </p>
+          <ul>
+            <li>Multi-phase validation: nested splits, bootstrap CI filtering, outlier-dependence analysis</li>
+            <li>11 of 49 candidates survived all statistical filters</li>
+            <li>Discovered that fixed configs outperform adaptive re-optimization&mdash;shaped deployment strategy</li>
+            <li>Identified exit engineering as the primary research frontier (97% of losers showed favorable excursion)</li>
+            <li>Currently deployed and trading live</li>
+          </ul>
           <div class="figure-gallery">
             <figure>
               <img src="assets/trading/portfolio_summary.png" alt="Portfolio performance dashboard">
-              <figcaption>Portfolio dashboard &mdash; cumulative PnL (gross vs net), monthly returns, and per-config performance on out-of-sample data (2023&ndash;present)</figcaption>
+              <figcaption>Portfolio dashboard &mdash; cumulative PnL, monthly returns, and per-config performance (OOS 2023&ndash;present)</figcaption>
             </figure>
             <figure>
               <img src="assets/trading/cumulative_pnl_example.png" alt="Example equity curve">
-              <figcaption>Example equity curve &mdash; gross vs net after transaction costs, with train/test split</figcaption>
+              <figcaption>Example equity curve &mdash; gross vs net after costs, with train/test split</figcaption>
             </figure>
           </div>
         </div>
@@ -116,18 +103,14 @@
             <span class="strategy-badge badge-pass">Edge Found</span>
           </div>
           <p>
-            <strong>Thesis:</strong> Combining a price-action signal (candlestick rejection)
-            with a regime filter (momentum extremes) produces a mean-reversion edge that
-            neither signal achieves alone.
+            After the standalone rejection signal failed, Bryan hypothesized that adding a
+            regime filter would rescue the signal. This combination strategy was the result.
           </p>
-          <p>
-            This strategy emerged from a deliberate research progression: after the standalone
-            rejection signal failed (see below), I hypothesized that adding contextual
-            confirmation would rescue the signal. Testing across 97 tickers confirmed the
-            hypothesis&mdash;9 passed with statistically significant positive expected value
-            (p&nbsp;=&nbsp;0.0001, 57% win rate), validated through jackknife stability checks
-            and multi-year rolling evaluation.
-          </p>
+          <ul>
+            <li>Research progression: standalone failure motivated combination hypothesis</li>
+            <li>9 of 97 tickers passed with statistically significant edge (p&nbsp;=&nbsp;0.0001)</li>
+            <li>Validated through jackknife stability checks and multi-year rolling evaluation</li>
+          </ul>
           <div class="figure-gallery">
             <figure>
               <img src="assets/trading/rejection_rsi_verdict.png" alt="Verdict distribution">
@@ -142,15 +125,12 @@
             <span class="strategy-badge badge-fail">No Edge</span>
           </div>
           <p>
-            <strong>Thesis:</strong> Candles with dominant wicks signal institutional
-            rejection and predict short-term direction.
+            Bryan tested whether dominant-wick candles predict short-term direction in isolation.
           </p>
-          <p>
-            Tested extensively across 99 tickers with multiple signal quality gates.
-            The result was unambiguous: no directional content in isolation. However,
-            this negative result directly motivated the combination strategy above&mdash;the
-            signal needed contextual filtering, not better parameterization.
-          </p>
+          <ul>
+            <li>No directional content found across 99 tickers with multiple signal quality gates</li>
+            <li>Negative result directly motivated the successful combination strategy above</li>
+          </ul>
         </div>
 
         <div id="strat-dip" class="strategy-item strategy-fail">
@@ -159,15 +139,12 @@
             <span class="strategy-badge badge-fail">No Edge</span>
           </div>
           <p>
-            <strong>Thesis:</strong> Intraday pullbacks from recent highs create
-            mean-reversion opportunities.
+            Bryan tested whether intraday pullbacks from recent highs create mean-reversion opportunities.
           </p>
-          <p>
-            Tested across multiple lookback windows and reversion thresholds on 99 tickers.
-            While a weak signal existed pre-cost, realistic transaction costs eliminated
-            profitability for nearly all configurations&mdash;a pattern that recurred across
-            several strategies and reinforced cost modeling as a first-order design constraint.
-          </p>
+          <ul>
+            <li>Weak pre-cost signal eliminated by realistic transaction costs across 99 tickers</li>
+            <li>Reinforced cost modeling as a first-order design constraint for all subsequent strategies</li>
+          </ul>
         </div>
 
         <div id="strat-fvg" class="strategy-item strategy-fail">
@@ -176,14 +153,13 @@
             <span class="strategy-badge badge-fail">No Edge</span>
           </div>
           <p>
-            <strong>Thesis:</strong> Sequential fair value gaps (same or opposite direction)
-            carry predictive information about continuation or reversal.
+            Bryan investigated whether sequential fair value gaps carry predictive information
+            about price continuation or reversal.
           </p>
-          <p>
-            Analyzed 25.8M gap pairs across 41 tickers. The favorable/adverse excursion
-            ratio was 0.999&mdash;statistically indistinguishable from random. This clean null
-            result ruled out an entire class of gap-based signals with high confidence.
-          </p>
+          <ul>
+            <li>25.8M gap pairs analyzed; favorable/adverse excursion ratio = 0.999 (indistinguishable from random)</li>
+            <li>Clean null result ruled out an entire class of gap-based signals</li>
+          </ul>
           <div class="figure-gallery">
             <figure>
               <img src="assets/trading/fvg_heatmap.png" alt="FVG pair heatmap">
@@ -198,16 +174,13 @@
             <span class="strategy-badge badge-fail">No Edge</span>
           </div>
           <p>
-            <strong>Thesis:</strong> Price wicks that sweep key structural levels
-            (prior-day high/low, opening range) predict directional continuation.
+            Bryan designed a paired-delta methodology to isolate sweep-specific directional
+            effects from confounders (time-of-day, volatility, VWAP displacement).
           </p>
-          <p>
-            Designed a paired-delta methodology comparing each sweep event against matched
-            controls (same time-of-day, similar VWAP displacement and volatility) to
-            isolate the sweep-specific effect. With 2.5M+ observations, the test had
-            sufficient power to detect edges as small as 0.2 bps&mdash;none were found.
-            Sweeps are real price events but carry no tradeable directional information.
-          </p>
+          <ul>
+            <li>2.5M+ observations with sufficient power to detect edges as small as 0.2 bps</li>
+            <li>Sweeps are real price events but carry no tradeable directional signal</li>
+          </ul>
           <div class="figure-gallery">
             <figure>
               <img src="assets/trading/sweep_returns.png" alt="Sweep paired delta returns">
@@ -226,16 +199,13 @@
             <span class="strategy-badge badge-fail">No Edge</span>
           </div>
           <p>
-            <strong>Thesis:</strong> Modeling intraday price as an Ornstein&ndash;Uhlenbeck
-            process enables systematic mean-reversion entries at extreme deviations.
+            Bryan modeled intraday price as an Ornstein&ndash;Uhlenbeck process and
+            iteratively refined the strategy across three research phases.
           </p>
-          <p>
-            Iterated through three research phases, progressively refining entry gates
-            and exit logic. Each phase diagnosed specific failure modes (cost sensitivity,
-            regime dependence, parameter instability) and attempted targeted fixes. Ultimately,
-            the signal-to-noise ratio at intraday timescales was insufficient to overcome
-            transaction costs&mdash;a principled conclusion after exhaustive investigation.
-          </p>
+          <ul>
+            <li>Each phase diagnosed specific failure modes and attempted targeted fixes</li>
+            <li>Signal-to-noise ratio insufficient to overcome costs at intraday timescales</li>
+          </ul>
           <div class="figure-gallery">
             <figure>
               <img src="assets/trading/ou_diagnostics.png" alt="OU diagnostics dashboard">
@@ -250,14 +220,13 @@
             <span class="strategy-badge badge-fail">No Edge</span>
           </div>
           <p>
-            <strong>Thesis:</strong> VWAP crossings with sufficient divergence signal
-            institutional flow and predict short-term direction.
+            Bryan tested whether VWAP crossings with divergence thresholds signal
+            institutional flow.
           </p>
-          <p>
-            Comprehensive parameter sweep across signal and exit configurations on 41 tickers.
-            No post-cost edge found, consistent with the broader finding that single-indicator
-            signals lack sufficient edge in liquid US equities.
-          </p>
+          <ul>
+            <li>Comprehensive evaluation across 41 tickers; no post-cost edge found</li>
+            <li>Consistent with the broader finding that single-indicator signals lack sufficient edge in liquid equities</li>
+          </ul>
         </div>
 
       </div>
