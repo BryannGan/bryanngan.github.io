@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Algorithmic Trading System | Bryan Gan</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <nav id="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">BG</a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="index.html#projects">Research</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="project-detail trading-page">
+    <div class="container">
+      <a href="index.html" class="back-link">&larr; Back to Home</a>
+      <h2>Algorithmic Trading System</h2>
+      <p class="project-subtitle">US Equities &mdash; Live Trading via Alpaca API</p>
+
+      <div class="trading-stats">
+        <div class="stat">
+          <span class="stat-value">+16.8%</span>
+          <span class="stat-label">OOS Portfolio Return</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">+4.5 bps</span>
+          <span class="stat-label">Net EV / Trade</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">~4,200</span>
+          <span class="stat-label">OOS Trades</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">10</span>
+          <span class="stat-label">Strategies Tested</span>
+        </div>
+      </div>
+
+      <p>
+        End-to-end algorithmic trading research platform spanning data collection, feature
+        engineering, strategy research, backtesting, and live execution. Tested 10 distinct
+        intraday strategies across a 99-ticker universe (2016&ndash;2026), applying rigorous
+        statistical filtering to separate signal from noise. Currently deployed and trading live.
+      </p>
+
+      <div class="toc">
+        <h4>Table of Contents</h4>
+        <ol>
+          <li><a href="#strat-opening-range">Opening Range Momentum / Reversal</a> <span class="toc-badge toc-pass">Deployed</span></li>
+          <li><a href="#strat-rejection-rsi">Rejection Candle + RSI Extremes</a> <span class="toc-badge toc-pass">Edge Found</span></li>
+          <li><a href="#strat-rejection-candle">Rejection Candle (Standalone)</a> <span class="toc-badge toc-fail">No Edge</span></li>
+          <li><a href="#strat-dip">Mean-Reversion Dip</a> <span class="toc-badge toc-fail">No Edge</span></li>
+          <li><a href="#strat-fvg">Fair Value Gap Pairs</a> <span class="toc-badge toc-fail">No Edge</span></li>
+          <li><a href="#strat-sweep">Liquidity Sweep</a> <span class="toc-badge toc-fail">No Edge</span></li>
+          <li><a href="#strat-ou">OU Mean-Reversion Rules</a> <span class="toc-badge toc-fail">No Edge</span></li>
+          <li><a href="#strat-vwap">VWAP Crossover</a> <span class="toc-badge toc-fail">No Edge</span></li>
+        </ol>
+      </div>
+
+      <!-- Strategies -->
+      <div class="strategy-list">
+
+        <div id="strat-opening-range" class="strategy-item strategy-pass">
+          <div class="strategy-header">
+            <h4>Opening Range Momentum / Reversal</h4>
+            <span class="strategy-badge badge-pass">Deployed</span>
+          </div>
+          <p>
+            Exploits directional bias in the first intraday bar across two timeframes.
+            Brute-force grid search over 3.4M+ trade events, narrowed to 11 statistically
+            robust configs via bootstrap CI filtering and outlier-dependence analysis.
+            Currently trading live.
+          </p>
+          <div class="figure-gallery">
+            <figure>
+              <img src="assets/trading/portfolio_summary.png" alt="Portfolio performance dashboard">
+              <figcaption>Portfolio dashboard &mdash; cumulative PnL, monthly returns, and per-config EV on OOS data (2023&ndash;present)</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/trading/cumulative_pnl_example.png" alt="Example equity curve">
+              <figcaption>Example config equity curve &mdash; gross vs net after costs, with train/test split</figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <div id="strat-rejection-rsi" class="strategy-item strategy-pass">
+          <div class="strategy-header">
+            <h4>Rejection Candle + RSI Extremes</h4>
+            <span class="strategy-badge badge-pass">Edge Found</span>
+          </div>
+          <p>
+            Combines candlestick rejection patterns with RSI extreme readings as a
+            mean-reversion signal. 9 tickers pass across 97 tested, with +9.1 bps net EV
+            (p&nbsp;=&nbsp;0.0001) and 57% win rate on out-of-sample data.
+          </p>
+          <div class="figure-gallery">
+            <figure>
+              <img src="assets/trading/rejection_rsi_verdict.png" alt="Rejection RSI verdict distribution">
+              <figcaption>Verdict distribution across 97 tickers &mdash; 9 PASS, 41 CAUTION, 47 FAIL</figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <div id="strat-rejection-candle" class="strategy-item strategy-fail">
+          <div class="strategy-header">
+            <h4>Rejection Candle (Standalone)</h4>
+            <span class="strategy-badge badge-fail">No Edge</span>
+          </div>
+          <p>
+            Tests whether dominant-wick candles (institutional rejection) predict direction.
+            Scanned 3,600+ gate combinations across 99 tickers. Mean test EV = &minus;0.04R;
+            96% of configs fail. The signal lacks directional content without additional context.
+          </p>
+        </div>
+
+        <div id="strat-dip" class="strategy-item strategy-fail">
+          <div class="strategy-header">
+            <h4>Mean-Reversion Dip</h4>
+            <span class="strategy-badge badge-fail">No Edge</span>
+          </div>
+          <p>
+            Detects price pullbacks from recent highs at various lookback windows and
+            reversion thresholds. 95% of configs fail across 99 tickers; transaction
+            costs kill the marginal mean-reversion signal.
+          </p>
+        </div>
+
+        <div id="strat-fvg" class="strategy-item strategy-fail">
+          <div class="strategy-header">
+            <h4>Fair Value Gap Pairs</h4>
+            <span class="strategy-badge badge-fail">No Edge</span>
+          </div>
+          <p>
+            Tests whether consecutive fair value gaps (same or opposite direction) predict
+            price continuation or reversal. Analyzed 25.8M FVG pairs across 41 tickers.
+            MFE/MAE ratio = 0.999 &mdash; perfectly symmetric, zero directional content.
+          </p>
+          <div class="figure-gallery">
+            <figure>
+              <img src="assets/trading/fvg_heatmap.png" alt="FVG pair ticker heatmap">
+              <figcaption>Mean return by ticker and pair type &mdash; near-zero across the board</figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <div id="strat-sweep" class="strategy-item strategy-fail">
+          <div class="strategy-header">
+            <h4>Liquidity Sweep</h4>
+            <span class="strategy-badge badge-fail">No Edge</span>
+          </div>
+          <p>
+            Tests wick sweeps at structural price levels (prior-day high/low, opening range)
+            using a paired-delta methodology against matched controls. 2.5M+ large-cap observations
+            yield zero statistical significance &mdash; sweeps are real events but not directionally predictive.
+          </p>
+          <div class="figure-gallery">
+            <figure>
+              <img src="assets/trading/sweep_returns.png" alt="Sweep paired delta returns">
+              <figcaption>Paired delta (sweep edge vs controls) across horizons &mdash; confidence intervals span zero</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/trading/sweep_heatmap.png" alt="Sweep ticker x level heatmap">
+              <figcaption>Mean return by ticker and structural level &mdash; no consistent pattern</figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <div id="strat-ou" class="strategy-item strategy-fail">
+          <div class="strategy-header">
+            <h4>OU Mean-Reversion Rules</h4>
+            <span class="strategy-badge badge-fail">No Edge</span>
+          </div>
+          <p>
+            Rule-based mean-reversion inspired by Ornstein&ndash;Uhlenbeck processes. Iterated through
+            3+ research phases with progressively refined entry gates and exit logic. All configs
+            are negative EV at realistic transaction costs.
+          </p>
+          <div class="figure-gallery">
+            <figure>
+              <img src="assets/trading/ou_diagnostics.png" alt="OU diagnostics dashboard">
+              <figcaption>Diagnostics &mdash; z-score vs price change, hit rate by bin, and return distribution</figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <div id="strat-vwap" class="strategy-item strategy-fail">
+          <div class="strategy-header">
+            <h4>VWAP Crossover</h4>
+            <span class="strategy-badge badge-fail">No Edge</span>
+          </div>
+          <p>
+            Tests VWAP crossing signals with divergence thresholds. Full grid of 468 signal
+            configurations &times; 1,344 exit parameters across 41 tickers. No post-cost edge found.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="tags">
+        <span>Python</span>
+        <span>XGBoost</span>
+        <span>CMA-ES</span>
+        <span>Bootstrap CI</span>
+        <span>Alpaca API</span>
+        <span>Live Trading</span>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2026 Bryan Gan</p>
+  </footer>
+
+</body>
+</html>

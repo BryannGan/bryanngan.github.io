@@ -442,6 +442,52 @@ section h2 {
   }
 }
 
+/* ── Side Projects ── */
+.side-projects-section {
+  padding: 2rem 0 3rem;
+}
+
+.side-projects-section h3 {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.side-project-link {
+  display: block;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  transition: border-color 0.2s, transform 0.2s;
+  color: var(--text);
+}
+.side-project-link:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+  color: var(--text);
+}
+
+.side-project-title {
+  display: block;
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.side-project-desc {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* ── Trading Page ── */
+.trading-page {
+  padding-top: 6rem;
+}
+
 /* ── Skills ── */
 .skills-grid {
   display: grid;
