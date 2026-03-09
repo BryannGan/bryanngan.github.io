@@ -56,8 +56,7 @@
         <h4>Strategies</h4>
         <ol>
           <li><a href="#strat-opening-range">Opening Range Momentum / Reversal</a> <span class="toc-badge toc-pass">Deployed</span></li>
-          <li><a href="#strat-rejection-rsi">Candlestick Rejection + Momentum Extremes</a> <span class="toc-badge toc-pass">Edge Found</span></li>
-          <li><a href="#strat-rejection-candle">Candlestick Rejection (Standalone)</a> <span class="toc-badge toc-fail">No Edge</span></li>
+          <li><a href="#strat-rejection">Candlestick Rejection</a> <span class="toc-badge toc-pass">Edge Found</span></li>
           <li><a href="#strat-dip">Mean-Reversion Dip</a> <span class="toc-badge toc-fail">No Edge</span></li>
           <li><a href="#strat-fvg">Fair Value Gap Pairs</a> <span class="toc-badge toc-fail">No Edge</span></li>
           <li><a href="#strat-sweep">Liquidity Sweep</a> <span class="toc-badge toc-fail">No Edge</span></li>
@@ -97,17 +96,17 @@
           </div>
         </div>
 
-        <div id="strat-rejection-rsi" class="strategy-item strategy-pass">
+        <div id="strat-rejection" class="strategy-item strategy-pass">
           <div class="strategy-header">
-            <h4>Candlestick Rejection + Momentum Extremes</h4>
+            <h4>Candlestick Rejection</h4>
             <span class="strategy-badge badge-pass">Edge Found</span>
           </div>
           <p>
-            After the standalone rejection signal failed, Bryan hypothesized that adding a
-            regime filter would rescue the signal. This combination strategy was the result.
+            Bryan studied candlestick rejection patterns under various market conditions
+            and contextual filters across 99 tickers.
           </p>
           <ul>
-            <li>Research progression: standalone failure motivated combination hypothesis</li>
+            <li>Tested standalone, with momentum regime filters, and with multiple signal quality gates</li>
             <li>9 of 97 tickers passed with statistically significant edge (p&nbsp;=&nbsp;0.0001)</li>
             <li>Validated through jackknife stability checks and multi-year rolling evaluation</li>
           </ul>
@@ -117,20 +116,6 @@
               <figcaption>Verdict distribution across 97 tickers &mdash; strict filtering yields 9 deployable signals</figcaption>
             </figure>
           </div>
-        </div>
-
-        <div id="strat-rejection-candle" class="strategy-item strategy-fail">
-          <div class="strategy-header">
-            <h4>Candlestick Rejection (Standalone)</h4>
-            <span class="strategy-badge badge-fail">No Edge</span>
-          </div>
-          <p>
-            Bryan tested whether dominant-wick candles predict short-term direction in isolation.
-          </p>
-          <ul>
-            <li>No directional content found across 99 tickers with multiple signal quality gates</li>
-            <li>Negative result directly motivated the successful combination strategy above</li>
-          </ul>
         </div>
 
         <div id="strat-dip" class="strategy-item strategy-fail">
