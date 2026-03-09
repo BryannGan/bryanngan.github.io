@@ -107,20 +107,20 @@ a:hover {
 }
 
 .profile-info h1 {
-  font-size: 1.5rem;
+  font-size: 1.375rem;
   font-weight: 700;
   letter-spacing: -0.01em;
   margin-bottom: 0.25rem;
 }
 
 .profile-affiliation {
-  font-size: 1rem;
+  font-size: 0.875rem;
   color: var(--text-muted);
   margin-bottom: 1rem;
 }
 
 .profile-bio {
-  font-size: 0.88rem;
+  font-size: 0.755rem;
   color: var(--text-muted);
   line-height: 1.5;
   max-width: 600px;
