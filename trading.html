@@ -45,11 +45,10 @@
       </div>
 
       <p>
-        A solo research project in systematic intraday trading. Designed the full
-        pipeline&mdash;from hypothesis generation and data infrastructure to statistical
-        validation and live deployment&mdash;treating each strategy as an empirical question
-        with strict out-of-sample evaluation. Of 10 strategies investigated across 99 tickers,
-        2 survived validation and are currently trading live.
+        A solo research project in systematic intraday trading, developed independently
+        outside of work hours. Designed the full pipeline&mdash;from hypothesis generation
+        and data infrastructure to statistical validation and live deployment&mdash;treating
+        each strategy as an empirical question with strict out-of-sample evaluation.
       </p>
 
       <div class="toc">
@@ -73,14 +72,13 @@
             <span class="strategy-badge badge-pass">Deployed</span>
           </div>
           <p>
-            Investigated whether the first intraday bar carries a tradeable directional
-            signal across two timeframes. Designed a multi-phase validation pipeline to
+            Investigated whether opening range momentum carries a tradeable directional
+            signal across multiple timeframes. Designed a multi-phase validation pipeline to
             control for overfitting and select only statistically robust configurations.
           </p>
           <ul>
             <li>Multi-phase validation: nested splits, bootstrap CI filtering, outlier-dependence analysis</li>
             <li>11 of 49 candidates survived all statistical filters</li>
-            <li>Discovered that fixed configs outperform adaptive re-optimization&mdash;shaped deployment strategy</li>
             <li>Identified exit engineering as the primary research frontier (97% of losers showed favorable excursion)</li>
             <li>Currently deployed and trading live</li>
           </ul>
