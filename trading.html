@@ -57,11 +57,11 @@
         <ol>
           <li><a href="#strat-opening-range">Opening Range Momentum / Reversal</a> <span class="toc-badge toc-pass">Deployed</span></li>
           <li><a href="#strat-rejection">Candlestick Rejection</a> <span class="toc-badge toc-pass">Edge Found</span></li>
-          <li><a href="#strat-dip">Mean-Reversion Dip</a> <span class="toc-badge toc-fail">No Edge</span></li>
-          <li><a href="#strat-fvg">Fair Value Gap Pairs</a> <span class="toc-badge toc-fail">No Edge</span></li>
-          <li><a href="#strat-sweep">Liquidity Sweep</a> <span class="toc-badge toc-fail">No Edge</span></li>
-          <li><a href="#strat-ou">Stochastic Mean-Reversion</a> <span class="toc-badge toc-fail">No Edge</span></li>
-          <li><a href="#strat-vwap">VWAP Crossover</a> <span class="toc-badge toc-fail">No Edge</span></li>
+          <li><a href="#strat-dip">Mean-Reversion Dip</a></li>
+          <li><a href="#strat-fvg">Fair Value Gap Pairs</a></li>
+          <li><a href="#strat-sweep">Liquidity Sweep</a></li>
+          <li><a href="#strat-ou">Stochastic Mean-Reversion</a></li>
+          <li><a href="#strat-vwap">VWAP Crossover</a></li>
         </ol>
       </div>
 
@@ -118,10 +118,9 @@
           </div>
         </div>
 
-        <div id="strat-dip" class="strategy-item strategy-fail">
+        <div id="strat-dip" class="strategy-item">
           <div class="strategy-header">
             <h4>Mean-Reversion Dip</h4>
-            <span class="strategy-badge badge-fail">No Edge</span>
           </div>
           <p>
             Explored whether intraday pullbacks from recent highs create mean-reversion opportunities.
@@ -132,10 +131,9 @@
           </ul>
         </div>
 
-        <div id="strat-fvg" class="strategy-item strategy-fail">
+        <div id="strat-fvg" class="strategy-item">
           <div class="strategy-header">
             <h4>Fair Value Gap Pairs</h4>
-            <span class="strategy-badge badge-fail">No Edge</span>
           </div>
           <p>
             Investigated whether sequential fair value gaps carry predictive information
@@ -143,7 +141,7 @@
           </p>
           <ul>
             <li>25.8M gap pairs analyzed; favorable/adverse excursion ratio = 0.999 (indistinguishable from random)</li>
-            <li>Clean null result ruled out an entire class of gap-based signals</li>
+            <li>Initial results suggest limited signal; exploring alternative gap definitions</li>
           </ul>
           <div class="figure-gallery">
             <figure>
@@ -153,10 +151,9 @@
           </div>
         </div>
 
-        <div id="strat-sweep" class="strategy-item strategy-fail">
+        <div id="strat-sweep" class="strategy-item">
           <div class="strategy-header">
             <h4>Liquidity Sweep</h4>
-            <span class="strategy-badge badge-fail">No Edge</span>
           </div>
           <p>
             Designed a paired-delta methodology to isolate sweep-specific directional
@@ -164,7 +161,7 @@
           </p>
           <ul>
             <li>2.5M+ observations with sufficient power to detect edges as small as 0.2 bps</li>
-            <li>Sweeps are real price events but carry no tradeable directional signal</li>
+            <li>Sweeps identified as real price events; directional signal under further investigation</li>
           </ul>
           <div class="figure-gallery">
             <figure>
@@ -178,10 +175,9 @@
           </div>
         </div>
 
-        <div id="strat-ou" class="strategy-item strategy-fail">
+        <div id="strat-ou" class="strategy-item">
           <div class="strategy-header">
             <h4>Stochastic Mean-Reversion</h4>
-            <span class="strategy-badge badge-fail">No Edge</span>
           </div>
           <p>
             Modeled intraday price as an Ornstein&ndash;Uhlenbeck process and
@@ -189,7 +185,7 @@
           </p>
           <ul>
             <li>Each phase diagnosed specific failure modes and attempted targeted fixes</li>
-            <li>Signal-to-noise ratio insufficient to overcome costs at intraday timescales</li>
+            <li>Investigating signal-to-noise improvements to overcome costs at intraday timescales</li>
           </ul>
           <div class="figure-gallery">
             <figure>
@@ -199,18 +195,16 @@
           </div>
         </div>
 
-        <div id="strat-vwap" class="strategy-item strategy-fail">
+        <div id="strat-vwap" class="strategy-item">
           <div class="strategy-header">
             <h4>VWAP Crossover</h4>
-            <span class="strategy-badge badge-fail">No Edge</span>
           </div>
           <p>
             Tested whether VWAP crossings with divergence thresholds signal
             institutional flow.
           </p>
           <ul>
-            <li>Comprehensive evaluation across 41 tickers; no post-cost edge found</li>
-            <li>Consistent with the broader finding that single-indicator signals lack sufficient edge in liquid equities</li>
+            <li>Comprehensive evaluation across 41 tickers; exploring additional filters and signal combinations</li>
           </ul>
         </div>
 
