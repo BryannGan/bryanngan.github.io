@@ -27,15 +27,15 @@
 
       <div class="trading-stats">
         <div class="stat">
-          <span class="stat-value">+16.8%</span>
-          <span class="stat-label">OOS Portfolio Return</span>
+          <span class="stat-value">11.1</span>
+          <span class="stat-label">Sharpe Ratio (OOS)</span>
         </div>
         <div class="stat">
-          <span class="stat-value">+4.5 bps</span>
+          <span class="stat-value">+12.1 bps</span>
           <span class="stat-label">Net EV / Trade</span>
         </div>
         <div class="stat">
-          <span class="stat-value">~4,200</span>
+          <span class="stat-value">~34,000</span>
           <span class="stat-label">OOS Trades</span>
         </div>
         <div class="stat">
@@ -54,13 +54,13 @@
       <div class="toc">
         <h4>Strategies</h4>
         <ol>
-          <li><a href="#strat-opening-range">Opening Range Momentum / Reversal</a> <span class="toc-badge toc-pass">Deployed</span></li>
-          <li><a href="#strat-rejection">Candlestick Rejection</a> <span class="toc-badge toc-pass">Edge Found</span></li>
-          <li><a href="#strat-dip">Mean-Reversion Dip</a></li>
-          <li><a href="#strat-fvg">Fair Value Gap Pairs</a></li>
-          <li><a href="#strat-sweep">Liquidity Sweep</a></li>
-          <li><a href="#strat-ou">Stochastic Mean-Reversion</a></li>
-          <li><a href="#strat-vwap">VWAP Crossover</a></li>
+          <li><a href="#strat-opening-range">Opening Range Momentum</a> <span class="toc-badge toc-pass">Deployed</span></li>
+          <li><a href="#strat-rejection">Candlestick Rejection + Extreme RSI</a> <span class="toc-badge toc-pass">Deployed</span></li>
+          <li><a href="#strat-dip">Mean-Reversion Dip</a> <span class="toc-badge toc-fail">Concluded</span></li>
+          <li><a href="#strat-fvg">Fair Value Gap Pairs</a> <span class="toc-badge toc-fail">Concluded</span></li>
+          <li><a href="#strat-sweep">Liquidity Sweep</a> <span class="toc-badge toc-fail">Concluded</span></li>
+          <li><a href="#strat-ou">Stochastic Mean-Reversion</a> <span class="toc-badge toc-fail">Concluded</span></li>
+          <li><a href="#strat-vwap">VWAP Crossover</a> <span class="toc-badge toc-fail">Concluded</span></li>
         </ol>
       </div>
 
@@ -68,78 +68,86 @@
 
         <div id="strat-opening-range" class="strategy-item strategy-pass">
           <div class="strategy-header">
-            <h4>Opening Range Momentum / Reversal</h4>
+            <h4>Opening Range Momentum</h4>
             <span class="strategy-badge badge-pass">Deployed</span>
           </div>
           <p>
-            Investigated whether opening range momentum carries a tradeable directional
-            signal across multiple timeframes. Designed a multi-phase validation pipeline to
-            control for overfitting and select only statistically robust configurations.
+            Intraday directional strategy on US equities at market open.
+            Multi-phase validation pipeline with strict out-of-sample evaluation
+            across 10 years of data.
           </p>
           <ul>
-            <li>Multi-phase validation: nested splits, bootstrap CI filtering, outlier-dependence analysis</li>
-            <li>11 of 49 candidates survived all statistical filters</li>
-            <li>Identified exit engineering as the primary research frontier (97% of losers showed favorable excursion)</li>
+            <li>OOS Sharpe 11.1, net EV +12.1 bps/trade, 76.7% positive days (2023&ndash;2026)</li>
+            <li>99.2% monthly win rate across 122 months (2016&ndash;2026)</li>
+            <li>Per-trade EV stable at +9 to +13 bps across all years</li>
             <li>Currently deployed and trading live</li>
           </ul>
           <div class="figure-gallery">
             <figure>
-              <img src="assets/trading/portfolio_summary.png" alt="Portfolio performance dashboard">
-              <figcaption>Portfolio dashboard &mdash; cumulative PnL, monthly returns, and per-config performance (OOS 2023&ndash;present)</figcaption>
+              <img src="assets/trading/drawdown.png" alt="Equity curve and drawdown">
+              <figcaption>Equity curve and underwater drawdown (OOS 2023&ndash;present)</figcaption>
             </figure>
             <figure>
-              <img src="assets/trading/cumulative_pnl_example.png" alt="Example equity curve">
-              <figcaption>Example equity curve &mdash; gross vs net after costs, with train/test split</figcaption>
+              <img src="assets/trading/rolling_sharpe.png" alt="Rolling Sharpe ratio">
+              <figcaption>Rolling Sharpe ratio across configurations</figcaption>
             </figure>
           </div>
         </div>
 
         <div id="strat-rejection" class="strategy-item strategy-pass">
           <div class="strategy-header">
-            <h4>Candlestick Rejection</h4>
-            <span class="strategy-badge badge-pass">Edge Found</span>
+            <h4>Candlestick Rejection + Extreme RSI</h4>
+            <span class="strategy-badge badge-pass">Deployed</span>
           </div>
           <p>
-            Studied candlestick rejection patterns under various market conditions
-            and contextual filters across 99 tickers.
+            Intraday mean-reversion strategy triggered by price action patterns
+            at statistically extreme conditions. Screened 199 tickers with strict
+            out-of-sample validation.
           </p>
           <ul>
-            <li>Tested standalone, with momentum regime filters, and with multiple signal quality gates</li>
-            <li>9 of 97 tickers passed with statistically significant edge (p&nbsp;=&nbsp;0.0001)</li>
-            <li>Validated through jackknife stability checks and multi-year rolling evaluation</li>
+            <li>OOS Sharpe 3.9, net EV +13.2 bps/trade, portfolio p&nbsp;=&nbsp;0.0001</li>
+            <li>Edge survives top-5% winner removal&mdash;not driven by outliers</li>
+            <li>88.5% monthly win rate (2024&ndash;2026)</li>
+            <li>Currently deployed and trading live</li>
           </ul>
           <div class="figure-gallery">
             <figure>
-              <img src="assets/trading/rejection_rsi_verdict.png" alt="Verdict distribution">
-              <figcaption>Verdict distribution across 97 tickers &mdash; strict filtering yields 9 deployable signals</figcaption>
+              <img src="assets/trading/rejection_rsi_drawdown.png" alt="Equity curve and drawdown">
+              <figcaption>Equity curve and underwater drawdown (OOS 2024&ndash;present)</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/trading/rejection_rsi_rolling_sharpe.png" alt="Rolling Sharpe ratio">
+              <figcaption>Rolling Sharpe ratio across configurations</figcaption>
             </figure>
           </div>
         </div>
 
-        <div id="strat-dip" class="strategy-item">
+        <div id="strat-dip" class="strategy-item strategy-fail">
           <div class="strategy-header">
             <h4>Mean-Reversion Dip</h4>
+            <span class="strategy-badge badge-fail">Concluded</span>
           </div>
           <p>
             Explored whether intraday pullbacks from recent highs create mean-reversion opportunities.
           </p>
           <ul>
-            <li>Weak pre-cost signal eliminated by realistic transaction costs across 99 tickers</li>
-            <li>Reinforced cost modeling as a first-order design constraint for all subsequent strategies</li>
+            <li>Initial backtest PnL was entirely driven by feature leakage&mdash;no edge remained after fixing</li>
+            <li>Reinforced cost modeling and leakage checks as first-order design constraints</li>
           </ul>
         </div>
 
-        <div id="strat-fvg" class="strategy-item">
+        <div id="strat-fvg" class="strategy-item strategy-fail">
           <div class="strategy-header">
             <h4>Fair Value Gap Pairs</h4>
+            <span class="strategy-badge badge-fail">Concluded</span>
           </div>
           <p>
             Investigated whether sequential fair value gaps carry predictive information
             about price continuation or reversal.
           </p>
           <ul>
-            <li>25.8M gap pairs analyzed; favorable/adverse excursion ratio = 0.999 (indistinguishable from random)</li>
-            <li>Initial results suggest limited signal; exploring alternative gap definitions</li>
+            <li>25.8M gap pairs analyzed; MFE/MAE ratio = 0.999&mdash;perfectly symmetric, no directional content</li>
+            <li>Price paths after FVG events are indistinguishable from random</li>
           </ul>
           <div class="figure-gallery">
             <figure>
@@ -149,9 +157,10 @@
           </div>
         </div>
 
-        <div id="strat-sweep" class="strategy-item">
+        <div id="strat-sweep" class="strategy-item strategy-fail">
           <div class="strategy-header">
             <h4>Liquidity Sweep</h4>
+            <span class="strategy-badge badge-fail">Concluded</span>
           </div>
           <p>
             Designed a paired-delta methodology to isolate sweep-specific directional
@@ -159,7 +168,7 @@
           </p>
           <ul>
             <li>2.5M+ observations with sufficient power to detect edges as small as 0.2 bps</li>
-            <li>Sweeps identified as real price events; directional signal under further investigation</li>
+            <li>Raw returns looked promising but vanished entirely against matched controls</li>
           </ul>
           <div class="figure-gallery">
             <figure>
@@ -173,17 +182,18 @@
           </div>
         </div>
 
-        <div id="strat-ou" class="strategy-item">
+        <div id="strat-ou" class="strategy-item strategy-fail">
           <div class="strategy-header">
             <h4>Stochastic Mean-Reversion</h4>
+            <span class="strategy-badge badge-fail">Concluded</span>
           </div>
           <p>
             Modeled intraday price as an Ornstein&ndash;Uhlenbeck process and
             iteratively refined the strategy across multiple research phases.
           </p>
           <ul>
-            <li>Each phase diagnosed specific failure modes and attempted targeted fixes</li>
-            <li>Investigating signal-to-noise improvements to overcome costs at intraday timescales</li>
+            <li>All configurations negative EV after realistic transaction costs (~4 bps RT)</li>
+            <li>Signal exists but edge is too thin to survive intraday cost structure</li>
           </ul>
           <div class="figure-gallery">
             <figure>
@@ -193,16 +203,18 @@
           </div>
         </div>
 
-        <div id="strat-vwap" class="strategy-item">
+        <div id="strat-vwap" class="strategy-item strategy-fail">
           <div class="strategy-header">
             <h4>VWAP Crossover</h4>
+            <span class="strategy-badge badge-fail">Concluded</span>
           </div>
           <p>
             Tested whether VWAP crossings with divergence thresholds signal
             institutional flow.
           </p>
           <ul>
-            <li>Comprehensive evaluation across 41 tickers; exploring additional filters and signal combinations</li>
+            <li>No directional content in signal&mdash;permutation tests confirmed returns indistinguishable from random</li>
+            <li>Exit engineering could not rescue a zero-content entry signal</li>
           </ul>
         </div>
 
