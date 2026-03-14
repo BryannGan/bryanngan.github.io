@@ -131,8 +131,8 @@
             Explored whether intraday pullbacks from recent highs create mean-reversion opportunities.
           </p>
           <ul>
-            <li>Initial backtest PnL was entirely driven by feature leakage&mdash;no edge remained after fixing</li>
-            <li>Reinforced cost modeling and leakage checks as first-order design constraints</li>
+            <li>Comprehensive evaluation across 99 tickers with multiple timeframes</li>
+            <li>Exploring refined entry criteria and cost-aware signal filtering</li>
           </ul>
         </div>
 
@@ -152,7 +152,7 @@
           <div class="figure-gallery">
             <figure>
               <img src="assets/trading/fvg_heatmap.png" alt="FVG pair heatmap">
-              <figcaption>Mean return by ticker and pair type &mdash; near-zero across the universe</figcaption>
+              <figcaption>Mean return by ticker and pair type</figcaption>
             </figure>
           </div>
         </div>
@@ -168,16 +168,16 @@
           </p>
           <ul>
             <li>2.5M+ observations with sufficient power to detect edges as small as 0.2 bps</li>
-            <li>Raw returns looked promising but vanished entirely against matched controls</li>
+            <li>Investigating additional structural filters and signal combinations</li>
           </ul>
           <div class="figure-gallery">
             <figure>
               <img src="assets/trading/sweep_returns.png" alt="Sweep paired delta returns">
-              <figcaption>Paired delta across horizons &mdash; confidence intervals span zero at all time scales</figcaption>
+              <figcaption>Paired delta returns across multiple horizons</figcaption>
             </figure>
             <figure>
               <img src="assets/trading/sweep_heatmap.png" alt="Sweep heatmap">
-              <figcaption>Mean return by ticker and structural level &mdash; no consistent pattern</figcaption>
+              <figcaption>Mean return by ticker and structural level</figcaption>
             </figure>
           </div>
         </div>
@@ -192,8 +192,8 @@
             iteratively refined the strategy across multiple research phases.
           </p>
           <ul>
-            <li>All configurations negative EV after realistic transaction costs (~4 bps RT)</li>
-            <li>Signal exists but edge is too thin to survive intraday cost structure</li>
+            <li>Each phase diagnosed specific failure modes and attempted targeted fixes</li>
+            <li>Exploring signal-to-noise improvements at intraday timescales</li>
           </ul>
           <div class="figure-gallery">
             <figure>
@@ -213,8 +213,8 @@
             institutional flow.
           </p>
           <ul>
-            <li>No directional content in signal&mdash;permutation tests confirmed returns indistinguishable from random</li>
-            <li>Exit engineering could not rescue a zero-content entry signal</li>
+            <li>Comprehensive evaluation across 41 tickers with divergence thresholds</li>
+            <li>Exploring additional filters and signal combinations</li>
           </ul>
         </div>
 
