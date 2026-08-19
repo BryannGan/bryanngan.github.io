@@ -87,7 +87,7 @@
   <section id="news">
     <div class="container">
       <h2>News</h2>
-      <ul class="news-list">
+      <ul class="news-list" id="news-list">
         <li><span class="news-date">[Jul 2026]</span> Presented &ldquo;Personalized Left Atrial Mechanics with Experimentally-Informed Tissue Heterogeneity&rdquo; at the International Conference on Computational and Mathematical Biomedical Engineering (CMBE) in Kobe, Japan.</li>
         <li><span class="news-date">[Jul 2026]</span> Awarded the PhD Student Travel Grant at the International Conference on Computational and Mathematical Biomedical Engineering (CMBE) in Kobe, Japan &mdash; one of ten student recipients selected on the strength of the submitted abstract.</li>
         <li><span class="news-date">[Dec 2025]</span> Elected PhD Career Chair of the <a href="https://mega.studentgroups.columbia.edu/content/executive-board-2025-2026" target="_blank">Mechanical Engineering Graduate Association (MEGA)</a> at Columbia University.</li>
@@ -100,6 +100,7 @@
         <li><span class="news-date">[Jun 2024]</span> Awarded the Diversity Travel Award at the <a href="https://archive.sb3c.org/" target="_blank">2024 Summer Biomechanics, Bioengineering, and Biotransport Conference</a>.</li>
         <li><span class="news-date">[May 2024]</span> Graduated from UC Berkeley with a B.S. in Mechanical Engineering.</li>
       </ul>
+      <button type="button" class="expand-btn" id="news-toggle" aria-controls="news-list" aria-expanded="false"></button>
     </div>
   </section>
 
@@ -214,6 +215,35 @@
   <footer>
     <p>&copy; 2026 Bryan Gan</p>
   </footer>
+
+  <script>
+    // Collapse long lists to the N most recent entries behind an Expand button.
+    // Applied by script so the full list still renders when JS is unavailable.
+    (function () {
+      function collapsible(listId, btnId, visible) {
+        var list = document.getElementById(listId);
+        var btn = document.getElementById(btnId);
+        if (!list || !btn) return;
+        var items = Array.prototype.slice.call(list.children);
+        var hidden = items.slice(visible);
+        if (!hidden.length) return;
+
+        function render(open) {
+          hidden.forEach(function (li) { li.classList.toggle('is-hidden', !open); });
+          btn.textContent = open ? 'Collapse' : 'Expand (' + hidden.length + ' more)';
+          btn.setAttribute('aria-expanded', String(open));
+        }
+
+        render(false);
+        btn.classList.add('is-visible');
+        btn.addEventListener('click', function () {
+          render(btn.getAttribute('aria-expanded') !== 'true');
+        });
+      }
+
+      collapsible('news-list', 'news-toggle', 3);
+    })();
+  </script>
 
 </body>
 </html>

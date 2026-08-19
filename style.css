@@ -665,3 +665,34 @@ footer {
     gap: 1rem;
   }
 }
+
+/* ── Collapsible lists (News) ── */
+.news-list li.is-hidden {
+  display: none;
+}
+
+.expand-btn {
+  display: none;
+  margin-top: 0.5rem;
+  padding: 0.3rem 0.85rem;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+.expand-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent-hover);
+}
+.expand-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.expand-btn.is-visible {
+  display: inline-block;
+}
