@@ -55,28 +55,21 @@ a:hover {
 .nav-container {
   max-width: 900px;
   margin: 0 auto;
-  padding: 0.75rem 1.5rem;
+  padding: 0.55rem 1.5rem;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-}
-
-.nav-logo {
-  font-weight: 700;
-  font-size: 1.25rem;
-  color: var(--text);
-  letter-spacing: 0.05em;
+  justify-content: flex-start;
 }
 
 .nav-links {
   list-style: none;
   display: flex;
-  gap: 1.75rem;
+  gap: 1.5rem;
 }
 
 .nav-links a {
   color: var(--text-muted);
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   font-weight: 500;
 }
 .nav-links a:hover {
@@ -85,7 +78,7 @@ a:hover {
 
 /* ── Profile / About ── */
 #about {
-  padding-top: 6rem;
+  padding-top: 4.5rem;
   padding-bottom: 3rem;
 }
 
@@ -519,7 +512,7 @@ section h2 {
 
 /* ── Trading Page ── */
 .trading-page {
-  padding-top: 6rem;
+  padding-top: 4.5rem;
 }
 
 /* ── Skills ── */
