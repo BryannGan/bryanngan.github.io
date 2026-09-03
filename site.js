@@ -239,7 +239,7 @@
      preload="none" keeps the front page light; the clip is only fetched
      when someone actually hovers the card. */
   function cardPreviews() {
-    document.querySelectorAll('.project-card.has-preview').forEach(function (card) {
+    document.querySelectorAll('.project-card.has-preview, .pub-list li.has-thumb').forEach(function (card) {
       var v = card.querySelector('video');
       if (!v) return;
       card.addEventListener('pointerenter', function () {

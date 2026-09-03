@@ -1171,6 +1171,8 @@ footer {
 
 /* ── News as a timeline ── */
 .news-list {
+  --date-col: 104px;
+  --rail-gap: 1.6rem;
   position: relative;
   list-style: none;
   padding: 0;
@@ -1178,8 +1180,8 @@ footer {
 }
 .news-list li {
   display: grid;
-  grid-template-columns: 96px minmax(0, 1fr);
-  gap: 0 1.4rem;
+  grid-template-columns: var(--date-col) minmax(0, 1fr);
+  gap: 0 var(--rail-gap);
   align-items: start;
   position: relative;
   padding: 0 0 1.15rem 0;
@@ -1194,25 +1196,23 @@ footer {
 .news-list li::before {
   content: "";
   position: absolute;
-  left: 96px;
+  left: calc(var(--date-col) + var(--rail-gap) / 2);
   top: 0.62rem;
   bottom: -0.35rem;
   width: 1px;
   background: var(--rule);
-  transform: translateX(-0.7rem);
 }
 .news-list li:last-child::before { bottom: auto; height: 0; }
 
 .news-list li::after {
   content: "";
   position: absolute;
-  left: 96px;
+  left: calc(var(--date-col) + var(--rail-gap) / 2 - 2px);
   top: 0.5rem;
   width: 5px;
   height: 5px;
   border-radius: 50%;
   background: var(--clay);
-  transform: translateX(calc(-0.7rem - 2px));
 }
 
 .news-date {
@@ -1236,12 +1236,13 @@ footer {
   gap: 1.4rem;
   align-items: start;
 }
-.pub-thumb img {
+.pub-thumb img,
+.pub-thumb video {
   display: block;
   width: 100%;
   aspect-ratio: 1 / 1;
   object-fit: contain;
-  background: var(--paper-sunk);
+  background: var(--paper-raised);
   border: 1px solid var(--rule);
   border-radius: 3px;
 }
@@ -1249,7 +1250,5 @@ footer {
 
 @media (max-width: 640px) {
   .pub-list li.has-thumb { grid-template-columns: 92px minmax(0, 1fr); gap: 1rem; }
-  .news-list li { grid-template-columns: 74px minmax(0, 1fr); gap: 0 1rem; }
-  .news-list li::before,
-  .news-list li::after { left: 74px; }
+  .news-list { --date-col: 76px; --rail-gap: 1.1rem; }
 }
