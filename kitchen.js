@@ -21,7 +21,7 @@ window.KITCHEN = [
     notes: ['Shank, noodles, scallion, dark broth'] },
 
   { src: 'candlelit-fish.webp',       name: 'Fish, green sauce, a bottle',
-    notes: ['Two glasses, one candle'], size: 'wide' },
+    notes: ['Two glasses, one candle'], size: 'tall' },
 
   { src: 'steamed-fish.webp',         name: 'Steamed fish',
     notes: ['Ginger, scallion, hot oil over soy'], size: 'tall' },
@@ -33,7 +33,7 @@ window.KITCHEN = [
     notes: ['Boiled pork belly, napa, kimchi, garlic'] },
 
   { src: 'dinner-party.webp',         name: 'Dinner for the table',
-    notes: ['Caprese, meatballs, rigatoni, steak'], size: 'wide' },
+    notes: ['Caprese, meatballs, rigatoni, steak'], size: 'tall' },
 
   { src: 'braised-beef-bowl.webp',    name: 'Braised beef bowl',
     notes: ['Cabbage, soft egg, dark broth'] },
