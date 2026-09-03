@@ -482,7 +482,7 @@
 
     function build() {
       var ref = Math.min(h, (window.innerHeight || 800));
-      hz = Math.round(ref * 0.72);
+      hz = Math.round(ref * 0.94);
       sky = document.createElement('canvas');
       sky.width = Math.round(w * dpr);
       sky.height = Math.round(h * dpr);
@@ -500,7 +500,7 @@
         var step = near ? -w * 0.04 : w * 0.02;
         while (step < w + 40) {
           var bw = bwBase * (0.62 + rnd() * 0.85);
-          var bh = ref * (near ? 0.20 : 0.14) * (0.55 + rnd() * 1.25);
+          var bh = ref * (near ? 0.15 : 0.10) * (0.55 + rnd() * 1.15);
           var x = step, top = hz - bh, cut = 8 + rnd() * 22;
 
           c.fillStyle = near ? FILL[(rnd() * FILL.length) | 0] : '#FFFFFF';
