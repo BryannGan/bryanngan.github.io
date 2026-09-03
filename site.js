@@ -473,12 +473,12 @@
     if (!ctx) return;
 
     var PAL = [
-      ['#EAFF00', '#7B2FF7'],   // lemon  -> violet
-      ['#7B2FF7', '#3B0F8F'],   // violet -> deep violet
-      ['#B44BFF', '#EAFF00'],   // orchid -> lemon
-      ['#7B2FF7', '#FF2D95']    // violet -> magenta (accent)
+      ['#FF2D95', '#7B2FF7'],   // magenta -> violet
+      ['#7B2FF7', '#2B6BFF'],   // violet  -> blue
+      ['#00E5FF', '#2B6BFF'],   // cyan    -> blue
+      ['#FF2D95', '#FFA23F']    // magenta -> amber
     ];
-    var EDGE = ['#EAFF00', '#B44BFF', '#EAFF00', '#7B2FF7', '#00E5FF'];
+    var EDGE = ['#FF2D95', '#00E5FF', '#EAFF00', '#B44BFF'];
 
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
     var w = 0, h = 0, hz = 0, city = null, wins = [], t = 0, raf = 0, running = false;
@@ -567,18 +567,18 @@
 
       // Sky.
       var sky = ctx.createLinearGradient(0, 0, 0, hz);
-      sky.addColorStop(0,    '#160A2E');
-      sky.addColorStop(0.42, '#3E0F86');
-      sky.addColorStop(0.76, '#8A2BD6');
-      sky.addColorStop(1,    '#EAFF00');
+      sky.addColorStop(0,    '#1A0B2E');
+      sky.addColorStop(0.45, '#4B1170');
+      sky.addColorStop(0.8,  '#B4227E');
+      sky.addColorStop(1,    '#FF6A3D');
       ctx.fillStyle = sky;
       ctx.fillRect(0, 0, w, hz);
 
       // Sun disc sitting on the horizon.
       var sr = Math.min(w, h) * 0.16;
       var sg = ctx.createLinearGradient(0, hz - sr, 0, hz);
-      sg.addColorStop(0, '#FBFF7A');
-      sg.addColorStop(1, '#B44BFF');
+      sg.addColorStop(0, '#FFE24A');
+      sg.addColorStop(1, '#FF2D95');
       ctx.save();
       ctx.beginPath(); ctx.rect(0, 0, w, hz); ctx.clip();
       ctx.fillStyle = sg;
@@ -606,7 +606,7 @@
 
       // Ground.
       var gr = ctx.createLinearGradient(0, hz, 0, h);
-      gr.addColorStop(0, '#33116B');
+      gr.addColorStop(0, '#2A0F4A');
       gr.addColorStop(1, '#0C0618');
       ctx.fillStyle = gr;
       ctx.fillRect(0, hz, w, h - hz);
@@ -619,7 +619,7 @@
       ctx.closePath(); ctx.fill();
 
       // Glowing kerbs.
-      ['#EAFF00', '#B44BFF'].forEach(function (col, k) {
+      ['#FF2D95', '#00E5FF'].forEach(function (col, k) {
         ctx.strokeStyle = col;
         ctx.lineWidth = 2.5;
         ctx.shadowColor = col; ctx.shadowBlur = 14;
@@ -646,9 +646,9 @@
       // Horizon pulse.
       var pulse = 0.5 + 0.5 * Math.sin(t * 1.6);
       var hb = ctx.createLinearGradient(0, hz - 22, 0, hz + 22);
-      hb.addColorStop(0, 'rgba(180, 75, 255, 0)');
-      hb.addColorStop(0.5, 'rgba(234, 255, 0,' + (0.34 + pulse * 0.26) + ')');
-      hb.addColorStop(1, 'rgba(123, 47, 247, 0)');
+      hb.addColorStop(0, 'rgba(255, 45, 149, 0)');
+      hb.addColorStop(0.5, 'rgba(255, 210, 74,' + (0.30 + pulse * 0.22) + ')');
+      hb.addColorStop(1, 'rgba(0, 229, 255, 0)');
       ctx.fillStyle = hb;
       ctx.fillRect(0, hz - 22, w, 44);
 
@@ -685,7 +685,7 @@
     for (var n = 0; n < 16; n++) {
       var px = Math.floor(rnd() * 20) * 24;
       var py = Math.floor(rnd() * 11) * 24;
-      x.strokeStyle = ['#EAFF00','#B44BFF','#EAFF00','#7B2FF7'][(rnd()*4)|0];
+      x.strokeStyle = ['#FF2D95','#00E5FF','#EAFF00','#B44BFF'][(rnd()*4)|0];
       x.lineWidth = 3;
       x.beginPath(); x.moveTo(px, py);
       var steps = 2 + Math.floor(rnd() * 3);

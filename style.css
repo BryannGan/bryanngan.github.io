@@ -2133,65 +2133,56 @@ footer {
   .foot-skyline { height: 120px; }
 }
 
-/* ── Lemon + purple lead ──
-   Magenta and cyan stay as small accents; the page reads yellow/violet. */
-
-.edge {
-  background-image:
-    repeating-linear-gradient(-45deg, rgba(180, 75, 255, 0.34) 0 3px, transparent 3px 15px),
-    repeating-linear-gradient(90deg,  rgba(234, 255, 0, 0.22) 0 1px, transparent 1px 26px),
-    radial-gradient(circle at 50% 50%, rgba(234, 255, 0, 0.34) 1.2px, transparent 1.6px);
-  background-size: auto, auto, 12px 12px;
+/* ── Clear the middle, weight the sides ──
+   The city was still running straight through the headline and the three
+   pillars. Masking an ellipse out of the canvas at the top centre leaves
+   the pattern on the left and right and gives the type flat dark ground
+   to sit on. The road and lower skyline are untouched. */
+.grid-city {
+  -webkit-mask-image: radial-gradient(78% 46% at 50% 16%, transparent 0 42%, rgba(0,0,0,0.55) 66%, #000 88%);
+  mask-image: radial-gradient(78% 46% at 50% 16%, transparent 0 42%, rgba(0,0,0,0.55) 66%, #000 88%);
 }
 
-.field-p { background: var(--violet); }
-.field-m { background: var(--violet-l); }
+/* Edge columns carry more of the pattern now that the middle is empty. */
+.edge { width: 26vw; height: 84vh; }
+.edge-l { -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 34%, transparent 100%); mask-image: linear-gradient(90deg, #000 0%, #000 34%, transparent 100%); }
+.edge-r { -webkit-mask-image: linear-gradient(270deg, #000 0%, #000 34%, transparent 100%); mask-image: linear-gradient(270deg, #000 0%, #000 34%, transparent 100%); }
 
-.title-band { box-shadow: 0 0 70px rgba(234, 255, 0, 0.38); }
-.title-band::after { background: var(--violet); }
-.lab-title { text-shadow: 3px 3px 0 var(--violet), 6px 6px 0 rgba(180, 75, 255, 0.85); }
+.centre-clear {
+  height: 68vh;
+  background: radial-gradient(52% 62% at 50% 26%, rgba(11, 6, 22, 0.94) 0 48%, rgba(11, 6, 22, 0.60) 74%, transparent 100%);
+}
 
-.lab-eyebrow { color: var(--yellow); border-color: rgba(234, 255, 0, 0.55); box-shadow: 0 0 18px rgba(234,255,0,0.20) inset; }
-.blip { background: var(--violet-l); box-shadow: 0 0 8px var(--violet-l); }
+/* Colour fields stay outboard so nothing crosses the type. */
+.field-y { top: -14%; left: -22%; width: 28%; height: 60%; opacity: 0.95; }
+.field-p { top: 44%;  right: -22%; width: 30%; height: 74%; opacity: 0.95; }
+.field-m { display: none; }
+
+/* ── Contrast on the middle ──
+   The band is the brightest thing on the page and the type is the darkest
+   thing on the band; the pillars sit on solid black with a lit edge. */
+.title-band {
+  top: 3.4rem;
+  height: 6rem;
+  background: var(--yellow);
+  box-shadow: 0 0 90px rgba(234, 255, 0, 0.45), 0 10px 40px rgba(0,0,0,0.6);
+}
+.title-band::after { background: var(--magenta); height: 12px; bottom: -12px; }
+
+.lab-title {
+  color: #08040F;
+  text-shadow: 3px 3px 0 var(--magenta), 6px 6px 0 rgba(0, 229, 255, 0.9);
+}
 
 .spec {
-  border-color: rgba(180, 75, 255, 0.55);
-  box-shadow: 0 0 26px rgba(123, 47, 247, 0.22) inset;
+  background: #08040F;
+  border: 1px solid var(--cyan);
+  box-shadow: 0 0 0 1px rgba(0,229,255,0.18), 0 0 30px rgba(0, 229, 255, 0.28), 0 8px 26px rgba(0,0,0,0.7);
 }
-.spec-idx { color: var(--yellow); }
-.spec-name { text-shadow: 0 0 14px rgba(234, 255, 0, 0.65); }
+.spec-name { color: #fff; text-shadow: 0 0 16px rgba(0, 229, 255, 0.9); }
+.spec-idx  { color: var(--yellow); text-shadow: 0 0 12px rgba(234,255,0,0.8); }
+.lab-eyebrow { background: #08040F; }
 
-.shelf-head {
-  background: linear-gradient(90deg, rgba(123,47,247,0.55), rgba(234,255,0,0.16) 58%, rgba(11,6,22,0.5));
-  border-left: 4px solid var(--yellow);
-  box-shadow: 0 0 26px rgba(123, 47, 247, 0.30);
+@media (max-width: 720px) {
+  .edge { width: 34vw; }
 }
-[data-mode="dev"] .shelf-title { text-shadow: 0 0 14px var(--yellow); }
-.shelf-count { color: var(--yellow); text-shadow: 0 0 10px rgba(234,255,0,0.6); }
-
-.cap { border-color: rgba(180, 75, 255, 0.5); }
-.cap:hover {
-  border-color: var(--yellow);
-  box-shadow: 0 0 0 1px rgba(234,255,0,0.5), 0 0 46px rgba(234, 255, 0, 0.28);
-}
-.cap-art { background: #17093A; border-bottom-color: rgba(180,75,255,0.45); }
-.cap-art::after { background: linear-gradient(to top, rgba(11,6,22,0.92), rgba(123,47,247,0.16) 62%); }
-.cap-year  { color: var(--yellow); }
-.cap-title { text-shadow: 0 0 16px rgba(234, 255, 0, 0.35); }
-.cap-tags span { color: #EAF7A9; background: rgba(234, 255, 0, 0.07); border-color: rgba(234, 255, 0, 0.32); }
-.cap-flood-note { color: var(--yellow); }
-.cap-status[data-s="LIVE"]    { background: var(--yellow); color: #0B0616; box-shadow: 0 0 14px rgba(234,255,0,0.6); }
-.cap-status[data-s="SHIPPED"] { background: var(--yellow); color: #0B0616; box-shadow: 0 0 14px rgba(234,255,0,0.6); }
-.cap-status[data-s="IN DEV"]  { background: var(--violet-l); color: #fff; box-shadow: 0 0 14px rgba(180,75,255,0.6); }
-
-[data-mode="dev"] .mode-switch summary { border-color: var(--yellow); color: var(--yellow); background: rgba(234,255,0,0.08); box-shadow: 0 0 14px rgba(234,255,0,0.3); }
-[data-mode="dev"] .mode-dot { background: var(--yellow); box-shadow: 0 0 8px var(--yellow); }
-[data-mode="dev"] .scroll-rail i { background: linear-gradient(90deg, var(--violet), var(--yellow)); }
-[data-mode="dev"] #navbar { border-bottom-color: rgba(234, 255, 0, 0.35); }
-
-/* Footer band follows. */
-.foot-field-m { background: var(--violet-l); }
-.foot-field-p { background: var(--violet); }
-.foot-field-y { background: var(--yellow); }
-.foot-skyline .crowns path { stroke: var(--yellow); filter: drop-shadow(0 0 6px var(--yellow)); }
-.foot-rule { background: linear-gradient(90deg, var(--violet), var(--yellow) 45%, var(--violet-l) 78%, var(--violet)); box-shadow: 0 0 22px rgba(234, 255, 0, 0.45); }
