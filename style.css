@@ -2033,3 +2033,35 @@ footer {
 }
 .title-band { top: 2.2rem; height: 4.6rem; }
 .lab-head { padding: 2.6rem 0 3rem; }
+
+/* Headline centred and stepped down again. The band loses its skew — a
+   tilted bar can't read as symmetric no matter where the type sits — and
+   becomes a level full-bleed rule with the line centred inside it. */
+.lab-title {
+  font-size: min(2.6rem, 3.6vw);
+  text-align: center;
+  margin-bottom: 2.4rem;
+  text-shadow: 3px 3px 0 var(--magenta), 6px 6px 0 var(--violet);
+}
+.title-band {
+  top: 2.4rem;
+  height: 4rem;
+  transform: none;
+}
+.title-band::after { bottom: -16px; height: 12px; }
+.lab-head { padding: 2.4rem 0 3rem; }
+
+/* With the headline centred, the two colour fields sat at different heights
+   and read as a mistake. Mirrored: same band, same size, opposite edges. */
+.field-y {
+  top: 42%; left: -26%; right: auto;
+  width: 28%; height: 64%;
+  background: var(--yellow);
+  clip-path: polygon(0 0, 100% 0, 72% 100%, 0 100%);
+}
+.field-p {
+  top: 42%; right: -26%; left: auto;
+  width: 28%; height: 64%;
+  background: var(--violet);
+  clip-path: polygon(28% 0, 100% 0, 100% 100%, 0 100%);
+}
