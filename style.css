@@ -2275,3 +2275,89 @@ footer {
   -webkit-text-fill-color: var(--mint);
   text-shadow: 0 0 12px rgba(0, 255, 179, 0.55);
 }
+
+/* ══ Dev mode v4 ══ */
+
+/* ── Headline: one row, colour travelling left to right ──
+   The previous gradient ran through #A700FF, which is dark enough that the
+   sweep visibly dipped as it passed. Stops are now all high-luminance, so
+   the hue changes without the brightness swinging. */
+.led {
+  background-image: linear-gradient(90deg,
+    #FF007A 0%, #FF4DA6 12%, #FFEA00 26%, #7CFF5A 40%,
+    #00FFB3 54%, #45E9FF 68%, #FF4DA6 84%, #FF007A 100%);
+  background-size: 220% 100%;
+}
+/* Travel left to right: position runs down, so a given colour moves right. */
+.motion .led { animation: led-run 3s linear infinite, led-bloom 3s linear infinite; }
+@keyframes led-run {
+  from { background-position: 220% 0; }
+  to   { background-position: 0% 0; }
+}
+@keyframes led-bloom {
+  0%   { filter: drop-shadow(0 0 16px rgba(255, 0, 122, 0.80)); }
+  33%  { filter: drop-shadow(0 0 18px rgba(255, 234, 0, 0.80)); }
+  66%  { filter: drop-shadow(0 0 18px rgba(0, 255, 179, 0.80)); }
+  100% { filter: drop-shadow(0 0 16px rgba(255, 0, 122, 0.80)); }
+}
+
+.lab-title {
+  white-space: nowrap;              /* one row, always */
+  font-size: min(3.9rem, 5.6vw);
+  letter-spacing: -0.02em;
+}
+
+/* Specs pick up the same run, staggered so the colour reads as one wave
+   crossing all three rather than three independent loops. */
+.spec-name { white-space: nowrap; }
+.motion .spec:nth-child(1) .spec-name { animation-delay: 0s,    0s; }
+.motion .spec:nth-child(2) .spec-name { animation-delay: -0.4s, -0.4s; }
+.motion .spec:nth-child(3) .spec-name { animation-delay: -0.8s, -0.8s; }
+.led-sm { background-size: 220% 100%; }
+.motion .led-sm { animation-duration: 3s, 3s; }
+
+/* ── Brighter city ── */
+.lab-scrim {
+  background: linear-gradient(to bottom,
+    rgba(27, 27, 42, 0.00) 0%,
+    rgba(27, 27, 42, 0.04) 30%,
+    rgba(27, 27, 42, 0.48) 48%,
+    rgba(27, 27, 42, 0.80) 62%,
+    rgba(27, 27, 42, 0.90) 100%);
+}
+.capsule {
+  background: linear-gradient(160deg, rgba(27, 27, 42, 0.62), rgba(18, 18, 31, 0.72));
+  box-shadow:
+    0 0 0 1px rgba(255, 0, 122, 0.28) inset,
+    0 0 40px rgba(0, 255, 179, 0.24) inset,
+    0 0 70px rgba(255, 0, 122, 0.34),
+    0 24px 80px rgba(0, 0, 0, 0.45);
+}
+
+/* Capsule needs enough body to hold text over a lit skyline. Keeps the
+   outer glow — the punch is in the bloom and the border, not in letting
+   buildings read through the panel. */
+.capsule {
+  background:
+    linear-gradient(160deg, rgba(31, 26, 58, 0.90), rgba(20, 18, 36, 0.94)),
+    linear-gradient(0deg, rgba(255, 0, 122, 0.06), rgba(0, 255, 179, 0.05));
+  backdrop-filter: blur(6px);
+}
+
+/* The .led mask spans the element box, not the glyphs. In a wide grid cell
+   a short word left a dark plate floating to its right — visible beside
+   ITERATE and DESIGN. Shrink the element to its text. */
+.spec-name {
+  justify-self: start;
+  width: fit-content;
+}
+
+/* And lighten the small-size scan: at 0.42 alpha it was dimming the words
+   roughly as much as the mask it replaced. */
+.led-sm::after {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(27, 27, 42, 0.20) 0 1px,
+    transparent 1px 3px);
+}
+.led-sm { filter: drop-shadow(0 0 9px rgba(255, 255, 255, 0.22)); }

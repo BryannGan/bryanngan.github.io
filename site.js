@@ -495,7 +495,7 @@
       // Four depth layers, far to near: dimmer, hazier, shorter.
       for (var layer = 0; layer < 4; layer++) {
         var depth = layer / 3;
-        var alpha = 0.30 + depth * 0.70;
+        var alpha = 0.55 + depth * 0.45;
         var maxH  = h * (0.16 + depth * 0.30);
         var minH  = h * (0.05 + depth * 0.10);
         var bw    = 26 + depth * 46;
@@ -506,15 +506,15 @@
           var bh  = minH + rnd() * (maxH - minH);
           var top = horizon - bh;
 
-          c.fillStyle = 'rgba(11, 11, 20,' + (0.55 + depth * 0.45) + ')';
+          c.fillStyle = 'rgba(26, 20, 48,' + (0.62 + depth * 0.34) + ')';
           c.fillRect(x, top, bwv, bh);
 
           // Rooftop neon edge — the thing that makes it read as a city at night.
           if (rnd() > 0.42) {
             var edge = pick(NEON);
             c.strokeStyle = edge;
-            c.globalAlpha = 0.35 + depth * 0.5;
-            c.lineWidth = 1.6;
+            c.globalAlpha = 0.60 + depth * 0.40;
+            c.lineWidth = 2.2;
             c.beginPath(); c.moveTo(x, top); c.lineTo(x + bwv, top); c.stroke();
             c.globalAlpha = 1;
           }
@@ -523,8 +523,8 @@
           if (rnd() > 0.62 && bwv > 22) {
             var sx = x + 4 + rnd() * (bwv - 10);
             c.strokeStyle = pick(NEON);
-            c.globalAlpha = 0.28 + depth * 0.42;
-            c.lineWidth = 2.2;
+            c.globalAlpha = 0.50 + depth * 0.45;
+            c.lineWidth = 2.8;
             c.beginPath(); c.moveTo(sx, top + 8); c.lineTo(sx, horizon - 6); c.stroke();
             c.globalAlpha = 1;
           }
@@ -534,12 +534,12 @@
           var rows = Math.max(1, Math.floor(bh / 11));
           for (var cxi = 0; cxi < cols; cxi++) {
             for (var ry = 0; ry < rows; ry++) {
-              if (rnd() > 0.38) continue;
+              if (rnd() > 0.56) continue;
               windows.push({
                 x: x + 4 + cxi * 9,
                 y: top + 6 + ry * 11,
                 c: pick(NEON),
-                a: (0.25 + rnd() * 0.6) * alpha,
+                a: (0.55 + rnd() * 0.45) * alpha,
                 f: rnd() > 0.92 ? 0.6 + rnd() * 2.4 : 0,   // flicker rate
                 p: rnd() * 6.28
               });
@@ -571,9 +571,10 @@
 
       // Sky wash above the skyline.
       var g = ctx.createLinearGradient(0, 0, 0, horizon);
-      g.addColorStop(0,    'rgba(27, 27, 42, 0)');
-      g.addColorStop(0.55, 'rgba(167, 0, 255, 0.16)');
-      g.addColorStop(1,    'rgba(255, 0, 122, 0.20)');
+      g.addColorStop(0,    'rgba(69, 233, 255, 0.28)');
+      g.addColorStop(0.38, 'rgba(167, 0, 255, 0.42)');
+      g.addColorStop(0.72, 'rgba(255, 0, 122, 0.52)');
+      g.addColorStop(1,    'rgba(255, 122, 60, 0.42)');
       ctx.fillStyle = g;
       ctx.fillRect(0, 0, w, horizon);
 
@@ -582,7 +583,7 @@
         var bm = beams[i];
         var bx = (bm.x + Math.sin(t * bm.sp + bm.p) * w * 0.32 + w) % w;
         var bg = ctx.createLinearGradient(bx, horizon, bx, horizon - h * 0.55);
-        bg.addColorStop(0, bm.c + '44');
+        bg.addColorStop(0, bm.c + '77');
         bg.addColorStop(1, bm.c + '00');
         ctx.fillStyle = bg;
         ctx.beginPath();
@@ -609,15 +610,15 @@
 
       // Wet street: the skyline mirrored, squashed, wobbling, fading out.
       ctx.save();
-      ctx.globalAlpha = 0.32;
+      ctx.globalAlpha = 0.48;
       ctx.translate(0, horizon * 2);
       ctx.scale(1, -0.55);
       ctx.drawImage(sky, Math.sin(t * 0.7) * 2, 0, w, h);
       ctx.restore();
 
       var fade = ctx.createLinearGradient(0, horizon, 0, h);
-      fade.addColorStop(0, 'rgba(27, 27, 42, 0.25)');
-      fade.addColorStop(1, 'rgba(27, 27, 42, 0.98)');
+      fade.addColorStop(0, 'rgba(27, 27, 42, 0.10)');
+      fade.addColorStop(1, 'rgba(27, 27, 42, 0.92)');
       ctx.fillStyle = fade;
       ctx.fillRect(0, horizon, w, h - horizon);
 
@@ -627,23 +628,24 @@
         var z = d + 1 - ((t * 0.35) % 1);
         var y = horizon + fl / z;
         if (y > h) continue;
-        ctx.strokeStyle = 'rgba(0, 255, 179,' + (0.18 * (1 - d / 20)) + ')';
+        ctx.strokeStyle = 'rgba(0, 255, 179,' + (0.40 * (1 - d / 20)) + ')';
         ctx.lineWidth = 1;
         ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
       }
       var cx = w / 2;
       for (var m = -14; m <= 14; m++) {
-        ctx.strokeStyle = 'rgba(167, 0, 255, 0.10)';
+        ctx.strokeStyle = 'rgba(255, 0, 122, 0.16)';
         ctx.beginPath(); ctx.moveTo(cx, horizon); ctx.lineTo(cx + m * (w / 10), h); ctx.stroke();
       }
 
       // Horizon bloom.
-      var hb = ctx.createLinearGradient(0, horizon - 26, 0, horizon + 10);
+      var hb = ctx.createLinearGradient(0, horizon - 40, 0, horizon + 12);
       hb.addColorStop(0, 'rgba(255, 234, 0, 0)');
-      hb.addColorStop(0.7, 'rgba(255, 0, 122, 0.20)');
-      hb.addColorStop(1, 'rgba(0, 255, 179, 0.16)');
+      hb.addColorStop(0.6, 'rgba(255, 234, 0, 0.34)');
+      hb.addColorStop(0.85, 'rgba(255, 0, 122, 0.46)');
+      hb.addColorStop(1, 'rgba(0, 255, 179, 0.34)');
       ctx.fillStyle = hb;
-      ctx.fillRect(0, horizon - 26, w, 36);
+      ctx.fillRect(0, horizon - 40, w, 52);
 
       raf = requestAnimationFrame(frame);
     }
