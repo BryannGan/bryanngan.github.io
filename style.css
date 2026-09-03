@@ -1956,3 +1956,153 @@ footer {
 @media (prefers-reduced-motion: reduce) {
   .lab-grid, .lab-scan { display: none; }
 }
+
+/* ══ Dev mode, second pass: yellow/purple, LED panels, more pattern ══ */
+
+[data-mode="dev"] {
+  --amber:   #ffd23f;
+  --violet:  #a855f7;
+  --violet-d:#6d28d9;
+  --cyan:    #35e6ff;
+  --magenta: #ff2d78;
+  --acid:    #d8ff3e;
+}
+
+/* Background: amber pooling top-left, violet sweeping right, magenta
+   underneath, over three stacked pattern layers — halftone dots, a fine
+   circuit weave, and a coarse diagonal weave. */
+[data-mode="dev"] .lab {
+  background:
+    radial-gradient(78% 52% at 6% -6%,   rgba(255, 210, 63, 0.30), transparent 62%),
+    radial-gradient(72% 58% at 96% 8%,   rgba(168, 85, 247, 0.42), transparent 64%),
+    radial-gradient(90% 60% at 50% 108%, rgba(109, 40, 217, 0.46), transparent 66%),
+    radial-gradient(60% 40% at 78% 62%,  rgba(255, 45, 120, 0.20), transparent 68%),
+    /* halftone */
+    radial-gradient(circle at 50% 50%, rgba(255, 210, 63, 0.10) 1px, transparent 1.6px),
+    /* circuit weave */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90' viewBox='0 0 90 90'%3E%3Cg fill='none' stroke='%23a855f7' stroke-opacity='0.20' stroke-width='1'%3E%3Cpath d='M0 22h30v22h26v24h34'/%3E%3Cpath d='M22 0v18h24v30h44'/%3E%3Cpath d='M0 68h14v-24h20'/%3E%3Cpath d='M62 90V64h28'/%3E%3C/g%3E%3Cg fill='%23ffd23f' fill-opacity='0.28'%3E%3Ccircle cx='30' cy='22' r='2'/%3E%3Ccircle cx='56' cy='44' r='2'/%3E%3Ccircle cx='46' cy='18' r='2'/%3E%3Ccircle cx='14' cy='68' r='2'/%3E%3C/g%3E%3C/svg%3E"),
+    /* coarse diagonal weave */
+    repeating-linear-gradient(45deg, rgba(255,255,255,0.022) 0 2px, transparent 2px 14px),
+    var(--void);
+  background-size: auto, auto, auto, auto, 5px 5px, 90px 90px, auto, auto;
+}
+
+/* ── LED panel type ──
+   An animated spectrum swept behind the glyphs and clipped to them, with a
+   dot mask punched over the top so the letters read as lit pixels. */
+.led {
+  position: relative;
+  background-image: linear-gradient(100deg,
+    #ffd23f 0%, #ffa53f 14%, #ff2d78 30%, #a855f7 48%,
+    #35e6ff 66%, #d8ff3e 82%, #ffd23f 100%);
+  background-size: 260% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+.motion .led { animation: led-sweep 7s linear infinite; }
+@keyframes led-sweep { to { background-position: 260% 0; } }
+
+/* The pixel grid. Sits over the glyphs and darkens the gaps between LEDs. */
+.led::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 50% 50%, transparent 0 38%, rgba(7, 8, 14, 0.72) 42%);
+  background-size: 5px 5px;
+}
+.led-sm::after { background-size: 3px 3px; }
+
+/* Keep the glitch copies readable now that the base is a gradient. */
+.glitch::before,
+.glitch::after {
+  -webkit-text-fill-color: currentColor;
+  background: none;
+}
+.lab-title { text-shadow: 0 0 34px rgba(168, 85, 247, 0.45); }
+
+[data-mode="dev"] .shelf-title { color: transparent; }
+.spec-name { color: transparent; }
+
+/* ── Hazard tape ── */
+.hazard {
+  height: 12px;
+  margin: 0 0 1.6rem;
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--amber) 0 14px,
+    #0b0d16 14px 28px);
+  opacity: 0.85;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 100%, 10px 100%);
+}
+.motion .hazard { animation: hazard-roll 2.4s linear infinite; }
+@keyframes hazard-roll { to { background-position: 40px 0; } }
+
+/* ── Capsule and cards pick up the new palette ── */
+.capsule {
+  background:
+    linear-gradient(155deg, rgba(48, 22, 84, 0.72), rgba(13, 16, 24, 0.90) 62%),
+    linear-gradient(0deg, rgba(255, 210, 63, 0.05), rgba(255, 210, 63, 0.05));
+  border-color: rgba(168, 85, 247, 0.45);
+  box-shadow: 0 0 0 1px rgba(255, 210, 63, 0.10) inset,
+              0 24px 70px rgba(109, 40, 217, 0.28);
+}
+.hud { border-color: var(--amber); }
+.lab-eyebrow { color: var(--amber); }
+.blip { background: var(--violet); box-shadow: 0 0 10px var(--violet); }
+
+.spec-idx { color: var(--amber); }
+.spec-bar { background: rgba(168, 85, 247, 0.22); }
+.spec-bar i { background: linear-gradient(90deg, var(--amber), var(--magenta) 55%, var(--violet)); }
+
+.shelf-head { border-bottom-color: rgba(168, 85, 247, 0.35); }
+.shelf-count { color: var(--amber); opacity: 0.7; }
+
+.cap {
+  background:
+    linear-gradient(165deg, rgba(40, 20, 70, 0.92), rgba(11, 14, 22, 0.95) 70%);
+  border-color: rgba(168, 85, 247, 0.32);
+}
+.cap:hover {
+  border-color: var(--amber);
+  box-shadow: 0 0 0 1px rgba(255, 210, 63, 0.25), 0 14px 40px rgba(109, 40, 217, 0.35);
+}
+.cap-art::after {
+  background: linear-gradient(to top, rgba(9, 7, 18, 0.94), rgba(60, 20, 90, 0.18) 60%);
+}
+.cap-status            { background: var(--amber); color: #14101f; }
+.cap-status[data-s="LIVE"]      { background: var(--cyan);    color: #0b1016; }
+.cap-status[data-s="SHIPPED"]   { background: var(--acid);    color: #14180b; }
+.cap-status[data-s="IN DEV"]    { background: var(--magenta); color: #fff; }
+.cap-status[data-s="PROTOTYPE"] { background: var(--violet);  color: #fff; }
+.cap-tags span { border-color: rgba(168, 85, 247, 0.30); color: #c6b6e8; }
+
+[data-mode="dev"] .scroll-rail i { background: linear-gradient(90deg, var(--amber), var(--violet)); }
+[data-mode="dev"] .mode-dot { background: var(--amber); }
+
+/* The section nav belongs to research mode only — chef and dev have no
+   About/Publications/Conferences to point at. The switcher stays. */
+[data-mode="chef"] .nav-links,
+[data-mode="dev"]  .nav-links { display: none; }
+[data-mode="chef"] .nav-container,
+[data-mode="dev"]  .nav-container { justify-content: flex-end; }
+
+/* At small sizes the pixel mask swallows the glyphs — a 3px grid over 12px
+   type removes more ink than it stylises. Small LED keeps the colour sweep
+   and a faint scan, and drops the dot grid. */
+.led-sm::after {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(7, 8, 14, 0.42) 0 1px,
+    transparent 1px 3px);
+  background-size: auto;
+  inset: 0;
+}
+.led-sm {
+  filter: drop-shadow(0 0 6px rgba(255, 210, 63, 0.30));
+  background-size: 200% 100%;
+}
+.motion .led-sm { animation-duration: 5s; }

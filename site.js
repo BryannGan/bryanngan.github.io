@@ -498,7 +498,7 @@
         var y = hz + (fl * eye) / z;
         if (y < hz || y > h + 2) continue;
         var fade = Math.max(0, 1 - z / 26);
-        ctx.strokeStyle = 'rgba(34, 224, 255,' + (0.05 + fade * 0.20) + ')';
+        ctx.strokeStyle = 'rgba(168, 85, 247,' + (0.10 + fade * 0.34) + ')';
         ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
       }
 
@@ -506,14 +506,14 @@
       var cx = w / 2;
       for (var k = -18; k <= 18; k++) {
         var xf = cx + k * (w / 14);
-        ctx.strokeStyle = 'rgba(34, 224, 255, 0.11)';
+        ctx.strokeStyle = 'rgba(255, 210, 63, 0.10)';
         ctx.beginPath(); ctx.moveTo(cx, hz); ctx.lineTo(xf, h); ctx.stroke();
       }
 
       // Horizon glow.
       var g = ctx.createLinearGradient(0, hz - 60, 0, hz + 8);
-      g.addColorStop(0, 'rgba(255, 45, 120, 0)');
-      g.addColorStop(1, 'rgba(255, 45, 120, 0.16)');
+      g.addColorStop(0, 'rgba(255, 210, 63, 0)');
+      g.addColorStop(1, 'rgba(255, 210, 63, 0.26)');
       ctx.fillStyle = g;
       ctx.fillRect(0, hz - 60, w, 68);
 
@@ -542,15 +542,15 @@
     for (var i = 0; i < seed.length; i++) s = (s * 31 + seed.charCodeAt(i)) >>> 0;
     function rnd() { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }
 
-    x.fillStyle = '#0b0e18'; x.fillRect(0, 0, 480, 270);
-    x.strokeStyle = 'rgba(34,224,255,0.16)'; x.lineWidth = 1;
+    x.fillStyle = '#140d24'; x.fillRect(0, 0, 480, 270);
+    x.strokeStyle = 'rgba(168,85,247,0.20)'; x.lineWidth = 1;
     for (var gx = 0; gx <= 480; gx += 24) { x.beginPath(); x.moveTo(gx, 0); x.lineTo(gx, 270); x.stroke(); }
     for (var gy = 0; gy <= 270; gy += 24) { x.beginPath(); x.moveTo(0, gy); x.lineTo(480, gy); x.stroke(); }
 
     for (var n = 0; n < 16; n++) {
       var px = Math.floor(rnd() * 20) * 24;
       var py = Math.floor(rnd() * 11) * 24;
-      x.strokeStyle = rnd() > 0.5 ? 'rgba(34,224,255,0.75)' : 'rgba(255,45,120,0.7)';
+      x.strokeStyle = rnd() > 0.5 ? 'rgba(255,210,63,0.80)' : 'rgba(168,85,247,0.85)';
       x.lineWidth = 2;
       x.beginPath(); x.moveTo(px, py);
       var steps = 2 + Math.floor(rnd() * 3);

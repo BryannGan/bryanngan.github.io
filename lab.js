@@ -22,14 +22,6 @@ window.LAB = [
     href: 'https://github.com/BryannGan/MIROS'
   },
   {
-    title: 'Momentum Trading System',
-    tagline: 'Ten strategies tested, two deployed. Full pipeline from hypothesis to live execution on the Alpaca API.',
-    tags: ['Python', 'Backtesting', 'Live trading'],
-    status: 'LIVE',
-    year: '2026',
-    href: 'trading.html'
-  },
-  {
     title: 'This Site',
     tagline: 'Three modes, one document. Hand-authored canvas fields, SVG botanicals, zero framework.',
     tags: ['Vanilla JS', 'Canvas', 'CSS'],
