@@ -1635,3 +1635,21 @@ footer {
     grid-auto-rows: 132px;
   }
 }
+
+/* Lede is now a single line, so it carries more weight and less width. */
+[data-mode="chef"] .kitchen-lede {
+  font-size: clamp(1.15rem, 2.2vw, 1.5rem);
+  font-style: italic;
+  color: var(--ink-soft);
+  max-width: none;
+  margin-bottom: 1.25rem;
+}
+
+.kitchen-hint {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-top: 0.35rem;
+}
