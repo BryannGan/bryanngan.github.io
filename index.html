@@ -6,7 +6,7 @@
   <title>Bryan Gan | Columbia University</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&family=Bungee&display=swap&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -138,45 +138,82 @@
 
 
   <section id="lab" class="lab">
-    <canvas class="lab-grid" aria-hidden="true"></canvas>
-    <div class="lab-scrim" aria-hidden="true"></div>
-    <div class="lab-scan" aria-hidden="true"></div>
+
+    <!-- Ink sprite. Four splats and a drip edge, hand-authored. Everything
+         inked on the page is a <use> of one of these. -->
+    <svg class="ink-defs" width="0" height="0" aria-hidden="true" focusable="false">
+      <defs>
+        <symbol id="splat-a" viewBox="0 0 200 200">
+          <path d="M96 8c14-6 26 4 30 18 4 13 16 15 27 9 14-8 28 2 27 17-1 12-9 18-4 28 5 11 20 12 22 26 2 13-11 22-24 21-11-1-18 6-18 17 0 16-16 25-28 17-10-6-19-4-26 5-9 12-27 10-32-4-4-11-12-15-23-13-15 3-27-9-23-24 3-11-1-19-12-24C4 95 2 78 15 71c10-5 13-13 10-24C21 33 33 20 47 24c11 3 19-2 22-13 2-8 12-11 27 3z"/>
+          <circle cx="176" cy="42" r="9"/><circle cx="192" cy="72" r="5"/>
+          <circle cx="22" cy="162" r="7"/><circle cx="150" cy="186" r="6"/>
+          <circle cx="8" cy="108" r="4"/>
+        </symbol>
+
+        <symbol id="splat-b" viewBox="0 0 200 200">
+          <path d="M104 4c18 2 22 18 20 33-2 12 6 19 18 18 17-2 29 12 22 27-5 11-2 19 8 25 13 8 12 27-2 33-11 5-15 13-12 25 4 15-10 27-24 21-11-4-19 0-24 11-7 15-27 15-33-1-4-11-12-15-23-12-15 4-28-8-24-23 3-11-2-18-13-22-15-6-17-25-4-33 10-6 13-14 9-25-5-15 7-28 22-25 12 2 20-4 21-16 2-14 15-24 39-36z"/>
+          <circle cx="18" cy="40" r="8"/><circle cx="186" cy="128" r="7"/>
+          <circle cx="96" cy="194" r="6"/><circle cx="196" cy="30" r="4"/>
+        </symbol>
+
+        <symbol id="splat-c" viewBox="0 0 200 200">
+          <path d="M100 12c22-4 34 12 30 32-3 15 5 22 20 21 20-2 32 16 22 32-8 13-5 22 8 29 17 9 14 32-5 36-14 3-20 12-17 26 4 18-15 30-30 21-11-7-21-4-27 7-9 17-33 15-38-4-3-12-11-17-23-14-19 5-33-11-26-29 5-12 1-21-11-26-18-8-18-33 0-40 12-5 16-14 11-26-7-18 8-34 26-29 12 3 21-3 23-15 3-16 15-24 37-21z"/>
+          <circle cx="10" cy="76" r="6"/><circle cx="188" cy="60" r="8"/>
+          <circle cx="170" cy="182" r="5"/>
+        </symbol>
+
+        <symbol id="splat-d" viewBox="0 0 200 200">
+          <path d="M100 18c16-8 32 2 33 19 1 13 9 19 22 17 18-3 30 13 21 29-6 11-3 19 8 25 15 8 14 29-3 34-12 4-17 12-14 24 4 17-13 29-28 20-11-6-20-3-26 8-8 15-30 14-35-3-3-11-11-16-22-13-17 4-30-10-24-26 4-11 0-19-11-24-16-7-16-28 0-35 11-5 15-13 11-24-6-16 7-30 23-26 12 3 20-3 22-15 2-13 10-19 23-10z"/>
+          <circle cx="184" cy="94" r="7"/><circle cx="26" cy="30" r="6"/>
+          <circle cx="120" cy="192" r="5"/>
+        </symbol>
+
+        <!-- Drip edge: a band with tongues of ink hanging off the bottom. -->
+        <symbol id="drip-edge" viewBox="0 0 400 44" preserveAspectRatio="none">
+          <path d="M0 0h400v16c-10 0-12 14-22 14s-11-10-21-10-9 18-20 18-12-16-23-16-10 12-21 12-11-14-22-14-10 16-21 16-12-12-23-12-10 10-21 10-11-16-22-16-10 14-21 14-12-12-23-12-10 12-21 12-11-14-22-14-10 10-21 10-12-12-23-12-10 10-21 10-11-8-22-8V0z"/>
+        </symbol>
+      </defs>
+    </svg>
+
+    <!-- Splats painted into the page margins, revealed on scroll. -->
+    <div class="ink-field" aria-hidden="true">
+      <svg class="blot blot-1 ink-y" viewBox="0 0 200 200"><use href="#splat-a"/></svg>
+      <svg class="blot blot-2 ink-p" viewBox="0 0 200 200"><use href="#splat-b"/></svg>
+      <svg class="blot blot-3 ink-y" viewBox="0 0 200 200"><use href="#splat-c"/></svg>
+      <svg class="blot blot-4 ink-p" viewBox="0 0 200 200"><use href="#splat-d"/></svg>
+      <svg class="blot blot-5 ink-y" viewBox="0 0 200 200"><use href="#splat-b"/></svg>
+      <svg class="blot blot-6 ink-p" viewBox="0 0 200 200"><use href="#splat-c"/></svg>
+    </div>
 
     <div class="container lab-inner">
 
-      <!-- Capsule: the store-page hero -->
-      <div class="capsule">
-        <span class="hud hud-tl" aria-hidden="true"></span>
-        <span class="hud hud-tr" aria-hidden="true"></span>
-        <span class="hud hud-bl" aria-hidden="true"></span>
-        <span class="hud hud-br" aria-hidden="true"></span>
+      <header class="ink-head">
+        <!-- The headline sits on its own splat. -->
+        <svg class="head-splat ink-y" viewBox="0 0 200 200" aria-hidden="true"><use href="#splat-a"/></svg>
+        <svg class="head-splat-2 ink-p" viewBox="0 0 200 200" aria-hidden="true"><use href="#splat-c"/></svg>
 
         <p class="lab-eyebrow"><span class="blip" aria-hidden="true"></span>System online &mdash; build 2026.09</p>
-
-        <h1 class="lab-title glitch led" data-text="I UNDERSTAND VIBE CODING.">I UNDERSTAND VIBE CODING.</h1>
+        <h1 class="lab-title glitch" data-text="I UNDERSTAND VIBE CODING.">I UNDERSTAND VIBE CODING.</h1>
 
         <ul class="spec-row">
-          <li class="spec">
+          <li class="spec spec-y">
+            <svg class="spec-blob" viewBox="0 0 200 200" preserveAspectRatio="none" aria-hidden="true"><use href="#splat-b"/></svg>
             <span class="spec-idx">01</span>
-            <span class="spec-name led led-sm">Fast prototype</span>
-            <span class="spec-bar"><i style="--fill:96%"></i></span>
+            <span class="spec-name">Fast prototype</span>
           </li>
-          <li class="spec">
+          <li class="spec spec-p">
+            <svg class="spec-blob" viewBox="0 0 200 200" preserveAspectRatio="none" aria-hidden="true"><use href="#splat-d"/></svg>
             <span class="spec-idx">02</span>
-            <span class="spec-name led led-sm">Iterate</span>
-            <span class="spec-bar"><i style="--fill:92%"></i></span>
+            <span class="spec-name">Iterate</span>
           </li>
-          <li class="spec">
+          <li class="spec spec-y">
+            <svg class="spec-blob" viewBox="0 0 200 200" preserveAspectRatio="none" aria-hidden="true"><use href="#splat-c"/></svg>
             <span class="spec-idx">03</span>
-            <span class="spec-name led led-sm">Design</span>
-            <span class="spec-bar"><i style="--fill:88%"></i></span>
+            <span class="spec-name">Design</span>
           </li>
         </ul>
-      </div>
+      </header>
 
-      <div class="hazard" aria-hidden="true"></div>
-
-      <!-- Store shelf -->
       <div class="shelf-head">
         <h2 class="shelf-title">Featured &amp; Recommended</h2>
         <span class="shelf-count" id="lab-count"></span>
