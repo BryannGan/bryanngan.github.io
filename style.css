@@ -1678,10 +1678,11 @@ footer {
 }
 .motion .led-sm { animation-duration: 5s; }
 
+
 /* ══════════════════════════════════════════════════════════════════
-   DEVELOPER MODE — ink
-   Bright ground, two inks, black outlines. Cyberpunk survives as
-   overlay only: HUD brackets, mono readouts, glitch on the headline.
+   DEVELOPER MODE — bold fields + neon city
+   Splatoon's graphic language (flat colour blocks, hard diagonals,
+   halftone) over a TRON-lit vector city. No splatter.
    ══════════════════════════════════════════════════════════════════ */
 
 #lab { display: none; }
@@ -1697,419 +1698,332 @@ footer {
 [data-mode="dev"] #kitchen { display: none; }
 
 [data-mode="dev"] {
-  --yellow:   #eaff00;
-  --yellow-d: #c6d600;
-  --purple:   #7a2ff2;
-  --purple-d: #5713c4;
-  --sky:      #2ec5ff;
-  --sky-soft: #d6f2ff;
-  --outline:  #0d0b16;
+  --void:    #0B0616;
+  --magenta: #FF2D95;
+  --violet:  #7B2FF7;
+  --violet-l:#B44BFF;
+  --cyan:    #00E5FF;
+  --yellow:  #EAFF00;
+  --blue:    #2B6BFF;
 
-  --paper:        #f4fbff;
-  --paper-sunk:   #e6f5ff;
-  --paper-raised: #ffffff;
-  --ink:          var(--outline);
-  --ink-soft:     #2c2942;
-  --ink-muted:    #56526f;
-  --ink-faint:    #8b87a3;
-  --rule:         rgba(13, 11, 22, 0.14);
-  --rule-strong:  rgba(13, 11, 22, 0.30);
-  --clay:         var(--purple);
-  --clay-hover:   var(--purple-d);
-  --accent-mode:  var(--purple);
+  --paper:        var(--void);
+  --paper-sunk:   #150C28;
+  --paper-raised: #1A1030;
+  --ink:          #F4F0FF;
+  --ink-soft:     #CFC5EC;
+  --ink-muted:    #9C90C4;
+  --ink-faint:    #6E639A;
+  --rule:         rgba(180, 75, 255, 0.30);
+  --rule-strong:  rgba(180, 75, 255, 0.55);
+  --clay:         var(--cyan);
+  --clay-hover:   #8CF3FF;
+  --accent-mode:  var(--cyan);
 }
 
-[data-mode="dev"] body { background: var(--paper); color: var(--ink); }
+[data-mode="dev"] body { background: var(--void); color: var(--ink); }
 [data-mode="dev"] #navbar {
-  background: rgba(244, 251, 255, 0.9);
-  border-bottom: 3px solid var(--outline);
+  background: rgba(11, 6, 22, 0.82);
+  border-bottom: 1px solid rgba(255, 45, 149, 0.4);
+  backdrop-filter: blur(8px);
 }
-[data-mode="dev"] .scroll-rail i { background: var(--purple); }
+[data-mode="dev"] .scroll-rail i { background: linear-gradient(90deg, var(--magenta), var(--cyan)); }
 [data-mode="dev"] .mode-switch summary {
-  border: 2px solid var(--outline);
-  color: var(--outline);
-  font-weight: 600;
-  background: var(--yellow);
+  border: 1px solid var(--cyan);
+  color: var(--cyan);
+  background: rgba(0, 229, 255, 0.08);
+  box-shadow: 0 0 14px rgba(0, 229, 255, 0.35);
 }
-[data-mode="dev"] .mode-dot { background: var(--purple); }
+[data-mode="dev"] .mode-dot { background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+[data-mode="dev"] .mode-menu { background: #150C28; border-color: rgba(180,75,255,0.45); }
 
 .lab {
   position: relative;
   min-height: 100vh;
-  padding: 6rem 0 5rem;
+  padding: 5.5rem 0 5rem;
   overflow: hidden;
+  background: var(--void);
+}
+.grid-city { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
+
+/* Halftone — the Splatoon poster texture, over the whole frame. */
+.halftone {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background-image: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.10) 1px, transparent 1.5px);
+  background-size: 5px 5px;
+  mix-blend-mode: overlay;
+}
+.vignette {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
   background:
-    radial-gradient(80% 55% at 50% -8%, var(--sky-soft), transparent 70%),
-    linear-gradient(180deg, #ffffff 0%, var(--paper) 42%, var(--sky-soft) 100%);
+    radial-gradient(120% 80% at 50% 40%, transparent 40%, rgba(11, 6, 22, 0.72) 100%),
+    linear-gradient(180deg, rgba(11,6,22,0.55) 0%, transparent 22%, transparent 62%, rgba(11,6,22,0.92) 100%);
 }
 .lab-inner { position: relative; z-index: 2; }
 
-/* ── Ink primitives ── */
-.ink-defs { position: absolute; }
-.ink-y { color: var(--yellow); }
-.ink-p { color: var(--purple); }
-.ink-y use, .ink-p use { fill: currentColor; stroke: var(--outline); stroke-width: 4; }
-
-/* Margin splats. Start collapsed; the scroll observer pops them. */
-.ink-field { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
-.blot { position: absolute; width: 260px; height: 260px; opacity: 0; transform: scale(0.2) rotate(-25deg); }
-.motion .blot { transition: opacity 0.5s ease, transform 0.7s cubic-bezier(0.18, 1.5, 0.4, 1); }
-.blot.is-in { opacity: 1; transform: scale(1) rotate(var(--rot, 0deg)); }
-.blot-1 { top: 4%;  left: -7%;  width: 340px; height: 340px; --rot: -18deg; }
-.blot-2 { top: 12%; right: -8%; width: 400px; height: 400px; --rot: 22deg; }
-.blot-3 { top: 46%; left: -9%;  width: 300px; height: 300px; --rot: 12deg; }
-.blot-4 { top: 62%; right: -7%; width: 320px; height: 320px; --rot: -14deg; }
-.blot-5 { top: 84%; left: -6%;  width: 260px; height: 260px; --rot: 28deg; }
-.blot-6 { top: 92%; right: -5%; width: 240px; height: 240px; --rot: -20deg; }
-
-/* ── Masthead ── */
-.ink-head { position: relative; padding: 1rem 0 3.25rem; }
-.head-splat, .head-splat-2 { position: absolute; z-index: -1; pointer-events: none; }
-.head-splat   { top: -8%;  left: -6%;  width: 460px; height: 460px; transform: rotate(-12deg); }
-.head-splat-2 { top: 30%;  right: -4%; width: 380px; height: 380px; transform: rotate(18deg); opacity: 0.92; }
+/* ── Masthead: flat colour fields cut on hard diagonals ── */
+.lab-head { position: relative; padding: 2.5rem 0 3rem; }
+.field {
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  /* halftone punched through each field */
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 1.4px, transparent 1.6px);
+  mask-image: radial-gradient(circle at 50% 50%, #000 1.4px, transparent 1.6px);
+  -webkit-mask-size: 4px 4px;
+  mask-size: 4px 4px;
+}
+.field-y {
+  top: -6%; left: -12%; width: 46%; height: 78%;
+  background: var(--yellow);
+  clip-path: polygon(0 0, 100% 0, 74% 100%, 0 100%);
+  opacity: 0.9;
+}
+.field-p {
+  top: 14%; right: -14%; width: 52%; height: 92%;
+  background: var(--violet);
+  clip-path: polygon(26% 0, 100% 0, 100% 100%, 0 100%);
+  opacity: 0.85;
+}
+.field-m {
+  bottom: -14%; left: 24%; width: 34%; height: 46%;
+  background: var(--magenta);
+  clip-path: polygon(0 0, 100% 22%, 82% 100%, 12% 78%);
+  opacity: 0.7;
+}
 
 .lab-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
+  display: inline-flex; align-items: center; gap: 0.5rem;
   font-family: var(--mono);
-  font-size: 0.64rem;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: #fff;
-  background: var(--outline);
-  padding: 0.32rem 0.7rem;
-  margin-bottom: 1.2rem;
+  font-size: 0.62rem; font-weight: 600;
+  letter-spacing: 0.28em; text-transform: uppercase;
+  color: var(--cyan);
+  border: 1px solid rgba(0, 229, 255, 0.5);
+  padding: 0.3rem 0.7rem;
+  margin-bottom: 1.4rem;
+  background: rgba(11, 6, 22, 0.6);
+  box-shadow: 0 0 18px rgba(0, 229, 255, 0.22) inset;
 }
-.blip { width: 7px; height: 7px; border-radius: 50%; background: var(--yellow); }
+.blip { width: 6px; height: 6px; border-radius: 50%; background: var(--yellow); box-shadow: 0 0 8px var(--yellow); }
 .motion .blip { animation: blip 1.4s steps(1) infinite; }
 @keyframes blip { 0%,60% { opacity: 1; } 61%,100% { opacity: 0.2; } }
 
-/* Headline: chunky display, hard black outline, offset drop. */
+/* Headline: heavy Splatoon weight, TRON glow. */
 .lab-title {
-  font-family: "Bungee", "IBM Plex Mono", monospace;
+  font-family: "Bungee", var(--mono), monospace;
   font-weight: 400;
-  font-size: min(4.4rem, 6.1vw);
+  font-size: min(4.3rem, 6vw);
   line-height: 1.02;
-  letter-spacing: 0.005em;
+  letter-spacing: 0.01em;
   white-space: nowrap;
   color: #fff;
-  -webkit-text-stroke: 3px var(--outline);
-  paint-order: stroke fill;
-  text-shadow: 6px 6px 0 var(--purple), 12px 12px 0 rgba(13, 11, 22, 0.18);
-  margin-bottom: 2.25rem;
+  margin-bottom: 2.4rem;
+  text-shadow:
+    0 0 6px rgba(255,255,255,0.9),
+    0 0 22px var(--cyan),
+    0 0 48px rgba(0, 229, 255, 0.7),
+    4px 4px 0 var(--magenta);
 }
 
-/* Glitch kept as the cyberpunk overlay — top-to-bottom band distortion. */
 .glitch { position: relative; }
 .glitch::before, .glitch::after {
   content: attr(data-text);
   position: absolute; inset: 0;
-  pointer-events: none;
-  opacity: 0;
-  -webkit-text-stroke: 3px var(--outline);
-  paint-order: stroke fill;
+  pointer-events: none; opacity: 0;
   text-shadow: none;
 }
-.glitch::before { color: var(--yellow); }
-.glitch::after  { color: var(--sky); }
-.motion .glitch::before { animation: glitch-a 6s infinite; }
-.motion .glitch::after  { animation: glitch-b 6s infinite; }
+.glitch::before { color: var(--magenta); }
+.glitch::after  { color: var(--cyan); }
+.motion .glitch::before { animation: glitch-a 5.5s infinite; }
+.motion .glitch::after  { animation: glitch-b 5.5s infinite; }
 @keyframes glitch-a {
   0%,90%,100% { opacity: 0; transform: none; clip-path: none; }
-  91% { opacity: 1; transform: translate(-6px, 2px); clip-path: inset(10% 0 62% 0); }
-  94% { opacity: 1; transform: translate(4px, -3px); clip-path: inset(66% 0 10% 0); }
-  97% { opacity: 1; transform: translate(-3px, 0);   clip-path: inset(40% 0 38% 0); }
+  91% { opacity: 0.95; transform: translate(-5px, 2px); clip-path: inset(10% 0 62% 0); }
+  94% { opacity: 0.95; transform: translate(4px, -3px); clip-path: inset(66% 0 10% 0); }
+  97% { opacity: 0.8;  transform: translate(-3px, 0);   clip-path: inset(40% 0 38% 0); }
 }
 @keyframes glitch-b {
   0%,90%,100% { opacity: 0; transform: none; clip-path: none; }
-  92%   { opacity: 1; transform: translate(6px, -2px); clip-path: inset(26% 0 48% 0); }
-  95.5% { opacity: 1; transform: translate(-5px, 3px); clip-path: inset(72% 0 6% 0); }
-  98.5% { opacity: 1; transform: translate(2px, 0);    clip-path: inset(4% 0 78% 0); }
+  92%   { opacity: 0.9; transform: translate(5px, -2px); clip-path: inset(26% 0 48% 0); }
+  95.5% { opacity: 0.9; transform: translate(-4px, 3px); clip-path: inset(72% 0 6% 0); }
+  98.5% { opacity: 0.7; transform: translate(2px, 0);    clip-path: inset(4% 0 78% 0); }
 }
 
-/* ── Specs, each in its own blob ── */
+/* ── Specs: angular neon chips ── */
 .spec-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
-  gap: 1.5rem 1.75rem;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  border: 0;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 226px), 1fr));
+  gap: 1rem;
+  list-style: none; padding: 0; margin: 0; border: 0;
 }
 .spec {
-  position: relative;
-  display: flex;
-  align-items: baseline;
-  gap: 0.7rem;
-  padding: 1.5rem 1.25rem 1.6rem;
-  min-height: 92px;
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.85rem 1.1rem;
+  background: rgba(11, 6, 22, 0.62);
+  border: 1px solid rgba(0, 229, 255, 0.42);
+  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+  box-shadow: 0 0 24px rgba(0, 229, 255, 0.14) inset;
 }
-.spec-blob {
-  position: absolute;
-  inset: -18% -10%;
-  width: auto; height: auto;
-  z-index: -1;
-  pointer-events: none;
-}
-.spec-y .spec-blob { color: var(--yellow); }
-.spec-p .spec-blob { color: var(--purple); }
 .spec-idx {
-  font-family: var(--mono);
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--outline);
+  font-family: var(--mono); font-size: 0.72rem; font-weight: 700;
+  color: var(--yellow); text-shadow: 0 0 10px rgba(234,255,0,0.7);
 }
-.spec-p .spec-idx { color: var(--yellow); }
 .spec-name {
   font-family: "Bungee", var(--mono), monospace;
-  font-size: 1.02rem;
-  letter-spacing: 0.01em;
-  text-transform: uppercase;
-  color: var(--outline);
-  white-space: nowrap;
+  font-size: 0.92rem; letter-spacing: 0.02em; text-transform: uppercase;
+  color: #fff; white-space: nowrap;
+  text-shadow: 0 0 14px rgba(0, 229, 255, 0.75);
 }
-.spec-p .spec-name { color: #fff; }
 
 /* ── Shelf ── */
 .shelf-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  background: var(--outline);
-  padding: 0.6rem 1rem;
-  margin-bottom: 1.4rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  margin: 3.5rem 0 1.3rem;
+  padding: 0.55rem 1rem;
+  background: linear-gradient(90deg, rgba(255,45,149,0.22), rgba(123,47,247,0.14) 60%, transparent);
+  border-left: 4px solid var(--magenta);
+  box-shadow: 0 0 26px rgba(255, 45, 149, 0.18);
 }
 [data-mode="dev"] .shelf-title {
   font-family: "Bungee", var(--mono), monospace;
-  font-size: 0.98rem;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  color: var(--yellow);
+  font-size: 0.95rem; letter-spacing: 0.03em; text-transform: uppercase;
+  color: #fff; text-shadow: 0 0 14px var(--magenta);
   border: 0; padding: 0; margin: 0; display: block;
 }
 [data-mode="dev"] .shelf-title::before { content: none; }
-.shelf-count {
-  font-family: var(--mono);
-  font-size: 0.66rem;
-  letter-spacing: 0.14em;
-  color: #fff;
-}
+.shelf-count { font-family: var(--mono); font-size: 0.64rem; letter-spacing: 0.14em; color: var(--cyan); }
 
 .capsule-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
-  gap: 18px;
+  gap: 16px;
 }
 
-/* ── Cards: hard outline, drip edge, ink flood on hover ── */
+/* ── Cards: notched, neon-edged, lit on hover ── */
 .cap {
-  position: relative;
-  display: block;
-  padding: 0;
-  text-align: left;
-  color: var(--outline);
-  background: var(--paper-raised);
-  border: 3px solid var(--outline);
-  border-radius: 4px;
+  position: relative; display: block; padding: 0; text-align: left;
+  color: var(--ink);
+  background: linear-gradient(165deg, rgba(26, 16, 48, 0.92), rgba(11, 6, 22, 0.96));
+  border: 1px solid rgba(180, 75, 255, 0.45);
+  clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);
   overflow: hidden;
-  box-shadow: 6px 6px 0 rgba(13, 11, 22, 0.9);
 }
-.motion .cap { transition: transform 0.25s cubic-bezier(0.22,1,0.36,1), box-shadow 0.25s; }
-.cap:hover { transform: translate(-3px, -3px); box-shadow: 10px 10px 0 var(--purple); }
-
-.cap-art { position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: var(--sky-soft); border-bottom: 3px solid var(--outline); }
+.motion .cap { transition: transform 0.25s cubic-bezier(0.22,1,0.36,1), box-shadow 0.25s, border-color 0.25s; }
+.cap:hover {
+  transform: translateY(-4px);
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 1px rgba(0,229,255,0.5), 0 0 46px rgba(0, 229, 255, 0.34);
+}
+.cap-art { position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: #120A22; border-bottom: 1px solid rgba(180,75,255,0.4); }
 .cap-art img, .cap-art canvas { width: 100%; height: 100%; object-fit: cover; display: block; }
-.cap-art::after { content: none; }
-
-/* Ink wipe. A coloured layer rises from the bottom behind a drip mask. */
-.cap-flood {
-  position: absolute;
-  left: -2%; right: -2%; bottom: 0;
-  height: 118%;
-  z-index: 1;
-  pointer-events: none;
-  transform: translateY(101%);
-  background: var(--purple);
+.cap-art::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(11,6,22,0.92), rgba(123,47,247,0.10) 62%);
 }
-.cap:nth-child(odd) .cap-flood { background: var(--yellow); }
-.motion .cap-flood { transition: transform 0.42s cubic-bezier(0.3, 1.1, 0.4, 1); }
-.cap:hover .cap-flood { transform: translateY(0); }
-.cap-flood .drip {
-  position: absolute;
-  top: -22px; left: 0; right: 0;
-  height: 24px;
-  width: 100%;
-  display: block;
-  color: inherit;
-  fill: currentColor;
-}
-.cap-flood-note {
-  position: absolute;
-  left: 1rem; bottom: 1rem;
-  z-index: 2;
-  font-family: "Bungee", var(--mono), monospace;
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  color: var(--outline);
-  opacity: 0;
-}
-.cap:nth-child(even) .cap-flood-note { color: #fff; }
-.motion .cap-flood-note { transition: opacity 0.2s 0.22s; }
-.cap:hover .cap-flood-note { opacity: 1; }
 
 .cap-status {
-  position: absolute;
-  top: 8px; left: 8px;
-  z-index: 3;
-  font-family: var(--mono);
-  font-size: 0.58rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  padding: 0.22rem 0.5rem;
-  color: var(--outline);
-  background: var(--yellow);
-  border: 2px solid var(--outline);
+  position: absolute; top: 10px; left: 10px; z-index: 2;
+  font-family: var(--mono); font-size: 0.56rem; font-weight: 700;
+  letter-spacing: 0.16em; padding: 0.2rem 0.5rem;
+  color: #0B0616; background: var(--yellow); box-shadow: 0 0 14px rgba(234,255,0,0.5);
 }
-.cap-status[data-s="LIVE"]      { background: var(--sky); }
-.cap-status[data-s="IN DEV"]    { background: var(--purple); color: #fff; }
-.cap-status[data-s="PROTOTYPE"] { background: #fff; }
-.cap-year {
-  position: absolute;
-  top: 10px; right: 10px;
-  z-index: 3;
-  font-family: var(--mono);
-  font-size: 0.62rem;
-  font-weight: 600;
-  color: var(--outline);
-  background: rgba(255,255,255,0.85);
-  padding: 0 0.3rem;
-}
+.cap-status[data-s="LIVE"]      { background: var(--cyan);    box-shadow: 0 0 14px rgba(0,229,255,0.6); }
+.cap-status[data-s="SHIPPED"]   { background: var(--cyan);    box-shadow: 0 0 14px rgba(0,229,255,0.6); }
+.cap-status[data-s="IN DEV"]    { background: var(--magenta); color: #fff; box-shadow: 0 0 14px rgba(255,45,149,0.6); }
+.cap-status[data-s="PROTOTYPE"] { background: var(--violet);  color: #fff; box-shadow: 0 0 14px rgba(123,47,247,0.6); }
+.cap-year { position: absolute; top: 11px; right: 12px; z-index: 2; font-family: var(--mono); font-size: 0.62rem; color: var(--cyan); }
 
 .cap-body { position: relative; z-index: 2; padding: 1rem 1.1rem 1.2rem; }
 .cap-title {
   font-family: "Bungee", var(--mono), monospace;
-  font-size: 1.05rem;
-  letter-spacing: 0.01em;
-  color: var(--outline);
-  margin-bottom: 0.45rem;
+  font-size: 1rem; letter-spacing: 0.01em; color: #fff;
+  margin-bottom: 0.45rem; text-shadow: 0 0 16px rgba(0,229,255,0.4);
 }
-.cap-tagline { font-size: 0.86rem; line-height: 1.5; color: var(--ink-soft); margin-bottom: 0.75rem; }
+.cap-tagline { font-size: 0.85rem; line-height: 1.5; color: var(--ink-soft); margin-bottom: 0.7rem; }
 .cap-tags { display: flex; flex-wrap: wrap; gap: 5px; }
 .cap-tags span {
-  font-family: var(--mono);
-  font-size: 0.6rem;
-  font-weight: 600;
-  padding: 0.16rem 0.42rem;
-  color: var(--outline);
-  background: var(--sky-soft);
-  border: 2px solid var(--outline);
+  font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.05em;
+  padding: 0.16rem 0.42rem; color: #A9E9FF;
+  background: rgba(0, 229, 255, 0.07); border: 1px solid rgba(0, 229, 255, 0.3);
 }
-
-/* ── Ink flood on load ── */
-.motion [data-mode="dev"] .ink-head { }
-.motion .lab-title,
-.motion .lab-eyebrow,
-.motion .spec,
-.motion .head-splat,
-.motion .head-splat-2 {
-  opacity: 0;
-  transform: scale(0.72) rotate(-8deg);
+.cap-flood-note {
+  position: absolute; right: 1.1rem; bottom: 1.15rem; z-index: 3;
+  font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--cyan); opacity: 0;
 }
-.motion .lab-title  { transform: translateY(24px) scale(0.94); }
-.motion .lab-eyebrow{ transform: translateY(14px); }
-.motion .lab-title.is-in,
-.motion .lab-eyebrow.is-in,
-.motion .spec.is-in,
-.motion .head-splat.is-in,
-.motion .head-splat-2.is-in {
-  opacity: 1;
-  transform: none;
-  transition: opacity 0.42s ease, transform 0.62s cubic-bezier(0.18, 1.42, 0.4, 1);
-}
-.motion .head-splat.is-in   { transform: rotate(-12deg); }
-.motion .head-splat-2.is-in { transform: rotate(18deg); }
+.motion .cap-flood-note { transition: opacity 0.2s; }
+.cap:hover .cap-flood-note { opacity: 1; }
 
 @media (max-width: 720px) {
-  .lab-title { font-size: 7.4vw; }
-  .head-splat, .head-splat-2 { width: 280px; height: 280px; }
-  .blot { display: none; }
+  .lab-title { font-size: 7.2vw; }
+  .field { opacity: 0.55; }
 }
-@media (prefers-reduced-motion: reduce) {
-  .blot { opacity: 1; transform: scale(1); }
+@media (prefers-reduced-motion: reduce) { .grid-city { display: none; } }
+
+/* ── Fixes ── */
+
+/* The fields carried their own halftone mask, which dissolved them into
+   texture — the opposite of the bold flat blocks they're meant to be.
+   Solid now; the page-wide .halftone layer supplies the dot texture. */
+.field {
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+.field-y { opacity: 0.95; top: -10%; left: -14%; width: 44%; height: 86%; }
+.field-p { opacity: 0.92; top: 6%;  right: -16%; width: 50%; height: 104%; }
+.field-m { opacity: 0.88; bottom: -20%; left: 20%; width: 32%; height: 52%; }
+
+/* Type sits on the yellow field, so it needs dark ink there rather than a
+   white glow that vanishes against it. */
+.lab-title {
+  color: #0B0616;
+  text-shadow:
+    3px 3px 0 var(--magenta),
+    6px 6px 0 rgba(0, 229, 255, 0.85),
+    0 0 30px rgba(255, 255, 255, 0.35);
+}
+.lab-eyebrow {
+  background: #0B0616;
+  border-color: var(--cyan);
+}
+.spec { background: rgba(11, 6, 22, 0.88); }
+
+/* Keep the skyline under the content rather than through it. */
+.grid-city { opacity: 0.78; }
+.vignette {
+  background:
+    radial-gradient(120% 70% at 50% 34%, transparent 30%, rgba(11, 6, 22, 0.80) 100%),
+    linear-gradient(180deg, rgba(11,6,22,0.60) 0%, transparent 20%, transparent 44%, rgba(11,6,22,0.96) 78%);
 }
 
-/* ── Ink fixes ── */
-
-/* The fill rule was scoped to .ink-y/.ink-p, which the spec blobs don't
-   carry — so their <use> fell back to default black and swallowed the
-   labels. Scope it to every splat instead, and let the wrapper set colour. */
-.blot use,
-.head-splat use,
-.head-splat-2 use,
-.spec-blob use {
-  fill: currentColor;
-  stroke: var(--outline);
-  stroke-width: 4;
-  stroke-linejoin: round;
+/* A full-bleed angled band behind the headline. Dark type on a bold field
+   is the poster move, and it fixes the headline reading as outline-only
+   where it crossed the dark ground. */
+.title-band {
+  position: absolute;
+  left: -50vw; right: -50vw;
+  top: 3.6rem;
+  height: 5.6rem;
+  z-index: -1;
+  background: var(--yellow);
+  transform: skewY(-1.6deg);
+  box-shadow: 0 0 60px rgba(234, 255, 0, 0.30);
 }
-.head-splat, .blot-1, .blot-3, .blot-5 { color: var(--yellow); }
-.head-splat-2, .blot-2, .blot-4, .blot-6 { color: var(--purple); }
-
-/* Splats were sized to cover rather than frame. Pulled back and pushed
-   further off-canvas so they bleed off the edges instead of sitting on
-   the type. */
-.head-splat   { top: -14%; left: -14%; width: 330px; height: 330px; }
-.head-splat-2 { top: 22%;  right: -12%; width: 260px; height: 260px; }
-.blot-1 { top: 6%;  left: -13%; width: 230px; height: 230px; }
-.blot-2 { top: 15%; right: -13%; width: 250px; height: 250px; }
-.blot-3 { top: 47%; left: -14%; width: 210px; height: 210px; }
-.blot-4 { top: 63%; right: -13%; width: 225px; height: 225px; }
-.blot-5 { top: 85%; left: -12%; width: 190px; height: 190px; }
-.blot-6 { top: 93%; right: -11%; width: 180px; height: 180px; }
-
-/* Masthead needs clear ground for the headline to read over. */
-.ink-head::before {
+.title-band::after {
   content: "";
   position: absolute;
-  inset: 6% -2% 22% -2%;
-  z-index: -1;
-  background: radial-gradient(60% 70% at 42% 46%, rgba(255,255,255,0.94) 0 58%, rgba(255,255,255,0) 100%);
-  pointer-events: none;
+  left: 0; right: 0; bottom: -10px;
+  height: 10px;
+  background: var(--magenta);
+}
+.lab-title {
+  color: #0B0616;
+  text-shadow: 3px 3px 0 var(--magenta), 6px 6px 0 rgba(0, 229, 255, 0.9);
 }
 
-/* Flood sat 101% down, which left its drip tongues poking into the card
-   at rest. Translate the whole thing clear of the drip height. */
-.cap-flood { transform: translateY(calc(100% + 28px)); }
-.cap:hover .cap-flood { transform: translateY(0); }
-.cap-flood .drip { color: inherit; }
-.cap-flood .drip use { fill: currentColor; stroke: none; }
+/* Field shapes step back so the band leads. */
+.field-y { opacity: 0.9; top: -14%; left: -16%; width: 34%; height: 62%; }
+.field-p { opacity: 0.9; top: 42%;  right: -16%; width: 44%; height: 78%; }
+.field-m { opacity: 0.85; bottom: -26%; left: 16%; width: 28%; height: 48%; }
 
-/* Specs: give the blob a tighter box so the label sits on colour. */
-.spec { padding: 1.35rem 1.4rem; min-height: 84px; }
-.spec-blob { inset: -10% -6%; }
-.spec-name { font-size: 0.95rem; }
-
-/* Spec blobs hold a 1:1 viewBox, so in a wide short box they scaled to the
-   width and ran far below their label — leaving the purple ones' white text
-   sitting on white. They now stretch to the box (preserveAspectRatio=none). */
-.spec-blob { inset: -8% -5%; }
-.spec-row { margin-bottom: 1rem; }
-.spec { align-items: center; }
-
-/* An <svg> is a replaced element with an intrinsic ratio, so inset + auto
-   size still preserved 1:1 and the blob hung below its label. Force the
-   box explicitly; preserveAspectRatio="none" lets the art fill it. */
-.spec-blob {
-  position: absolute;
-  top: -10%;
-  left: -5%;
-  right: auto;
-  bottom: auto;
-  width: 110%;
-  height: 120%;
-  z-index: -1;
-}
+.shelf-count { color: #fff; text-shadow: 0 0 10px var(--magenta); }
+.shelf-head { background: linear-gradient(90deg, rgba(255,45,149,0.42), rgba(123,47,247,0.24) 60%, rgba(11,6,22,0.5)); }
