@@ -6,7 +6,7 @@
   <title>Bryan Gan | Columbia University</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -137,11 +137,90 @@
 
 
   <section id="kitchen" class="kitchen">
+
+    <!-- Botanical sprite. Hand-authored: one blossom, one leaf, one fern
+         frond, one seed head, and two branch armatures that reuse them.
+         Everything downstream is a <use> of these five shapes. -->
+    <svg class="bot-defs" width="0" height="0" aria-hidden="true" focusable="false">
+      <defs>
+        <symbol id="bot-blossom" viewBox="0 0 40 40">
+          <g class="petals">
+            <ellipse cx="20" cy="11" rx="6.2" ry="8.4"/>
+            <ellipse cx="20" cy="11" rx="6.2" ry="8.4" transform="rotate(72 20 20)"/>
+            <ellipse cx="20" cy="11" rx="6.2" ry="8.4" transform="rotate(144 20 20)"/>
+            <ellipse cx="20" cy="11" rx="6.2" ry="8.4" transform="rotate(216 20 20)"/>
+            <ellipse cx="20" cy="11" rx="6.2" ry="8.4" transform="rotate(288 20 20)"/>
+          </g>
+          <circle class="pistil" cx="20" cy="20" r="3.1"/>
+        </symbol>
+
+        <symbol id="bot-leaf" viewBox="0 0 40 24">
+          <path class="blade" d="M1 12 C 10 1, 28 1, 39 12 C 28 23, 10 23, 1 12 Z"/>
+          <path class="vein" d="M3 12 H 36" fill="none"/>
+        </symbol>
+
+        <symbol id="bot-fern" viewBox="0 0 120 40">
+          <path class="stem" d="M2 34 C 40 30, 80 20, 118 6" fill="none"/>
+          <g class="pinnae">
+            <path d="M16 32 l -5 -11"/><path d="M30 29 l -5 -12"/>
+            <path d="M44 26 l -5 -12"/><path d="M58 23 l -5 -12"/>
+            <path d="M72 19 l -4 -12"/><path d="M86 15 l -4 -11"/>
+            <path d="M100 11 l -3 -10"/>
+          </g>
+        </symbol>
+
+        <symbol id="bot-seedhead" viewBox="0 0 44 44">
+          <g class="rays">
+            <path d="M22 22 L22 3"/><path d="M22 22 L35 9"/><path d="M22 22 L41 22"/>
+            <path d="M22 22 L35 35"/><path d="M22 22 L22 41"/><path d="M22 22 L9 35"/>
+            <path d="M22 22 L3 22"/><path d="M22 22 L9 9"/>
+            <path d="M22 22 L30 4"/><path d="M22 22 L40 30"/>
+            <path d="M22 22 L14 40"/><path d="M22 22 L4 14"/>
+          </g>
+          <circle class="core" cx="22" cy="22" r="2.4"/>
+        </symbol>
+
+        <!-- Branch: one bough, three twigs, blossoms and leaves hung off it. -->
+        <symbol id="bot-branch" viewBox="0 0 640 190">
+          <path class="bough" d="M-4 168 C 120 158, 196 108, 318 92 S 522 62, 646 22" fill="none"/>
+          <g class="twigs" fill="none">
+            <path d="M132 156 C 146 132, 150 116, 144 96"/>
+            <path d="M318 92  C 336 70, 344 56, 340 36"/>
+            <path d="M470 68  C 486 50, 494 34, 492 18"/>
+            <path d="M236 122 C 224 104, 220 92, 224 78"/>
+          </g>
+          <use href="#bot-blossom" x="128" y="76"  width="40" height="40"/>
+          <use href="#bot-blossom" x="322" y="14"  width="34" height="34"/>
+          <use href="#bot-blossom" x="474" y="0"   width="30" height="30"/>
+          <use href="#bot-blossom" x="206" y="58"  width="26" height="26"/>
+          <use href="#bot-leaf"    x="60"  y="150" width="34" height="20" transform="rotate(-12 77 160)"/>
+          <use href="#bot-leaf"    x="392" y="70"  width="30" height="18" transform="rotate(-24 407 79)"/>
+          <use href="#bot-leaf"    x="556" y="34"  width="26" height="16" transform="rotate(-30 569 42)"/>
+        </symbol>
+      </defs>
+    </svg>
+
+    <!-- Masthead. No profile block here — chef mode opens straight on the page. -->
+    <header class="kitchen-head">
+      <svg class="kitchen-bough" viewBox="0 0 640 190" aria-hidden="true"><use href="#bot-branch"/></svg>
+      <div class="container kitchen-head-inner">
+        <p class="kitchen-eyebrow">Off the clock</p>
+        <h1 class="kitchen-title">The Kitchen</h1>
+        <p class="kitchen-lede">
+          The other thing I do with my hands. Everything here came out of a home
+          kitchen, mostly on weeknights, mostly for other people.
+          <em>Hover a plate &mdash; or tap it &mdash; for what went in.</em>
+        </p>
+        <svg class="kitchen-rule" viewBox="0 0 240 24" aria-hidden="true">
+          <path d="M0 12 H 92" fill="none"/>
+          <use href="#bot-leaf" x="98" y="2" width="34" height="20"/>
+          <use href="#bot-blossom" x="136" y="1" width="22" height="22"/>
+          <path d="M166 12 H 240" fill="none"/>
+        </svg>
+      </div>
+    </header>
+
     <div class="container">
-      <h2>Kitchen</h2>
-      <p class="kitchen-lede">
-        Cooking is the other thing I do with my hands. Tap a plate for what went into it.
-      </p>
       <div class="plate-grid" id="plate-grid"></div>
       <p class="kitchen-empty" id="kitchen-empty">
         <span class="mono-label">Awaiting plates</span>
@@ -149,6 +228,10 @@
         <code>kitchen.js</code>.
       </p>
     </div>
+
+    <!-- Corner sprigs: fixed ornaments that frame the feed. -->
+    <svg class="bot-sprig bot-sprig-l" viewBox="0 0 120 40" aria-hidden="true"><use href="#bot-fern"/></svg>
+    <svg class="bot-sprig bot-sprig-r" viewBox="0 0 44 44" aria-hidden="true"><use href="#bot-seedhead"/></svg>
   </section>
 
   <section id="news">

@@ -276,7 +276,7 @@
       if (remember) {
         try { localStorage.setItem('site-mode', mode); } catch (e) {}
       }
-      if (mode === 'chef') renderKitchen();
+      if (mode === 'chef') { renderKitchen(); petalField(document.getElementById('kitchen')); }
     }
 
     Array.prototype.forEach.call(buttons, function (b) {
@@ -318,7 +318,7 @@
     data.forEach(function (d) {
       var card = document.createElement('button');
       card.type = 'button';
-      card.className = 'plate' + (d.tall ? ' is-tall' : '');
+      card.className = 'plate' + (d.size ? ' is-' + d.size : '');
       card.setAttribute('aria-expanded', 'false');
 
       var img = document.createElement('img');
@@ -351,6 +351,15 @@
       }
       card.appendChild(reveal);
 
+      var pin = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      pin.setAttribute('class', 'plate-pin');
+      pin.setAttribute('viewBox', '0 0 40 40');
+      pin.setAttribute('aria-hidden', 'true');
+      var pinUse = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+      pinUse.setAttribute('href', '#bot-blossom');
+      pin.appendChild(pinUse);
+      card.appendChild(pin);
+
       var pinned = false;
       function open(on) {
         card.classList.toggle('is-open', on);
@@ -358,12 +367,96 @@
       }
       card.addEventListener('pointerenter', function () { if (!pinned) open(true); });
       card.addEventListener('pointerleave', function () { if (!pinned) open(false); });
-      card.addEventListener('click', function () { pinned = !pinned; open(pinned); });
+      card.addEventListener('click', function () {
+        pinned = !pinned;
+        card.classList.toggle('is-pinned', pinned);
+        open(pinned);
+      });
       card.addEventListener('focus', function () { open(true); });
       card.addEventListener('blur', function () { if (!pinned) open(false); });
 
       grid.appendChild(card);
     });
+  }
+
+  /* ── Drifting petals ──
+     Chef mode's counterpart to the research flow field. Petals fall, sway on
+     a per-petal sine, and tumble; drawn as two arcs so they read as a petal
+     rather than a dot. Built once, only when chef mode is first shown. */
+  var petalsStarted = false;
+  function petalField(host) {
+    if (petalsStarted || !host) return;
+    petalsStarted = true;
+
+    var canvas = document.createElement('canvas');
+    canvas.className = 'petal-field';
+    canvas.setAttribute('aria-hidden', 'true');
+    host.insertBefore(canvas, host.firstChild);
+
+    var ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = 0, h = 0, petals = [], raf = 0, running = false;
+    var TINTS = ['rgba(246,211,220,', 'rgba(255,255,255,', 'rgba(226,240,205,', 'rgba(250,232,198,'];
+
+    function size() {
+      var r = host.getBoundingClientRect();
+      w = Math.max(1, r.width); h = Math.max(1, r.height);
+      canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      var n = Math.round(Math.min(70, Math.max(22, w / 22)));
+      petals = [];
+      for (var i = 0; i < n; i++) petals.push(spawn(true));
+    }
+
+    function spawn(anywhere) {
+      return {
+        x: Math.random() * w,
+        y: anywhere ? Math.random() * h : -20,
+        r: 4 + Math.random() * 6,
+        vy: 0.22 + Math.random() * 0.5,
+        sway: 0.4 + Math.random() * 1.0,
+        phase: Math.random() * Math.PI * 2,
+        spin: (Math.random() - 0.5) * 0.02,
+        rot: Math.random() * Math.PI,
+        c: TINTS[(Math.random() * TINTS.length) | 0],
+        a: 0.4 + Math.random() * 0.45
+      };
+    }
+
+    function frame() {
+      if (!running) return;
+      ctx.clearRect(0, 0, w, h);
+      for (var i = 0; i < petals.length; i++) {
+        var p = petals[i];
+        p.phase += 0.012;
+        p.y += p.vy;
+        p.x += Math.sin(p.phase) * p.sway;
+        p.rot += p.spin;
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle = p.c + p.a + ')';
+        ctx.beginPath();
+        ctx.moveTo(0, -p.r);
+        ctx.quadraticCurveTo(p.r * 0.9, 0, 0, p.r);
+        ctx.quadraticCurveTo(-p.r * 0.9, 0, 0, -p.r);
+        ctx.fill();
+        ctx.restore();
+
+        if (p.y > h + 24) petals[i] = spawn(false);
+      }
+      raf = requestAnimationFrame(frame);
+    }
+
+    function start() { if (!running) { running = true; raf = requestAnimationFrame(frame); } }
+    function stop() { running = false; cancelAnimationFrame(raf); }
+
+    size();
+    window.addEventListener('resize', debounce(size, 200));
+    document.addEventListener('visibilitychange', function () { document.hidden ? stop() : start(); });
+    start();
   }
 
   function debounce(fn, ms) {

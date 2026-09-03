@@ -1488,3 +1488,150 @@ footer {
 @media (max-width: 560px) {
   .plate-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 148px), 1fr)); grid-auto-rows: 148px; }
 }
+
+/* ══ Chef mode: the garden page ══
+   Its own masthead, its own display face, its own ornament. The hero and
+   every research section are hidden — this mode opens straight on the feed. */
+
+[data-mode="chef"] .hero,
+[data-mode="chef"] #contact { display: none; }
+
+[data-mode="chef"] .kitchen {
+  position: relative;
+  overflow: hidden;
+  padding-top: 3.5rem;
+  /* Scattered leaf pattern, drawn as a data-URI so it costs no request. */
+  background-image:
+    radial-gradient(115% 70% at 8% -6%,  rgba(226, 242, 205, 0.85), transparent 60%),
+    radial-gradient(85% 60% at 96% 6%,   rgba(205, 234, 236, 0.72), transparent 58%),
+    radial-gradient(70% 55% at 50% 104%, rgba(250, 238, 200, 0.55), transparent 62%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128' viewBox='0 0 128 128'%3E%3Cg fill='none' stroke='%233f7a45' stroke-opacity='0.10' stroke-width='1.2'%3E%3Cpath d='M14 30c8-9 22-9 30 0-8 9-22 9-30 0z'/%3E%3Cpath d='M18 30h22'/%3E%3Cpath d='M82 92c8-9 22-9 30 0-8 9-22 9-30 0z'/%3E%3Cpath d='M86 92h22'/%3E%3Cpath d='M96 26c5-6 14-6 19 0-5 6-14 6-19 0z'/%3E%3Cpath d='M30 100c5-6 14-6 19 0-5 6-14 6-19 0z'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: no-repeat, no-repeat, no-repeat, repeat;
+}
+
+/* ── Botanical ink ── */
+.bot-defs { position: absolute; }
+#bot-blossom .petals { fill: #f6d3dc; stroke: #e0a9b8; stroke-width: 1; }
+#bot-blossom .pistil { fill: #e8b45c; }
+#bot-leaf .blade     { fill: #cfe3bd; stroke: #7fa86c; stroke-width: 1.1; }
+#bot-leaf .vein      { stroke: #7fa86c; stroke-width: 0.9; }
+#bot-fern .stem,
+#bot-fern .pinnae path { stroke: #6f9a5e; stroke-width: 1.6; stroke-linecap: round; fill: none; }
+#bot-seedhead .rays path { stroke: #a9bb9c; stroke-width: 1.1; stroke-linecap: round; }
+#bot-seedhead .core  { fill: #8aa47a; }
+#bot-branch .bough   { stroke: #7a6248; stroke-width: 4.5; stroke-linecap: round; }
+#bot-branch .twigs   { stroke: #8d7458; stroke-width: 2.2; stroke-linecap: round; }
+
+/* ── Masthead ── */
+[data-mode="chef"] .kitchen-head {
+  position: relative;
+  padding-bottom: 1.25rem;
+}
+.kitchen-bough {
+  position: absolute;
+  top: -2.2rem;
+  right: -3rem;
+  width: min(620px, 78%);
+  height: auto;
+  opacity: 0.9;
+  pointer-events: none;
+}
+.kitchen-head-inner { position: relative; z-index: 1; }
+
+.kitchen-eyebrow {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 0.7rem;
+}
+
+.kitchen-title {
+  font-family: "IBM Plex Serif", Georgia, serif;
+  font-size: clamp(2.6rem, 8vw, 5.2rem);
+  font-weight: 400;
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  margin-bottom: 0.9rem;
+}
+
+[data-mode="chef"] .kitchen-lede {
+  font-family: "IBM Plex Serif", Georgia, serif;
+  font-size: 1.04rem;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  max-width: 54ch;
+  margin-bottom: 1.1rem;
+}
+[data-mode="chef"] .kitchen-lede em { color: var(--ink-muted); }
+
+.kitchen-rule { width: 240px; height: 24px; display: block; margin-bottom: 0.5rem; }
+.kitchen-rule path { stroke: var(--rule-strong); stroke-width: 1.2; }
+
+/* ── Corner sprigs ── */
+.bot-sprig { position: absolute; pointer-events: none; opacity: 0.55; }
+.bot-sprig-l { left: -14px;  bottom: 8%;  width: 150px; height: 50px; transform: rotate(8deg); }
+.bot-sprig-r { right: 2.5%;  top: 46%;    width: 56px;  height: 56px; }
+
+/* ── Mosaic ── */
+[data-mode="chef"] .plate-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 172px), 1fr));
+  grid-auto-rows: 172px;
+  grid-auto-flow: dense;      /* let small tiles backfill around the big ones */
+  gap: 7px;
+}
+.plate.is-big  { grid-column: span 2; grid-row: span 2; }
+.plate.is-tall { grid-row: span 2; }
+.plate.is-wide { grid-column: span 2; }
+
+[data-mode="chef"] .plate {
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(31, 42, 30, 0.05);
+}
+[data-mode="chef"] .plate-reveal {
+  background: linear-gradient(to top, rgba(24, 44, 24, 0.90) 0%, rgba(28, 52, 28, 0.62) 48%, rgba(30, 56, 30, 0.06) 100%);
+}
+[data-mode="chef"] .plate-name {
+  font-family: "IBM Plex Serif", Georgia, serif;
+  font-size: 1.02rem;
+  font-weight: 600;
+}
+
+/* A blossom marks the pinned plate, so a tapped card stays legible as chosen. */
+.plate-pin {
+  position: absolute;
+  top: 8px; right: 8px;
+  width: 22px; height: 22px;
+  opacity: 0;
+}
+.plate.is-pinned .plate-pin { opacity: 1; }
+.motion .plate-pin { transition: opacity 0.25s, transform 0.35s cubic-bezier(0.22,1,0.36,1); }
+.motion .plate.is-pinned .plate-pin { transform: rotate(18deg) scale(1.06); }
+
+/* ── Drifting petals ── */
+.petal-field {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+[data-mode="chef"] .kitchen > .container,
+[data-mode="chef"] .kitchen-head { position: relative; z-index: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .petal-field { display: none; }
+}
+
+@media (max-width: 700px) {
+  .kitchen-bough { top: -1rem; right: -5rem; width: 420px; opacity: 0.55; }
+  .bot-sprig-l, .bot-sprig-r { display: none; }
+  [data-mode="chef"] .plate-grid {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 132px), 1fr));
+    grid-auto-rows: 132px;
+  }
+}
