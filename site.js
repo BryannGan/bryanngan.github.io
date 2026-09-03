@@ -23,6 +23,11 @@
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
     var w = 0, h = 0, particles = [], running = false, raf = 0, t = 0;
 
+    // Pointer acts as a vortex seeded into the field. `grip` eases in and out
+    // so the disturbance arrives and decays rather than snapping.
+    var mx = -1e4, my = -1e4, grip = 0, wanted = 0;
+    var SWIRL_R = 190;
+
     var INK = [
       'rgba(168, 92, 60,',    // clay
       'rgba(74, 100, 128,',   // slate
@@ -42,7 +47,7 @@
     function seed() {
       // Density scales with area so a wide monitor isn't sparse and a phone
       // isn't melting.
-      var n = Math.round(Math.min(420, Math.max(90, (w * h) / 1750)));
+      var n = Math.round(Math.min(900, Math.max(160, (w * h) / 980)));
       particles = [];
       for (var i = 0; i < n; i++) particles.push(spawn());
       ctx.clearRect(0, 0, w, h);
@@ -60,7 +65,7 @@
     }
 
     // Smooth, slowly-rotating angle field.
-    function angleAt(x, y) {
+    function baseAngle(x, y) {
       var sx = x * 0.0042, sy = y * 0.0042;
       return (
         Math.sin(sx + t * 0.22) * 1.35 +
@@ -69,13 +74,33 @@
       );
     }
 
+    // Blend the ambient field toward a tangential (circulating) direction
+    // near the pointer, falling off smoothly to nothing at SWIRL_R.
+    function angleAt(x, y) {
+      var a = baseAngle(x, y);
+      if (grip < 0.01) return a;
+
+      var dx = x - mx, dy = y - my;
+      var d = Math.sqrt(dx * dx + dy * dy);
+      if (d > SWIRL_R || d < 0.001) return a;
+
+      var falloff = (1 - d / SWIRL_R);
+      var weight = falloff * falloff * grip;
+      var tangent = Math.atan2(dy, dx) + Math.PI / 2;
+
+      // Shortest-path blend between two angles.
+      var delta = Math.atan2(Math.sin(tangent - a), Math.cos(tangent - a));
+      return a + delta * weight;
+    }
+
     function frame() {
       if (!running) return;
       t += 0.0055;
+      grip += (wanted - grip) * 0.055;
 
       // Fade toward paper instead of clearing, which leaves trails.
       ctx.globalCompositeOperation = 'source-over';
-      ctx.fillStyle = 'rgba(253, 252, 250, 0.030)';
+      ctx.fillStyle = 'rgba(253, 252, 250, 0.034)';
       ctx.fillRect(0, 0, w, h);
 
       ctx.lineWidth = 1.15;
@@ -106,6 +131,15 @@
 
     resize();
     window.addEventListener('resize', debounce(resize, 180));
+
+    var host = canvas.parentNode;
+    host.addEventListener('pointermove', function (e) {
+      var r = canvas.getBoundingClientRect();
+      mx = e.clientX - r.left;
+      my = e.clientY - r.top;
+      wanted = 1;
+    }, { passive: true });
+    host.addEventListener('pointerleave', function () { wanted = 0; }, { passive: true });
     document.addEventListener('visibilitychange', function () {
       document.hidden ? stop() : start();
     });

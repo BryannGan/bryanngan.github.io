@@ -887,10 +887,10 @@ footer {
 /* ── Hero ── */
 .hero {
   position: relative;
-  min-height: 82vh;
+  min-height: 68vh;
   display: flex;
   align-items: center;
-  padding: 7rem 0 4rem;
+  padding: 5.25rem 0 2.75rem;
   overflow: hidden;
   border-bottom: 1px solid var(--rule);
 }
@@ -1005,7 +1005,7 @@ footer {
 .hero-cue {
   position: absolute;
   left: 50%;
-  bottom: 1.5rem;
+  bottom: 1.1rem;
   transform: translateX(-50%);
   z-index: 1;
   font-family: var(--mono);
@@ -1099,7 +1099,7 @@ footer {
 }
 
 @media (max-width: 640px) {
-  .hero { min-height: auto; padding: 6rem 0 3rem; }
+  .hero { min-height: auto; padding: 5rem 0 2.5rem; }
   .hero-body { grid-template-columns: 1fr; gap: 1.4rem; }
   .hero-cue { display: none; }
 }
