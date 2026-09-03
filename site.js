@@ -460,11 +460,11 @@
     start();
   }
 
-  /* ── Developer mode: vector neon city ──
-     Angular buildings in flat neon fills with lit edges, a road running to
-     a centre vanishing point, and a wet reflection. Geometry is deterministic
-     from a fixed seed and drawn once to an offscreen buffer; per frame only
-     the road markings, the horizon pulse and the window flicker move. */
+  /* ── Developer mode: poster skyline ──
+     Bright ground. Flat colour blocks with heavy black keylines — no glow,
+     no gradient-into-black. The black is an outline, never the background.
+     Geometry is deterministic and drawn once; only the sun rings, the road
+     dashes and a few blinking windows move. */
   var labStarted = false;
   function labCity(canvas) {
     if (labStarted || !canvas) return;
@@ -472,80 +472,69 @@
     var ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    var PAL = [
-      ['#FF2D95', '#7B2FF7'],   // magenta -> violet
-      ['#7B2FF7', '#2B6BFF'],   // violet  -> blue
-      ['#00E5FF', '#2B6BFF'],   // cyan    -> blue
-      ['#FF2D95', '#FFA23F']    // magenta -> amber
-    ];
-    var EDGE = ['#FF2D95', '#00E5FF', '#EAFF00', '#B44BFF'];
+    var FILL = ['#EAFF00', '#7B2FF7', '#FF2D95', '#00E5FF', '#FFFFFF'];
+    var LINE = '#0B0616';
 
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
-    var w = 0, h = 0, hz = 0, city = null, wins = [], t = 0, raf = 0, running = false;
-    var seed = 7;
+    var w = 0, h = 0, hz = 0, sky = null, blinks = [], t = 0, raf = 0, running = false;
+    var seed = 11;
     function rnd() { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; }
 
-    function buildCity() {
+    function build() {
       var ref = Math.min(h, (window.innerHeight || 800));
-      hz = Math.round(ref * 0.62);
-      city = document.createElement('canvas');
-      city.width = Math.round(w * dpr);
-      city.height = Math.round(h * dpr);
-      var c = city.getContext('2d');
+      hz = Math.round(ref * 0.72);
+      sky = document.createElement('canvas');
+      sky.width = Math.round(w * dpr);
+      sky.height = Math.round(h * dpr);
+      var c = sky.getContext('2d');
       c.setTransform(dpr, 0, 0, dpr, 0, 0);
-      seed = 7;
-      wins = [];
+      seed = 11;
+      blinks = [];
 
-      // Two flanks marching in toward the vanishing point.
-      [-1, 1].forEach(function (side) {
-        var edgeX = side < 0 ? 0 : w;
-        var step = 0;
-        for (var i = 0; i < 9; i++) {
-          var depth = i / 8;                       // 0 near, 1 far
-          var bw = (w * 0.13) * (1 - depth * 0.66);
-          var bh = ref * (0.30 - depth * 0.19) * (0.5 + rnd() * 0.8);
-          var x  = side < 0 ? step : w - step - bw;
-          var top = hz - bh;
-          var cut = 10 + rnd() * 26;               // angled shoulder
+      c.lineJoin = 'round';
+      c.lineCap = 'round';
 
-          var pal = PAL[(rnd() * PAL.length) | 0];
-          var g = c.createLinearGradient(x, top, x + bw, hz);
-          g.addColorStop(0, pal[0]);
-          g.addColorStop(1, pal[1]);
-          c.fillStyle = g;
-          c.globalAlpha = 0.30 + (1 - depth) * 0.5;
+      // Skyline: flat blocks, heavy keyline, drawn far to near.
+      [1, 0].forEach(function (near) {
+        var bwBase = near ? w * 0.115 : w * 0.085;
+        var step = near ? -w * 0.04 : w * 0.02;
+        while (step < w + 40) {
+          var bw = bwBase * (0.62 + rnd() * 0.85);
+          var bh = ref * (near ? 0.20 : 0.14) * (0.55 + rnd() * 1.25);
+          var x = step, top = hz - bh, cut = 8 + rnd() * 22;
 
+          c.fillStyle = near ? FILL[(rnd() * FILL.length) | 0] : '#FFFFFF';
+          c.globalAlpha = near ? 1 : 0.55;
           c.beginPath();
-          if (side < 0) {
-            c.moveTo(x, hz); c.lineTo(x, top + cut); c.lineTo(x + cut, top);
-            c.lineTo(x + bw, top + cut * 0.4); c.lineTo(x + bw, hz);
-          } else {
-            c.moveTo(x, hz); c.lineTo(x, top + cut * 0.4); c.lineTo(x + bw - cut, top);
-            c.lineTo(x + bw, top + cut); c.lineTo(x + bw, hz);
-          }
-          c.closePath(); c.fill();
-
-          // Lit edge along the silhouette.
-          c.globalAlpha = 0.85;
-          c.strokeStyle = EDGE[(rnd() * EDGE.length) | 0];
-          c.lineWidth = 2;
-          c.stroke();
+          c.moveTo(x, hz);
+          c.lineTo(x, top + cut);
+          c.lineTo(x + cut, top);
+          c.lineTo(x + bw - cut * 0.5, top + cut * 0.3);
+          c.lineTo(x + bw, top + cut);
+          c.lineTo(x + bw, hz);
+          c.closePath();
+          c.fill();
           c.globalAlpha = 1;
+          c.strokeStyle = LINE;
+          c.lineWidth = near ? 4 : 2.5;
+          c.stroke();
 
-          // Windows as horizontal light bars.
-          var rows = Math.max(2, Math.floor(bh / 16));
-          for (var r = 0; r < rows; r++) {
-            if (rnd() > 0.55) continue;
-            wins.push({
-              x: x + 6, y: top + 14 + r * 16,
-              w: Math.max(6, bw - 12), h: 3,
-              c: EDGE[(rnd() * EDGE.length) | 0],
-              a: (0.25 + rnd() * 0.5) * (1 - depth * 0.5),
-              f: rnd() > 0.86 ? 1.4 + rnd() * 3 : 0,
-              p: rnd() * 6.28
-            });
+          if (near) {
+            // Windows are punched-out black rectangles, not lights.
+            var cols = Math.max(1, Math.floor(bw / 20));
+            var rows = Math.max(1, Math.floor(bh / 26));
+            for (var cx = 0; cx < cols; cx++) {
+              for (var ry = 0; ry < rows; ry++) {
+                if (rnd() > 0.62) continue;
+                var wx = x + 10 + cx * 20, wy = top + 16 + ry * 26;
+                if (wx + 9 > x + bw - 6 || wy + 12 > hz - 6) continue;
+                c.fillStyle = LINE;
+                c.fillRect(wx, wy, 9, 12);
+                if (rnd() > 0.88) blinks.push({ x: wx, y: wy, p: rnd() * 6.28, s: 1 + rnd() * 2.5 });
+              }
+            }
           }
-          step += bw * (0.72 + rnd() * 0.3);
+          step += bw + (near ? 6 : 14) + rnd() * 12;
         }
       });
     }
@@ -555,7 +544,7 @@
       w = Math.max(1, r.width); h = Math.max(1, r.height);
       canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      buildCity();
+      build();
     }
 
     function frame() {
@@ -563,94 +552,68 @@
       t += 0.016;
       var vpx = w / 2;
 
-      ctx.clearRect(0, 0, w, h);
-
-      // Sky.
-      var sky = ctx.createLinearGradient(0, 0, 0, hz);
-      sky.addColorStop(0,    '#1A0B2E');
-      sky.addColorStop(0.45, '#4B1170');
-      sky.addColorStop(0.8,  '#B4227E');
-      sky.addColorStop(1,    '#FF6A3D');
-      ctx.fillStyle = sky;
+      // Bright sky.
+      var g = ctx.createLinearGradient(0, 0, 0, hz);
+      g.addColorStop(0,    '#B9F2FF');
+      g.addColorStop(0.42, '#7FE3FF');
+      g.addColorStop(0.78, '#FFC8F0');
+      g.addColorStop(1,    '#FFF07A');
+      ctx.fillStyle = g;
       ctx.fillRect(0, 0, w, hz);
 
-      // Sun disc sitting on the horizon.
-      var sr = Math.min(w, h) * 0.16;
-      var sg = ctx.createLinearGradient(0, hz - sr, 0, hz);
-      sg.addColorStop(0, '#FFE24A');
-      sg.addColorStop(1, '#FF2D95');
+      // Flat sun with expanding rings.
+      var sr = Math.min(w, h) * 0.14;
       ctx.save();
       ctx.beginPath(); ctx.rect(0, 0, w, hz); ctx.clip();
-      ctx.fillStyle = sg;
-      ctx.beginPath(); ctx.arc(vpx, hz, sr, 0, Math.PI * 2); ctx.fill();
-      // Scanline cuts across the disc.
-      ctx.globalCompositeOperation = 'destination-out';
-      for (var b = 0; b < 8; b++) {
-        var by = hz - sr + b * (sr / 7);
-        ctx.fillRect(vpx - sr, by, sr * 2, 2 + b * 0.7);
-      }
-      ctx.globalCompositeOperation = 'source-over';
-      ctx.restore();
-
-      ctx.drawImage(city, 0, 0, w, h);
-
-      for (var i = 0; i < wins.length; i++) {
-        var wd = wins[i];
-        var a = wd.a;
-        if (wd.f) a *= 0.4 + 0.6 * (0.5 + 0.5 * Math.sin(t * wd.f * 5 + wd.p));
-        ctx.globalAlpha = a;
-        ctx.fillStyle = wd.c;
-        ctx.fillRect(wd.x, wd.y, wd.w, wd.h);
+      ctx.fillStyle = '#FFE24A';
+      ctx.beginPath(); ctx.arc(vpx, hz - sr * 0.15, sr, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = LINE; ctx.lineWidth = 4; ctx.stroke();
+      for (var r0 = 0; r0 < 3; r0++) {
+        var pr = ((t * 0.22 + r0 / 3) % 1);
+        ctx.globalAlpha = 0.45 * (1 - pr);
+        ctx.strokeStyle = '#FF2D95';
+        ctx.lineWidth = 6;
+        ctx.beginPath();
+        ctx.arc(vpx, hz - sr * 0.15, sr * (1 + pr * 1.5), 0, Math.PI * 2);
+        ctx.stroke();
       }
       ctx.globalAlpha = 1;
+      ctx.restore();
 
-      // Ground.
-      var gr = ctx.createLinearGradient(0, hz, 0, h);
-      gr.addColorStop(0, '#2A0F4A');
-      gr.addColorStop(1, '#0C0618');
-      ctx.fillStyle = gr;
-      ctx.fillRect(0, hz, w, h - hz);
+      ctx.drawImage(sky, 0, 0, w, h);
 
-      // Road: a trapezoid from the vanishing point to the bottom edge.
-      ctx.fillStyle = 'rgba(10, 5, 22, 0.85)';
-      ctx.beginPath();
-      ctx.moveTo(vpx - 26, hz); ctx.lineTo(vpx + 26, hz);
-      ctx.lineTo(w * 0.94, h);  ctx.lineTo(w * 0.06, h);
-      ctx.closePath(); ctx.fill();
-
-      // Glowing kerbs.
-      ['#FF2D95', '#00E5FF'].forEach(function (col, k) {
-        ctx.strokeStyle = col;
-        ctx.lineWidth = 2.5;
-        ctx.shadowColor = col; ctx.shadowBlur = 14;
-        ctx.beginPath();
-        if (k === 0) { ctx.moveTo(vpx - 26, hz); ctx.lineTo(w * 0.06, h); }
-        else         { ctx.moveTo(vpx + 26, hz); ctx.lineTo(w * 0.94, h); }
-        ctx.stroke();
-        ctx.shadowBlur = 0;
-      });
-
-      // Centre dashes running toward the viewer.
-      ctx.strokeStyle = '#EAFF00';
-      ctx.shadowColor = '#EAFF00'; ctx.shadowBlur = 10;
-      for (var d = 0; d < 16; d++) {
-        var z = d + 1 - ((t * 0.9) % 1);
-        var y = hz + (h - hz) * 0.55 / z;
-        if (y > h || y < hz) continue;
-        var wgt = (1 - d / 16);
-        ctx.lineWidth = 1 + wgt * 5;
-        ctx.beginPath(); ctx.moveTo(vpx, y); ctx.lineTo(vpx, y + 6 + wgt * 26); ctx.stroke();
+      // A few windows blink off.
+      for (var i = 0; i < blinks.length; i++) {
+        var b = blinks[i];
+        if (Math.sin(t * b.s + b.p) > 0.7) {
+          ctx.fillStyle = '#EAFF00';
+          ctx.fillRect(b.x, b.y, 9, 12);
+        }
       }
-      ctx.shadowBlur = 0;
 
-      // Horizon pulse.
-      var pulse = 0.5 + 0.5 * Math.sin(t * 1.6);
-      var hb = ctx.createLinearGradient(0, hz - 22, 0, hz + 22);
-      hb.addColorStop(0, 'rgba(255, 45, 149, 0)');
-      hb.addColorStop(0.5, 'rgba(255, 210, 74,' + (0.30 + pulse * 0.22) + ')');
-      hb.addColorStop(1, 'rgba(0, 229, 255, 0)');
-      ctx.fillStyle = hb;
-      ctx.fillRect(0, hz - 22, w, 44);
+      // Ground: flat, bright, with a black horizon keyline.
+      ctx.fillStyle = '#C9F7FF';
+      ctx.fillRect(0, hz, w, h - hz);
+      ctx.strokeStyle = LINE; ctx.lineWidth = 5;
+      ctx.beginPath(); ctx.moveTo(0, hz); ctx.lineTo(w, hz); ctx.stroke();
+
+      // Road as a flat magenta wedge with a keyline and yellow dashes.
+      ctx.fillStyle = '#FF2D95';
+      ctx.beginPath();
+      ctx.moveTo(vpx - 22, hz); ctx.lineTo(vpx + 22, hz);
+      ctx.lineTo(w * 0.96, h);  ctx.lineTo(w * 0.04, h);
+      ctx.closePath(); ctx.fill();
+      ctx.lineWidth = 4; ctx.strokeStyle = LINE; ctx.stroke();
+
+      ctx.strokeStyle = '#EAFF00';
+      for (var d = 0; d < 14; d++) {
+        var z = d + 1 - ((t * 0.8) % 1);
+        var y = hz + (h - hz) * 0.5 / z;
+        if (y > h || y < hz) continue;
+        var wgt = 1 - d / 14;
+        ctx.lineWidth = 2 + wgt * 8;
+        ctx.beginPath(); ctx.moveTo(vpx, y); ctx.lineTo(vpx, y + 8 + wgt * 30); ctx.stroke();
+      }
 
       raf = requestAnimationFrame(frame);
     }
@@ -677,16 +640,16 @@
     for (var i = 0; i < seed.length; i++) s = (s * 31 + seed.charCodeAt(i)) >>> 0;
     function rnd() { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }
 
-    x.fillStyle = '#120A22'; x.fillRect(0, 0, 480, 270);
-    x.strokeStyle = 'rgba(123,47,247,0.28)'; x.lineWidth = 1;
+    x.fillStyle = '#FFFFFF'; x.fillRect(0, 0, 480, 270);
+    x.strokeStyle = 'rgba(11,6,22,0.14)'; x.lineWidth = 1;
     for (var gx = 0; gx <= 480; gx += 24) { x.beginPath(); x.moveTo(gx, 0); x.lineTo(gx, 270); x.stroke(); }
     for (var gy = 0; gy <= 270; gy += 24) { x.beginPath(); x.moveTo(0, gy); x.lineTo(480, gy); x.stroke(); }
 
     for (var n = 0; n < 16; n++) {
       var px = Math.floor(rnd() * 20) * 24;
       var py = Math.floor(rnd() * 11) * 24;
-      x.strokeStyle = ['#FF2D95','#00E5FF','#EAFF00','#B44BFF'][(rnd()*4)|0];
-      x.lineWidth = 3;
+      x.strokeStyle = ['#FF2D95','#7B2FF7','#00B8D4','#EAFF00'][(rnd()*4)|0];
+      x.lineWidth = 6;
       x.beginPath(); x.moveTo(px, py);
       var steps = 2 + Math.floor(rnd() * 3);
       for (var st = 0; st < steps; st++) {
@@ -695,8 +658,8 @@
         x.lineTo(px, py);
       }
       x.stroke();
-      x.fillStyle = '#EAFF00';
-      x.beginPath(); x.arc(px, py, 3.5, 0, Math.PI * 2); x.fill();
+      x.fillStyle = '#0B0616';
+      x.beginPath(); x.arc(px, py, 4.5, 0, Math.PI * 2); x.fill();
     }
     return c;
   }
