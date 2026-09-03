@@ -20,8 +20,8 @@ window.KITCHEN = [
   { src: 'beef-noodle-soup.webp',     name: 'Beef noodle soup',
     notes: ['Shank, noodles, scallion, dark broth'] },
 
-  { src: 'candlelit-fish.webp',       name: 'Fish, green sauce, a bottle',
-    notes: ['Two glasses, one candle'], size: 'tall' },
+  { src: 'tuscan-salmon.webp',        name: 'Tuscan salmon',
+    notes: ['Cream, sun-dried tomato, spinach', 'Two glasses, one candle'], size: 'tall' },
 
   { src: 'steamed-fish.webp',         name: 'Steamed fish',
     notes: ['Ginger, scallion, hot oil over soy'], size: 'tall' },
@@ -32,8 +32,8 @@ window.KITCHEN = [
   { src: 'bossam.webp',               name: 'Bossam',
     notes: ['Boiled pork belly, napa, kimchi, garlic'] },
 
-  { src: 'dinner-party.webp',         name: 'Dinner for the table',
-    notes: ['Caprese, meatballs, rigatoni, steak'], size: 'tall' },
+  { src: 'new-year-dinner.webp',      name: 'New Year dinner',
+    notes: ['Steak Diane, pasta'], size: 'tall' },
 
   { src: 'braised-beef-bowl.webp',    name: 'Braised beef bowl',
     notes: ['Cabbage, soft egg, dark broth'] },
@@ -41,11 +41,11 @@ window.KITCHEN = [
   { src: 'pork-belly-spread.webp',    name: 'Pork belly spread',
     notes: ['Napa, tofu, kimchi, chilli'] },
 
-  { src: 'roast-chicken.webp',        name: 'Roast chicken',
-    notes: ['Asparagus, mushrooms, rice'] },
+  { src: 'black-miso-salmon.webp',    name: 'Black miso salmon',
+    notes: ['Miso glaze, asparagus, rice'] },
 
-  { src: 'watermelon.webp',           name: 'Watermelon',
-    notes: ['Hollowed out, eaten from the rind'], size: 'tall' },
+  { src: 'hwachae.webp',              name: 'Hwachae',
+    notes: ['Watermelon punch, served in the rind'], size: 'tall' },
 
   { src: 'skewers.webp',              name: 'Skewers',
     notes: ['Peppers, onion, shrimp, chicken'] },
@@ -59,8 +59,8 @@ window.KITCHEN = [
   { src: 'sliced-pork-scallion.webp', name: 'Sliced pork, scallion',
     notes: ['Cold cut, garlic, a lot of scallion'] },
 
-  { src: 'skillet-chicken.webp',      name: 'Skillet chicken',
-    notes: ['One pan, everything in it'] },
+  { src: 'mala-dry-pot.webp',         name: 'Mala dry pot',
+    notes: ['Sichuan peppercorn, chilli, one pan'] },
 
   { src: 'steak-and-rice.webp',       name: 'Steak over rice',
     notes: ['Sesame, sauce, a bowl of rice'] },
