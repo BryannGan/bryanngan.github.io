@@ -921,7 +921,7 @@ footer {
 }
 
 .hero-name {
-  font-size: clamp(2.1rem, 6.4vw, 4.25rem);
+  font-size: clamp(1.85rem, 5.1vw, 3.35rem);
   font-weight: 600;
   line-height: 1.02;
   letter-spacing: -0.035em;
@@ -966,7 +966,7 @@ footer {
 /* Lead claim gets its own line and sits at display weight. */
 .bio-lead {
   display: block;
-  font-size: 1.5rem;
+  font-size: 1.22rem;
   font-weight: 600;
   line-height: 1.2;
   letter-spacing: -0.02em;
