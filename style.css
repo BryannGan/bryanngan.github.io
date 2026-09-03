@@ -2027,3 +2027,171 @@ footer {
 
 .shelf-count { color: #fff; text-shadow: 0 0 10px var(--magenta); }
 .shelf-head { background: linear-gradient(90deg, rgba(255,45,149,0.42), rgba(123,47,247,0.24) 60%, rgba(11,6,22,0.5)); }
+
+/* ── Edge pattern columns ──
+   Density is pushed to the left and right margins so the centre channel
+   stays quiet and the headline plus the three pillars read straight off. */
+.edge {
+  position: absolute;
+  top: 0;
+  width: 21vw;
+  height: 78vh;
+  z-index: 1;
+  pointer-events: none;
+  background-image:
+    /* chevrons */
+    repeating-linear-gradient(-45deg,
+      rgba(255, 45, 149, 0.30) 0 3px, transparent 3px 15px),
+    /* circuit rails */
+    repeating-linear-gradient(90deg,
+      rgba(0, 229, 255, 0.26) 0 1px, transparent 1px 26px),
+    /* dot field */
+    radial-gradient(circle at 50% 50%, rgba(234, 255, 0, 0.30) 1.2px, transparent 1.6px);
+  background-size: auto, auto, 12px 12px;
+}
+.edge-l { left: 0;  -webkit-mask-image: linear-gradient(90deg, #000 0%, rgba(0,0,0,0.55) 52%, transparent 100%); mask-image: linear-gradient(90deg, #000 0%, rgba(0,0,0,0.55) 52%, transparent 100%); }
+.edge-r { right: 0; -webkit-mask-image: linear-gradient(270deg, #000 0%, rgba(0,0,0,0.55) 52%, transparent 100%); mask-image: linear-gradient(270deg, #000 0%, rgba(0,0,0,0.55) 52%, transparent 100%); }
+
+/* Calms the middle of the frame so type sits on near-flat ground. */
+.centre-clear {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 74vh;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(58% 74% at 50% 34%, rgba(11, 6, 22, 0.86) 0 42%, rgba(11, 6, 22, 0.42) 68%, transparent 100%);
+}
+
+/* Colour fields move outboard so they frame rather than cross the type. */
+.field-y { top: -12%; left: -20%; width: 30%; height: 66%; opacity: 0.92; }
+.field-p { top: 40%;  right: -20%; width: 34%; height: 82%; opacity: 0.92; }
+.field-m { bottom: -30%; left: -8%; width: 22%; height: 46%; opacity: 0.85; }
+
+/* ── Bottom band ── */
+.lab-foot {
+  position: relative;
+  z-index: 2;
+  margin-top: 5rem;
+  padding-top: 6rem;
+  overflow: hidden;
+}
+.foot-field {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+}
+.foot-field-m { bottom: 0;   left: -14%;  width: 42%; height: 74%; background: var(--magenta); clip-path: polygon(0 22%, 100% 0, 76% 100%, 0 100%); opacity: 0.55; }
+.foot-field-p { bottom: 0;   right: -12%; width: 40%; height: 88%; background: var(--violet);  clip-path: polygon(24% 0, 100% 16%, 100% 100%, 0 100%); opacity: 0.55; }
+.foot-field-y { bottom: 34%; left: 34%;   width: 20%; height: 26%; background: var(--yellow);  clip-path: polygon(0 0, 100% 18%, 84% 100%, 10% 76%); opacity: 0.55; }
+
+.foot-skyline {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 190px;
+}
+.foot-skyline .crowns path {
+  stroke: var(--cyan);
+  stroke-width: 3;
+  fill: none;
+  filter: drop-shadow(0 0 6px var(--cyan));
+}
+
+.foot-rule {
+  position: relative;
+  z-index: 2;
+  height: 4px;
+  background: linear-gradient(90deg, var(--magenta), var(--yellow) 40%, var(--cyan) 72%, var(--violet));
+  box-shadow: 0 0 22px rgba(0, 229, 255, 0.55);
+}
+.foot-line {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 1rem 1.5rem 0.4rem;
+  max-width: 1080px;
+  margin: 0 auto;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+.foot-tag {
+  color: #0B0616;
+  background: var(--yellow);
+  padding: 0.16rem 0.45rem;
+  font-weight: 700;
+}
+[data-mode="dev"] footer:not(.lab-foot) { display: none; }
+
+@media (max-width: 720px) {
+  .edge { width: 30vw; }
+  .foot-skyline { height: 120px; }
+}
+
+/* ── Lemon + purple lead ──
+   Magenta and cyan stay as small accents; the page reads yellow/violet. */
+
+.edge {
+  background-image:
+    repeating-linear-gradient(-45deg, rgba(180, 75, 255, 0.34) 0 3px, transparent 3px 15px),
+    repeating-linear-gradient(90deg,  rgba(234, 255, 0, 0.22) 0 1px, transparent 1px 26px),
+    radial-gradient(circle at 50% 50%, rgba(234, 255, 0, 0.34) 1.2px, transparent 1.6px);
+  background-size: auto, auto, 12px 12px;
+}
+
+.field-p { background: var(--violet); }
+.field-m { background: var(--violet-l); }
+
+.title-band { box-shadow: 0 0 70px rgba(234, 255, 0, 0.38); }
+.title-band::after { background: var(--violet); }
+.lab-title { text-shadow: 3px 3px 0 var(--violet), 6px 6px 0 rgba(180, 75, 255, 0.85); }
+
+.lab-eyebrow { color: var(--yellow); border-color: rgba(234, 255, 0, 0.55); box-shadow: 0 0 18px rgba(234,255,0,0.20) inset; }
+.blip { background: var(--violet-l); box-shadow: 0 0 8px var(--violet-l); }
+
+.spec {
+  border-color: rgba(180, 75, 255, 0.55);
+  box-shadow: 0 0 26px rgba(123, 47, 247, 0.22) inset;
+}
+.spec-idx { color: var(--yellow); }
+.spec-name { text-shadow: 0 0 14px rgba(234, 255, 0, 0.65); }
+
+.shelf-head {
+  background: linear-gradient(90deg, rgba(123,47,247,0.55), rgba(234,255,0,0.16) 58%, rgba(11,6,22,0.5));
+  border-left: 4px solid var(--yellow);
+  box-shadow: 0 0 26px rgba(123, 47, 247, 0.30);
+}
+[data-mode="dev"] .shelf-title { text-shadow: 0 0 14px var(--yellow); }
+.shelf-count { color: var(--yellow); text-shadow: 0 0 10px rgba(234,255,0,0.6); }
+
+.cap { border-color: rgba(180, 75, 255, 0.5); }
+.cap:hover {
+  border-color: var(--yellow);
+  box-shadow: 0 0 0 1px rgba(234,255,0,0.5), 0 0 46px rgba(234, 255, 0, 0.28);
+}
+.cap-art { background: #17093A; border-bottom-color: rgba(180,75,255,0.45); }
+.cap-art::after { background: linear-gradient(to top, rgba(11,6,22,0.92), rgba(123,47,247,0.16) 62%); }
+.cap-year  { color: var(--yellow); }
+.cap-title { text-shadow: 0 0 16px rgba(234, 255, 0, 0.35); }
+.cap-tags span { color: #EAF7A9; background: rgba(234, 255, 0, 0.07); border-color: rgba(234, 255, 0, 0.32); }
+.cap-flood-note { color: var(--yellow); }
+.cap-status[data-s="LIVE"]    { background: var(--yellow); color: #0B0616; box-shadow: 0 0 14px rgba(234,255,0,0.6); }
+.cap-status[data-s="SHIPPED"] { background: var(--yellow); color: #0B0616; box-shadow: 0 0 14px rgba(234,255,0,0.6); }
+.cap-status[data-s="IN DEV"]  { background: var(--violet-l); color: #fff; box-shadow: 0 0 14px rgba(180,75,255,0.6); }
+
+[data-mode="dev"] .mode-switch summary { border-color: var(--yellow); color: var(--yellow); background: rgba(234,255,0,0.08); box-shadow: 0 0 14px rgba(234,255,0,0.3); }
+[data-mode="dev"] .mode-dot { background: var(--yellow); box-shadow: 0 0 8px var(--yellow); }
+[data-mode="dev"] .scroll-rail i { background: linear-gradient(90deg, var(--violet), var(--yellow)); }
+[data-mode="dev"] #navbar { border-bottom-color: rgba(234, 255, 0, 0.35); }
+
+/* Footer band follows. */
+.foot-field-m { background: var(--violet-l); }
+.foot-field-p { background: var(--violet); }
+.foot-field-y { background: var(--yellow); }
+.foot-skyline .crowns path { stroke: var(--yellow); filter: drop-shadow(0 0 6px var(--yellow)); }
+.foot-rule { background: linear-gradient(90deg, var(--violet), var(--yellow) 45%, var(--violet-l) 78%, var(--violet)); box-shadow: 0 0 22px rgba(234, 255, 0, 0.45); }

@@ -140,6 +140,9 @@
   <section id="lab" class="lab">
     <canvas class="grid-city" aria-hidden="true"></canvas>
     <div class="halftone" aria-hidden="true"></div>
+    <div class="edge edge-l" aria-hidden="true"></div>
+    <div class="edge edge-r" aria-hidden="true"></div>
+    <div class="centre-clear" aria-hidden="true"></div>
     <div class="vignette" aria-hidden="true"></div>
 
     <div class="container lab-inner">
@@ -168,6 +171,51 @@
       </div>
       <div class="capsule-grid" id="lab-grid"></div>
     </div>
+
+    <!-- Bottom band: the design carries through to the end of the page
+         instead of stopping once the shelf does. -->
+    <footer class="lab-foot">
+      <div class="foot-field foot-field-m" aria-hidden="true"></div>
+      <div class="foot-field foot-field-p" aria-hidden="true"></div>
+      <div class="foot-field foot-field-y" aria-hidden="true"></div>
+
+      <svg class="foot-skyline" viewBox="0 0 1200 200" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="fg1" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0" stop-color="#0B0616"/><stop offset="1" stop-color="#EAFF00"/>
+          </linearGradient>
+          <linearGradient id="fg2" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0" stop-color="#0B0616"/><stop offset="1" stop-color="#7B2FF7"/>
+          </linearGradient>
+          <linearGradient id="fg3" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0" stop-color="#0B0616"/><stop offset="1" stop-color="#B44BFF"/>
+          </linearGradient>
+        </defs>
+        <g class="towers">
+          <path fill="url(#fg2)" d="M0 200V96l26-18h58l16 14v108z"/>
+          <path fill="url(#fg1)" d="M112 200V60l30-22h44l18 16v146z"/>
+          <path fill="url(#fg3)" d="M212 200v-78l22-16h52l14 12v82z"/>
+          <path fill="url(#fg2)" d="M308 200V38l34-24h40l20 18v168z"/>
+          <path fill="url(#fg1)" d="M410 200v-92l26-18h60l16 14v96z"/>
+          <path fill="url(#fg3)" d="M520 200V70l30-22h46l18 16v136z"/>
+          <path fill="url(#fg2)" d="M622 200v-64l24-18h56l14 12v70z"/>
+          <path fill="url(#fg1)" d="M724 200V44l32-24h42l20 18v162z"/>
+          <path fill="url(#fg3)" d="M826 200v-86l28-20h54l16 14v92z"/>
+          <path fill="url(#fg2)" d="M932 200V66l30-22h44l18 16v140z"/>
+          <path fill="url(#fg1)" d="M1032 200v-74l26-18h58l16 14v78z"/>
+          <path fill="url(#fg3)" d="M1140 200v-52l24-16h36v68z"/>
+        </g>
+        <g class="crowns">
+          <path d="M0 78h58M112 38h44M212 106h52M308 14h40M410 90h60M520 48h46M622 118h56M724 20h42M826 94h54M932 44h44M1032 108h58M1140 132h36"/>
+        </g>
+      </svg>
+
+      <div class="foot-rule" aria-hidden="true"></div>
+      <p class="foot-line">
+        <span class="foot-tag">EOF</span>
+        Built by hand &mdash; no framework, no template.
+      </p>
+    </footer>
   </section>
 
   <section id="kitchen" class="kitchen">
