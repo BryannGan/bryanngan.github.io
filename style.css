@@ -2106,3 +2106,172 @@ footer {
   background-size: 200% 100%;
 }
 .motion .led-sm { animation-duration: 5s; }
+
+/* ══ Dev mode v3 — the supplied palette, full neon ══
+   #1B1B2A ground, #FF007A / #00FFB3 / #A700FF / #FFEA00 signage. */
+
+[data-mode="dev"] {
+  --void:    #1B1B2A;
+  --void-2:  #12121f;
+  --pink:    #FF007A;
+  --mint:    #00FFB3;
+  --purple:  #A700FF;
+  --yellow:  #FFEA00;
+
+  --panel:   rgba(23, 23, 38, 0.72);
+  --wire:    rgba(167, 0, 255, 0.34);
+  --dim:     #9aa0c4;
+  --dimmer:  #616a94;
+
+  --cyan:    var(--mint);
+  --magenta: var(--pink);
+  --acid:    var(--yellow);
+  --amber:   var(--yellow);
+  --violet:  var(--purple);
+
+  --paper: var(--void);
+  --ink:   #eef0ff;
+  --ink-soft: #c3c8ea;
+  --clay: var(--mint);
+  --clay-edge: rgba(0, 255, 179, 0.55);
+  --accent-mode: var(--mint);
+}
+
+/* The city canvas is the background now — the gradient stack only tints it. */
+[data-mode="dev"] .lab {
+  background: var(--void);
+  padding-top: 4.5rem;
+}
+[data-mode="dev"] .lab-grid { opacity: 1; }
+
+/* Chromatic scanlines instead of grey ones. */
+.lab-scan {
+  background:
+    repeating-linear-gradient(to bottom,
+      rgba(255, 0, 122, 0.045) 0 1px,
+      rgba(0, 255, 179, 0.030) 1px 2px,
+      transparent 2px 4px);
+  mix-blend-mode: screen;
+}
+
+/* ── The colour buzz, turned up ──
+   All four neons cycling through the glyphs, faster, with a bloom that
+   cycles with them. This is the effect from the first pass, intensified. */
+.led {
+  background-image: linear-gradient(100deg,
+    #FF007A 0%, #A700FF 18%, #00FFB3 38%, #FFEA00 56%,
+    #FF007A 74%, #A700FF 88%, #FF007A 100%);
+  background-size: 300% 100%;
+}
+.motion .led { animation: led-sweep 3.4s linear infinite, led-bloom 3.4s linear infinite; }
+@keyframes led-sweep { to { background-position: 300% 0; } }
+@keyframes led-bloom {
+  0%   { filter: drop-shadow(0 0 18px rgba(255, 0, 122, 0.75)); }
+  25%  { filter: drop-shadow(0 0 22px rgba(167, 0, 255, 0.75)); }
+  50%  { filter: drop-shadow(0 0 20px rgba(0, 255, 179, 0.70)); }
+  75%  { filter: drop-shadow(0 0 22px rgba(255, 234, 0, 0.70)); }
+  100% { filter: drop-shadow(0 0 18px rgba(255, 0, 122, 0.75)); }
+}
+.led::after { background-image: radial-gradient(circle at 50% 50%, transparent 0 40%, rgba(27, 27, 42, 0.62) 45%); }
+.motion .led-sm { animation-duration: 2.8s, 2.8s; }
+.led-sm { filter: none; }
+
+.lab-title { text-shadow: none; letter-spacing: -0.01em; }
+
+/* ── Capsule: a lit sign, not a panel ── */
+.capsule {
+  background: linear-gradient(160deg, rgba(27, 27, 42, 0.80), rgba(18, 18, 31, 0.88));
+  border: 1px solid rgba(0, 255, 179, 0.42);
+  backdrop-filter: blur(3px);
+  box-shadow:
+    0 0 0 1px rgba(255, 0, 122, 0.20) inset,
+    0 0 34px rgba(0, 255, 179, 0.18) inset,
+    0 0 44px rgba(167, 0, 255, 0.30),
+    0 24px 80px rgba(0, 0, 0, 0.55);
+}
+.hud { border-color: var(--mint); box-shadow: 0 0 10px var(--mint); }
+.lab-eyebrow { color: var(--mint); text-shadow: 0 0 12px rgba(0, 255, 179, 0.6); }
+.blip { background: var(--pink); box-shadow: 0 0 12px var(--pink); }
+
+.spec-idx { color: var(--pink); text-shadow: 0 0 10px rgba(255, 0, 122, 0.7); }
+.spec-bar { background: rgba(167, 0, 255, 0.25); }
+.spec-bar i {
+  background: linear-gradient(90deg, var(--pink), var(--purple) 40%, var(--mint) 72%, var(--yellow));
+  box-shadow: 0 0 12px rgba(0, 255, 179, 0.6);
+}
+.spec-row { border-top-color: rgba(167, 0, 255, 0.32); }
+
+/* ── Hazard tape in signal yellow ── */
+.hazard {
+  background: repeating-linear-gradient(-45deg, var(--yellow) 0 14px, #1B1B2A 14px 28px);
+  box-shadow: 0 0 20px rgba(255, 234, 0, 0.40);
+  opacity: 0.95;
+}
+
+/* ── Shelf ── */
+.shelf-head { border-bottom-color: rgba(0, 255, 179, 0.35); }
+.shelf-count { color: var(--mint); opacity: 0.85; }
+
+.cap {
+  background: linear-gradient(165deg, rgba(27, 27, 42, 0.86), rgba(18, 18, 31, 0.94));
+  border: 1px solid rgba(167, 0, 255, 0.40);
+  box-shadow: 0 0 22px rgba(167, 0, 255, 0.16);
+}
+.cap:hover {
+  border-color: var(--mint);
+  box-shadow: 0 0 0 1px rgba(0, 255, 179, 0.45), 0 0 40px rgba(0, 255, 179, 0.30), 0 16px 44px rgba(0,0,0,0.6);
+}
+.cap-art::after { background: linear-gradient(to top, rgba(18, 18, 31, 0.96), rgba(167, 0, 255, 0.12) 62%); }
+
+.cap-status                     { background: var(--yellow); color: #1B1B2A; box-shadow: 0 0 14px rgba(255,234,0,0.55); }
+.cap-status[data-s="LIVE"]      { background: var(--mint);   color: #10201c; box-shadow: 0 0 14px rgba(0,255,179,0.6); }
+.cap-status[data-s="SHIPPED"]   { background: var(--mint);   color: #10201c; box-shadow: 0 0 14px rgba(0,255,179,0.6); }
+.cap-status[data-s="IN DEV"]    { background: var(--pink);   color: #fff;    box-shadow: 0 0 14px rgba(255,0,122,0.6); }
+.cap-status[data-s="PROTOTYPE"] { background: var(--purple); color: #fff;    box-shadow: 0 0 14px rgba(167,0,255,0.6); }
+
+.cap-year  { color: var(--mint); }
+.cap-title { color: #fff; text-shadow: 0 0 14px rgba(0, 255, 179, 0.35); }
+.cap-tags span { border-color: rgba(0, 255, 179, 0.30); color: #a9f5dd; background: rgba(0, 255, 179, 0.06); }
+
+[data-mode="dev"] .scroll-rail i { background: linear-gradient(90deg, var(--pink), var(--purple), var(--mint), var(--yellow)); }
+[data-mode="dev"] .mode-switch summary { border-color: rgba(0, 255, 179, 0.45); color: var(--mint); }
+[data-mode="dev"] .mode-dot { background: var(--mint); box-shadow: 0 0 8px var(--mint); }
+[data-mode="dev"] .mode-menu { background: #12121f; border-color: rgba(167, 0, 255, 0.4); }
+
+/* The skyline is a backdrop, not a competitor. Everything below the capsule
+   sits over a scrim that fades the city out, so cards and headings keep
+   their contrast while the top of the frame stays fully lit. */
+.lab-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(to bottom,
+    rgba(27, 27, 42, 0.00) 0%,
+    rgba(27, 27, 42, 0.10) 26%,
+    rgba(27, 27, 42, 0.72) 45%,
+    rgba(27, 27, 42, 0.93) 60%,
+    rgba(27, 27, 42, 0.97) 100%);
+}
+[data-mode="dev"] .lab-grid { z-index: 0; }
+[data-mode="dev"] .lab-inner { z-index: 2; }
+[data-mode="dev"] .lab-scan  { z-index: 3; }
+
+/* Shelf heading needs a plate — LED type over a lit skyline is unreadable
+   without one, and this is a label, not the hero. */
+.shelf-head {
+  background: rgba(18, 18, 31, 0.86);
+  border: 1px solid rgba(0, 255, 179, 0.30);
+  border-left: 3px solid var(--mint);
+  padding: 0.55rem 0.9rem;
+  margin-bottom: 1.2rem;
+  box-shadow: 0 0 24px rgba(0, 255, 179, 0.12);
+}
+[data-mode="dev"] .shelf-title { font-size: 0.82rem; }
+.shelf-count { color: var(--mint); opacity: 1; }
+
+[data-mode="dev"] .shelf-title {
+  color: var(--mint);
+  -webkit-text-fill-color: var(--mint);
+  text-shadow: 0 0 12px rgba(0, 255, 179, 0.55);
+}

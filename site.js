@@ -277,7 +277,7 @@
         try { localStorage.setItem('site-mode', mode); } catch (e) {}
       }
       if (mode === 'chef') { renderKitchen(); petalField(document.getElementById('kitchen')); }
-      if (mode === 'dev')  { renderLab(); labGrid(document.querySelector('.lab-grid')); }
+      if (mode === 'dev')  { renderLab(); labCity(document.querySelector('.lab-grid')); }
     }
 
     Array.prototype.forEach.call(buttons, function (b) {
@@ -460,62 +460,190 @@
     start();
   }
 
-  /* ── Developer mode ──
-     Perspective grid receding to a horizon, scrolling toward the viewer.
-     Lines are spaced in screen space by projecting evenly-spaced depths,
-     which is what gives the compression toward the horizon. */
+  /* ── Developer mode: neon city ──
+     A seeded skyline drawn once to an offscreen buffer, then composited each
+     frame with the cheap, moving parts on top: window flicker, sweeping
+     searchlights, and a wet-street reflection that wobbles. Redrawing the
+     buildings every frame would be pointless — they never change. */
   var labStarted = false;
-  function labGrid(canvas) {
+  function labCity(canvas) {
     if (labStarted || !canvas) return;
     labStarted = true;
     var ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    var NEON = ['#FF007A', '#00FFB3', '#A700FF', '#FFEA00'];
+    var VOID = '#1B1B2A';
+
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
-    var w = 0, h = 0, t = 0, raf = 0, running = false;
+    var w = 0, h = 0, sky = null, horizon = 0, t = 0, raf = 0, running = false;
+    var windows = [], beams = [], seed = 20260903;
+
+    function rnd() { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; }
+    function pick(a) { return a[(rnd() * a.length) | 0]; }
+
+    function buildSky() {
+      horizon = Math.round(h * 0.62);
+      sky = document.createElement('canvas');
+      sky.width = Math.round(w * dpr);
+      sky.height = Math.round(h * dpr);
+      var c = sky.getContext('2d');
+      c.setTransform(dpr, 0, 0, dpr, 0, 0);
+      seed = 20260903;
+      windows = [];
+
+      // Four depth layers, far to near: dimmer, hazier, shorter.
+      for (var layer = 0; layer < 4; layer++) {
+        var depth = layer / 3;
+        var alpha = 0.30 + depth * 0.70;
+        var maxH  = h * (0.16 + depth * 0.30);
+        var minH  = h * (0.05 + depth * 0.10);
+        var bw    = 26 + depth * 46;
+        var x = -40;
+
+        while (x < w + 40) {
+          var bwv = bw * (0.6 + rnd() * 0.9);
+          var bh  = minH + rnd() * (maxH - minH);
+          var top = horizon - bh;
+
+          c.fillStyle = 'rgba(11, 11, 20,' + (0.55 + depth * 0.45) + ')';
+          c.fillRect(x, top, bwv, bh);
+
+          // Rooftop neon edge — the thing that makes it read as a city at night.
+          if (rnd() > 0.42) {
+            var edge = pick(NEON);
+            c.strokeStyle = edge;
+            c.globalAlpha = 0.35 + depth * 0.5;
+            c.lineWidth = 1.6;
+            c.beginPath(); c.moveTo(x, top); c.lineTo(x + bwv, top); c.stroke();
+            c.globalAlpha = 1;
+          }
+
+          // A vertical neon strip running down some facades.
+          if (rnd() > 0.62 && bwv > 22) {
+            var sx = x + 4 + rnd() * (bwv - 10);
+            c.strokeStyle = pick(NEON);
+            c.globalAlpha = 0.28 + depth * 0.42;
+            c.lineWidth = 2.2;
+            c.beginPath(); c.moveTo(sx, top + 8); c.lineTo(sx, horizon - 6); c.stroke();
+            c.globalAlpha = 1;
+          }
+
+          // Windows. Collected, not drawn — the animated pass owns them.
+          var cols = Math.max(1, Math.floor(bwv / 9));
+          var rows = Math.max(1, Math.floor(bh / 11));
+          for (var cxi = 0; cxi < cols; cxi++) {
+            for (var ry = 0; ry < rows; ry++) {
+              if (rnd() > 0.38) continue;
+              windows.push({
+                x: x + 4 + cxi * 9,
+                y: top + 6 + ry * 11,
+                c: pick(NEON),
+                a: (0.25 + rnd() * 0.6) * alpha,
+                f: rnd() > 0.92 ? 0.6 + rnd() * 2.4 : 0,   // flicker rate
+                p: rnd() * 6.28
+              });
+            }
+          }
+          x += bwv + 2 + rnd() * 7;
+        }
+      }
+
+      beams = [];
+      for (var b = 0; b < 3; b++) {
+        beams.push({ x: rnd() * w, c: pick(NEON), sp: 0.12 + rnd() * 0.22, p: rnd() * 6.28 });
+      }
+    }
 
     function size() {
       var r = canvas.getBoundingClientRect();
       w = Math.max(1, r.width); h = Math.max(1, r.height);
       canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      buildSky();
     }
 
     function frame() {
       if (!running) return;
-      t += 0.006;
+      t += 0.016;
+
       ctx.clearRect(0, 0, w, h);
 
-      var hz = h * 0.46;            // horizon
-      var fl = h * 0.55;            // focal length
-      var eye = 1.15;
+      // Sky wash above the skyline.
+      var g = ctx.createLinearGradient(0, 0, 0, horizon);
+      g.addColorStop(0,    'rgba(27, 27, 42, 0)');
+      g.addColorStop(0.55, 'rgba(167, 0, 255, 0.16)');
+      g.addColorStop(1,    'rgba(255, 0, 122, 0.20)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, w, horizon);
 
-      ctx.lineWidth = 1;
+      // Searchlights, behind the buildings.
+      for (var i = 0; i < beams.length; i++) {
+        var bm = beams[i];
+        var bx = (bm.x + Math.sin(t * bm.sp + bm.p) * w * 0.32 + w) % w;
+        var bg = ctx.createLinearGradient(bx, horizon, bx, horizon - h * 0.55);
+        bg.addColorStop(0, bm.c + '44');
+        bg.addColorStop(1, bm.c + '00');
+        ctx.fillStyle = bg;
+        ctx.beginPath();
+        ctx.moveTo(bx - 3, horizon);
+        ctx.lineTo(bx - 34, horizon - h * 0.55);
+        ctx.lineTo(bx + 34, horizon - h * 0.55);
+        ctx.lineTo(bx + 3, horizon);
+        ctx.closePath();
+        ctx.fill();
+      }
 
-      // Depth lines, marching forward so the floor appears to scroll.
-      for (var i = 0; i < 26; i++) {
-        var z = i + 1 - (t % 1);
-        var y = hz + (fl * eye) / z;
-        if (y < hz || y > h + 2) continue;
-        var fade = Math.max(0, 1 - z / 26);
-        ctx.strokeStyle = 'rgba(168, 85, 247,' + (0.10 + fade * 0.34) + ')';
+      ctx.drawImage(sky, 0, 0, w, h);
+
+      // Windows, with the flickering subset animated.
+      for (var k = 0; k < windows.length; k++) {
+        var wd = windows[k];
+        var a = wd.a;
+        if (wd.f) a *= 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(t * wd.f * 6 + wd.p));
+        ctx.globalAlpha = a;
+        ctx.fillStyle = wd.c;
+        ctx.fillRect(wd.x, wd.y, 3, 4);
+      }
+      ctx.globalAlpha = 1;
+
+      // Wet street: the skyline mirrored, squashed, wobbling, fading out.
+      ctx.save();
+      ctx.globalAlpha = 0.32;
+      ctx.translate(0, horizon * 2);
+      ctx.scale(1, -0.55);
+      ctx.drawImage(sky, Math.sin(t * 0.7) * 2, 0, w, h);
+      ctx.restore();
+
+      var fade = ctx.createLinearGradient(0, horizon, 0, h);
+      fade.addColorStop(0, 'rgba(27, 27, 42, 0.25)');
+      fade.addColorStop(1, 'rgba(27, 27, 42, 0.98)');
+      ctx.fillStyle = fade;
+      ctx.fillRect(0, horizon, w, h - horizon);
+
+      // Street grid receding, drawn over the reflection.
+      var fl = h * 0.42;
+      for (var d = 0; d < 20; d++) {
+        var z = d + 1 - ((t * 0.35) % 1);
+        var y = horizon + fl / z;
+        if (y > h) continue;
+        ctx.strokeStyle = 'rgba(0, 255, 179,' + (0.18 * (1 - d / 20)) + ')';
+        ctx.lineWidth = 1;
         ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
       }
-
-      // Radial lines converging on the vanishing point.
       var cx = w / 2;
-      for (var k = -18; k <= 18; k++) {
-        var xf = cx + k * (w / 14);
-        ctx.strokeStyle = 'rgba(255, 210, 63, 0.10)';
-        ctx.beginPath(); ctx.moveTo(cx, hz); ctx.lineTo(xf, h); ctx.stroke();
+      for (var m = -14; m <= 14; m++) {
+        ctx.strokeStyle = 'rgba(167, 0, 255, 0.10)';
+        ctx.beginPath(); ctx.moveTo(cx, horizon); ctx.lineTo(cx + m * (w / 10), h); ctx.stroke();
       }
 
-      // Horizon glow.
-      var g = ctx.createLinearGradient(0, hz - 60, 0, hz + 8);
-      g.addColorStop(0, 'rgba(255, 210, 63, 0)');
-      g.addColorStop(1, 'rgba(255, 210, 63, 0.26)');
-      ctx.fillStyle = g;
-      ctx.fillRect(0, hz - 60, w, 68);
+      // Horizon bloom.
+      var hb = ctx.createLinearGradient(0, horizon - 26, 0, horizon + 10);
+      hb.addColorStop(0, 'rgba(255, 234, 0, 0)');
+      hb.addColorStop(0.7, 'rgba(255, 0, 122, 0.20)');
+      hb.addColorStop(1, 'rgba(0, 255, 179, 0.16)');
+      ctx.fillStyle = hb;
+      ctx.fillRect(0, horizon - 26, w, 36);
 
       raf = requestAnimationFrame(frame);
     }
@@ -524,7 +652,7 @@
     function stop() { running = false; cancelAnimationFrame(raf); }
 
     size();
-    window.addEventListener('resize', debounce(size, 200));
+    window.addEventListener('resize', debounce(size, 220));
     document.addEventListener('visibilitychange', function () { document.hidden ? stop() : start(); });
     start();
   }
@@ -542,15 +670,15 @@
     for (var i = 0; i < seed.length; i++) s = (s * 31 + seed.charCodeAt(i)) >>> 0;
     function rnd() { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }
 
-    x.fillStyle = '#140d24'; x.fillRect(0, 0, 480, 270);
-    x.strokeStyle = 'rgba(168,85,247,0.20)'; x.lineWidth = 1;
+    x.fillStyle = '#12121f'; x.fillRect(0, 0, 480, 270);
+    x.strokeStyle = 'rgba(167,0,255,0.22)'; x.lineWidth = 1;
     for (var gx = 0; gx <= 480; gx += 24) { x.beginPath(); x.moveTo(gx, 0); x.lineTo(gx, 270); x.stroke(); }
     for (var gy = 0; gy <= 270; gy += 24) { x.beginPath(); x.moveTo(0, gy); x.lineTo(480, gy); x.stroke(); }
 
     for (var n = 0; n < 16; n++) {
       var px = Math.floor(rnd() * 20) * 24;
       var py = Math.floor(rnd() * 11) * 24;
-      x.strokeStyle = rnd() > 0.5 ? 'rgba(255,210,63,0.80)' : 'rgba(168,85,247,0.85)';
+      x.strokeStyle = ['#FF007A','#00FFB3','#A700FF','#FFEA00'][(rnd()*4)|0];
       x.lineWidth = 2;
       x.beginPath(); x.moveTo(px, py);
       var steps = 2 + Math.floor(rnd() * 3);
@@ -560,7 +688,7 @@
         x.lineTo(px, py);
       }
       x.stroke();
-      x.fillStyle = 'rgba(216,255,62,0.9)';
+      x.fillStyle = '#FFEA00';
       x.beginPath(); x.arc(px, py, 3, 0, Math.PI * 2); x.fill();
     }
     return c;
