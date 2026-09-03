@@ -2023,3 +2023,13 @@ footer {
       #E4FAFF 74%,
       #E4FAFF 100%);
 }
+
+/* Headline steps down a size, and the band tightens with it now that the
+   eyebrow above it is gone. */
+.lab-title {
+  font-size: min(3.3rem, 4.6vw);
+  text-shadow: 3px 3px 0 var(--magenta), 6px 6px 0 var(--violet);
+  margin-bottom: 2.2rem;
+}
+.title-band { top: 2.2rem; height: 4.6rem; }
+.lab-head { padding: 2.6rem 0 3rem; }
