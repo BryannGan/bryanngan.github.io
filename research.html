@@ -35,6 +35,15 @@
         of enabling patient-specific digital twins of the heart.
       </p>
 
+
+      <figure class="fig fig-lead is-cutout">
+        <img src="assets/research/la-flow-streamlines.webp"
+             alt="Velocity streamlines through a patient-specific left atrium">
+        <figcaption>Velocity streamlines through a patient-specific left atrium, coloured by
+        speed. Pulmonary-vein inflow jets organise into a recirculating body flow that sweeps
+        the appendage.</figcaption>
+      </figure>
+
       <div class="toc">
         <h4>Projects</h4>
         <ol>
@@ -60,6 +69,35 @@
             <li>Nested optimization combining genetic algorithm with Sellier&rsquo;s method to calibrate Holzapfel&ndash;Ogden constitutive model</li>
             <li>Quantified the impact of variable vs uniform wall thickness on left atrial stress distribution and wall motion</li>
           </ul>
+          <div class="fig-grid">
+            <figure class="fig">
+              <img src="assets/research/biaxial-ho-parameters.webp"
+                   alt="Biaxial stress-stretch curves and Holzapfel-Ogden parameters by region">
+              <figcaption>Biaxial stress&ndash;stretch response of two left atria (mean&nbsp;&plusmn;&nbsp;SD
+              across five regions) and the fitted Holzapfel&ndash;Ogden parameters. Regional spread
+              spans roughly an order of magnitude &mdash; the motivation for abandoning uniform
+              material properties.</figcaption>
+            </figure>
+            <figure class="fig is-cutout">
+              <img src="assets/research/la-regional-segmentation.webp"
+                   alt="Left atrium partitioned into anterior, posterior, roof, appendage and mitral valve regions with fibre directions">
+              <figcaption>Regional partition with mapped fibre architecture: anterior, posterior,
+              roof, appendage and mitral-valve regions, each assigned its own constitutive
+              parameters.</figcaption>
+            </figure>
+            <figure class="fig is-cutout">
+              <video src="assets/research/la-ifea-stress.mp4" autoplay loop muted playsinline preload="metadata" aria-label="Animated wall stress over the cardiac cycle from inverse finite element analysis"></video>
+              <figcaption>Wall stress through the cardiac cycle, recovered by the inverse
+              finite-element loop.</figcaption>
+            </figure>
+            <figure class="fig">
+              <img src="assets/research/porcine-la-specimen.webp"
+                   alt="Dissected porcine left atrium with anatomical landmarks labelled">
+              <figcaption>Dissected porcine specimen with landmarks labelled, prepared for
+              biaxial testing. Experimental work carried out at Kennesaw State University.</figcaption>
+            </figure>
+          </div>
+
         </div>
 
         <div id="proj-cfd" class="strategy-item">
@@ -75,6 +113,28 @@
             <li>Applied Fourier-interpolated wall motion as boundary conditions with patient-specific contrast agent inflow profiles</li>
             <li>Evaluated wall shear stress, velocity, and concentration across the LA body and left atrial appendage</li>
           </ul>
+          <div class="fig-grid">
+            <figure class="fig is-cutout">
+              <video src="assets/research/la-flow-animation.mp4" autoplay loop muted playsinline preload="metadata" aria-label="Animated velocity field over the cardiac cycle"></video>
+              <figcaption>Velocity field over one cardiac cycle with imposed wall motion.</figcaption>
+            </figure>
+            <figure class="fig is-cutout">
+              <img src="assets/research/la-flow-vortex.webp"
+                   alt="Vortex structures visualised as isosurfaces inside the left atrium">
+              <figcaption>Vortex structures shed from the pulmonary-vein inflow jets, shown as
+              isosurfaces.</figcaption>
+            </figure>
+            <figure class="fig is-cutout">
+              <video src="assets/research/la-dye-transport.mp4" autoplay loop muted playsinline preload="metadata" aria-label="Animated contrast agent transport through the left atrium"></video>
+              <figcaption>Contrast-agent transport, used to evaluate washout of the appendage
+              &mdash; the region where stasis precedes thrombus formation.</figcaption>
+            </figure>
+            <figure class="fig is-cutout">
+              <video src="assets/research/la-wall-stress.mp4" autoplay loop muted playsinline preload="metadata" aria-label="Animated wall stress distribution across the atrial wall"></video>
+              <figcaption>Wall stress distribution across the atrium under imposed kinematics.</figcaption>
+            </figure>
+          </div>
+
         </div>
 
         <div id="proj-gnn" class="strategy-item">
@@ -89,6 +149,21 @@
             <li>Laplace&ndash;Dirichlet geometry encoding, multi-head attention, distance-based edge generation</li>
             <li>Currently implemented for structural mechanics; planned extension to electrophysiology and activation mapping</li>
           </ul>
+          <div class="fig-grid">
+            <figure class="fig is-cutout">
+              <video src="assets/research/la-activation.mp4" autoplay loop muted playsinline preload="metadata" aria-label="Animated action potential propagating across the atrial surface"></video>
+              <figcaption>Action potential propagating across the atrial surface. Producing maps
+              like this by finite-element solve is what the graph network is being trained to
+              replace.</figcaption>
+            </figure>
+            <figure class="fig is-cutout">
+              <img src="assets/research/la-fiber-architecture.webp"
+                   alt="Myofibre architecture mapped across the atrial wall">
+              <figcaption>Myofibre architecture across the wall. Fibre orientation sets conduction
+              anisotropy, and is an input feature to the network.</figcaption>
+            </figure>
+          </div>
+
         </div>
 
         <div id="proj-lpn" class="strategy-item">

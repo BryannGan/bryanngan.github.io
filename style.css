@@ -241,7 +241,7 @@ section h2 {
 
 /* Auto-numbered sections (01, 02, …). Only sections with an id count,
    so subpage detail headings stay unnumbered. */
-body { counter-reset: sec; }
+body { counter-reset: sec fig; }
 section[id] h2 { counter-increment: sec; }
 section[id] h2::before {
   content: counter(sec, decimal-leading-zero);
@@ -776,4 +776,79 @@ footer {
 }
 .expand-btn.is-visible {
   display: inline-block;
+}
+
+
+/* ── Figures ──
+   Auto-numbered plate system. Captions carry a mono "Fig. 03" label so
+   the prose can reference plates by number the way a paper does.
+   Videos are silent, looping, inline — they behave as animated plates,
+   not media players. */
+.fig-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr));
+  gap: 1.4rem 1.5rem;
+  margin: 1.5rem 0 0.5rem;
+}
+
+.fig {
+  margin: 0;
+  counter-increment: fig;
+}
+
+.fig img,
+.fig video {
+  display: block;
+  width: 100%;
+  background: var(--paper-sunk);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+}
+
+/* Plates inside a grid share one aspect box so caption baselines line up
+   across a row. Renders keep their own proportions inside it. */
+.fig-grid .fig img,
+.fig-grid .fig video {
+  aspect-ratio: 4 / 3;
+  object-fit: contain;
+}
+
+/* Renders with a transparent background sit directly on paper —
+   a boxed frame would fight the cut-out silhouette. */
+.fig.is-cutout img,
+.fig.is-cutout video {
+  background: transparent;
+  border-color: transparent;
+}
+
+.fig figcaption {
+  font-size: 0.82rem;
+  color: var(--ink-muted);
+  margin-top: 0.55rem;
+  line-height: 1.45;
+}
+
+.fig figcaption::before {
+  content: "Fig. " counter(fig, decimal-leading-zero) "  ";
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--clay);
+  white-space: pre;
+}
+
+/* One plate spanning the full measure, for a lead image. */
+.fig-lead {
+  margin: 1.75rem 0 2rem;
+}
+.fig-lead img,
+.fig-lead video {
+  max-height: 460px;
+  object-fit: contain;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fig video { display: none; }
+  .fig video + .fig-fallback { display: block; }
 }
