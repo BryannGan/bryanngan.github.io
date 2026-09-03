@@ -5,14 +5,59 @@
   box-sizing: border-box;
 }
 
+/* Design tokens — pastel neutrals with a muted clay accent.
+   Accent hues are sampled from Bryan's own figures (the regional LA
+   segmentation: clay/anterior, sage/roof, sand/LAA, slate/mitral valve),
+   so the page and the science share a palette.
+
+   Contrast rule: pastels are FILLS only. Anything carrying text uses the
+   -ink variants, all of which clear 4.5:1 on paper.
+   Legacy names are aliased so existing rules keep working. */
 :root {
-  --bg: #ffffff;
-  --bg-card: #f9fafb;
-  --text: #1a1a1a;
-  --text-muted: #6b7280;
-  --accent: #2563eb;
-  --accent-hover: #1d4ed8;
-  --border: #e5e7eb;
+  /* Surfaces */
+  --paper:        #fdfcfa;
+  --paper-sunk:   #f6f4f0;
+  --paper-raised: #ffffff;
+
+  /* Ink */
+  --ink:          #22252a;   /* 15.0:1 */
+  --ink-soft:     #464c54;   /*  8.5:1 */
+  --ink-muted:    #676e76;   /*  4.6:1 */
+  --ink-faint:    #9ba2aa;   /*  2.5:1 — decorative only */
+
+  /* Rules */
+  --rule:         #e8e4dd;
+  --rule-strong:  #cfcabf;
+
+  /* Clay — the primary accent. Muted, not saturated. */
+  --clay:         #a85c3c;   /*  4.8:1 — safe for text and links */
+  --clay-hover:   #83452c;
+  --clay-fill:    #f2ddd2;
+  --clay-edge:    #e0bfae;
+
+  /* Pastel support — fills, diagram surfaces, tags. Never text. */
+  --sage-fill:    #d9e6e1;
+  --sage-ink:     #3f6f65;   /*  4.9:1 */
+  --sand-fill:    #f2e8d2;
+  --sand-ink:     #7a6534;   /*  5.0:1 */
+  --slate-fill:   #dae2ec;
+  --slate-ink:    #4a6480;   /*  5.6:1 */
+
+  /* Type */
+  --sans: "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* Aliases (legacy) */
+  --bg:           var(--paper);
+  --bg-card:      var(--paper-sunk);
+  --text:         var(--ink);
+  --text-muted:   var(--ink-muted);
+  --accent:       var(--clay);
+  --accent-hover: var(--clay-hover);
+  --border:       var(--rule);
+  --signal:       var(--clay);
+  --signal-hover: var(--clay-hover);
+  --signal-wash:  var(--clay-fill);
 }
 
 html {
@@ -20,10 +65,23 @@ html {
 }
 
 body {
-  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.4;
+  font-family: var(--sans);
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.55;
+  font-feature-settings: "tnum" 1;   /* tabular figures — dates and stats align */
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Monospace label: the core annotation primitive.
+   Used for section numbers, metadata, figure captions, dates. */
+.mono-label {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
 }
 
 a {
@@ -68,12 +126,18 @@ a:hover {
 }
 
 .nav-links a {
-  color: var(--text-muted);
-  font-size: 0.8rem;
+  font-family: var(--mono);
+  color: var(--ink-muted);
+  font-size: 0.7rem;
   font-weight: 500;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  padding-bottom: 2px;
+  border-bottom: 1px solid transparent;
 }
 .nav-links a:hover {
-  color: var(--text);
+  color: var(--ink);
+  border-bottom-color: var(--signal);
 }
 
 /* ── Profile / About ── */
@@ -164,10 +228,29 @@ section {
 }
 
 section h2 {
-  font-size: 1.3rem;
-  font-weight: 700;
-  margin-bottom: 0.75rem;
-  letter-spacing: -0.01em;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1.1rem;
+  letter-spacing: -0.015em;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+}
+
+/* Auto-numbered sections (01, 02, …). Only sections with an id count,
+   so subpage detail headings stay unnumbered. */
+body { counter-reset: sec; }
+section[id] h2 { counter-increment: sec; }
+section[id] h2::before {
+  content: counter(sec, decimal-leading-zero);
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--signal);
+  flex: none;
 }
 
 /* (profile-bio replaces old #about p) */
@@ -302,12 +385,17 @@ section h2 {
   gap: 0.5rem;
 }
 
+/* Tags read as spec-sheet annotations, not marketing pills:
+   mono, squared off, hairline border, pastel wash. */
 .tags span {
-  background: rgba(96, 165, 250, 0.1);
-  color: var(--accent);
-  font-size: 0.78rem;
-  padding: 0.25rem 0.7rem;
-  border-radius: 999px;
+  font-family: var(--mono);
+  background: var(--clay-fill);
+  border: 1px solid var(--clay-edge);
+  color: var(--clay-hover);
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  padding: 0.2rem 0.5rem;
+  border-radius: 2px;
   font-weight: 500;
 }
 
