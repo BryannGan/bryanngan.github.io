@@ -960,6 +960,19 @@ footer {
   font-size: 1.02rem;
   line-height: 1.6;
   margin-bottom: 1.5rem;
+  max-width: none;          /* base .profile-bio caps at 600px */
+}
+
+/* Lead claim gets its own line and sits at display weight. */
+.bio-lead {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin-bottom: 0.6rem;
+  text-wrap: balance;
 }
 
 /* Spec-sheet readout: the most "instrument panel" element on the page. */
