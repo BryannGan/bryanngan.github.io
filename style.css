@@ -852,3 +852,231 @@ footer {
   .fig video { display: none; }
   .fig video + .fig-fallback { display: block; }
 }
+
+/* ── Motion layer ──
+   All of this is progressive. Without .motion on <html> (JS off, or
+   prefers-reduced-motion) every element below sits in its final state:
+   nothing is hidden by default, so the page can never fail to blank. */
+
+.scroll-rail {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  z-index: 200;
+  pointer-events: none;
+}
+.scroll-rail i {
+  display: block;
+  height: 100%;
+  background: var(--clay);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+}
+
+/* ── Hero ── */
+.hero {
+  position: relative;
+  min-height: 82vh;
+  display: flex;
+  align-items: center;
+  padding: 7rem 0 4rem;
+  overflow: hidden;
+  border-bottom: 1px solid var(--rule);
+}
+
+.hero-field {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  opacity: 0.85;
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+
+.hero-eyebrow {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-bottom: 1.1rem;
+}
+
+.hero-name {
+  font-size: clamp(2.1rem, 6.4vw, 4.25rem);
+  font-weight: 600;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  margin-bottom: 1.6rem;
+  text-wrap: balance;
+}
+.hero-name .line {
+  display: block;
+  overflow: hidden;
+}
+.hero-name .line > span {
+  display: block;
+}
+
+.hero-body {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+  gap: 2rem;
+  align-items: start;
+  max-width: 780px;
+}
+
+.hero-photo img {
+  width: 132px;
+  height: 132px;
+  object-fit: cover;
+  border-radius: 3px;
+  border: 1px solid var(--rule-strong);
+  display: block;
+}
+
+.hero-text .profile-bio {
+  margin-bottom: 1.25rem;
+  max-width: 60ch;
+}
+
+/* Spec-sheet readout: the most "instrument panel" element on the page. */
+.hero-readout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 2.25rem;
+  margin-bottom: 1.35rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--rule);
+}
+.hero-readout div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.hero-readout dt {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.hero-readout dd {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+
+.hero-cue {
+  position: absolute;
+  left: 50%;
+  bottom: 1.5rem;
+  transform: translateX(-50%);
+  z-index: 1;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.hero-cue span { display: block; }
+
+/* ── Link underline sweep ── */
+.profile-links a,
+.hero-text a {
+  position: relative;
+}
+.profile-links a::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -3px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: 100% 50%;
+}
+.profile-links a:hover::after {
+  transform: scaleX(1);
+  transform-origin: 0 50%;
+}
+
+/* Nav mirrors scroll position. */
+.nav-links a.is-current {
+  color: var(--ink);
+  border-bottom-color: var(--clay);
+}
+
+/* ── Motion-only state ── */
+.motion .profile-links a::after {
+  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.motion .hero-name .line > span,
+.motion .hero-eyebrow,
+.motion .hero-body,
+.motion .hero-cue {
+  opacity: 0;
+  transform: translateY(1.05em);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.motion .hero-eyebrow { transition-delay: 0.05s; }
+.motion .hero-name .line > span { transition-delay: 0.14s; }
+.motion .hero-body { transition-delay: 0.3s; transform: translateY(1.6rem); }
+.motion .hero-cue  { transition-delay: 0.55s; }
+
+.motion .hero-name .line > span.is-in,
+.motion .hero-eyebrow.is-in,
+.motion .hero-body.is-in,
+.motion .hero-cue.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+.motion .hero-cue.is-in span {
+  animation: cue-drift 1.9s ease-in-out infinite;
+}
+@keyframes cue-drift {
+  0%, 100% { transform: translateY(0);     opacity: 0.55; }
+  50%      { transform: translateY(0.3rem); opacity: 1; }
+}
+
+.motion .will-reveal {
+  opacity: 0;
+  transform: translateY(0.9rem);
+  transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.motion .will-reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* Project card lifts and warms on hover. */
+.motion .project-card {
+  transition: border-color 0.25s, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+              background 0.25s, box-shadow 0.35s;
+}
+.project-card:hover {
+  border-color: var(--clay-edge);
+  background: var(--paper-raised);
+  box-shadow: 0 1px 2px rgba(34, 37, 42, 0.03), 0 8px 26px rgba(34, 37, 42, 0.05);
+}
+
+@media (max-width: 640px) {
+  .hero { min-height: auto; padding: 6rem 0 3rem; }
+  .hero-body { grid-template-columns: 1fr; gap: 1.4rem; }
+  .hero-cue { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-field { display: none; }
+  .scroll-rail { display: none; }
+}

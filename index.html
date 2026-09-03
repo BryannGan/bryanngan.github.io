@@ -11,6 +11,8 @@
 </head>
 <body>
 
+  <div class="scroll-rail" aria-hidden="true"><i></i></div>
+
   <nav id="navbar">
     <div class="nav-container">
       <ul class="nav-links">
@@ -23,21 +25,35 @@
     </div>
   </nav>
 
-  <section id="about">
-    <div class="container">
-      <div class="profile-row">
-        <div class="profile-photo-wrap">
-          <img src="assets/headshot2.jpg" alt="Bryan Gan" class="profile-photo">
+  <header class="hero" id="about">
+    <canvas class="hero-field" aria-hidden="true"></canvas>
+
+    <div class="container hero-inner">
+      <p class="hero-eyebrow">Columbia University &middot; Mechanical Engineering</p>
+
+      <h1 class="hero-name">
+        <span class="line"><span>Boyang (Bryan) Gan</span></span>
+      </h1>
+
+      <div class="hero-body">
+        <div class="hero-photo">
+          <img src="assets/headshot2.jpg" alt="Bryan Gan">
         </div>
-        <div class="profile-info">
-          <h1>Boyang (Bryan) Gan</h1>
-          <p class="profile-affiliation">PhD Student, Columbia University</p>
+
+        <div class="hero-text">
           <p class="profile-bio">
             I am a computational researcher working at the <strong>intersection of biomechanics, scientific
             computing, and machine learning to build physics-based digital twins of the human heart.</strong>
             My research integrates cardiac electrophysiology, tissue mechanics, and blood-flow modeling
             to predict how an individual heart develops disease and responds to therapy.
           </p>
+
+          <dl class="hero-readout">
+            <div><dt>Field</dt><dd>Cardiac biomechanics</dd></div>
+            <div><dt>Methods</dt><dd>FEA &middot; CFD &middot; GNN &middot; MCMC</dd></div>
+            <div><dt>Scale</dt><dd>Tissue &rarr; organ &rarr; circulation</dd></div>
+          </dl>
+
           <div class="profile-links">
             <a href="mailto:bg2881@columbia.edu">Email</a>
             <a href="https://scholar.google.com/citations?user=cMBaQW4AAAAJ&hl=en" target="_blank">Google Scholar</a>
@@ -47,7 +63,10 @@
         </div>
       </div>
     </div>
-  </section>
+
+    <div class="hero-cue" aria-hidden="true"><span>Scroll</span></div>
+  </header>
+
 
   <section id="projects">
     <div class="container">
@@ -248,5 +267,6 @@
     })();
   </script>
 
+  <script src="site.js" defer></script>
 </body>
 </html>
