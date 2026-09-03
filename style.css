@@ -2011,3 +2011,15 @@ footer {
 /* Colour fields step further outboard so nothing crowds the pillars. */
 .field-y { top: -18%; left: -28%; width: 28%; height: 58%; }
 .field-p { top: 52%;  right: -28%; width: 30%; height: 70%; }
+
+/* Sky moves from canvas to CSS so the gradient still covers the cleared
+   centre channel now that the canvas only paints the outer flanks. */
+[data-mode="dev"] .lab {
+  background:
+    linear-gradient(180deg,
+      #B9F2FF 0%,
+      #9EEBFF 26%,
+      #DFF6FF 52%,
+      #E4FAFF 74%,
+      #E4FAFF 100%);
+}

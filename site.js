@@ -498,10 +498,17 @@
       [1, 0].forEach(function (near) {
         var bwBase = near ? w * 0.115 : w * 0.085;
         var step = near ? -w * 0.04 : w * 0.02;
+        var LEFT_END = w * 0.26, RIGHT_START = w * 0.74;
         while (step < w + 40) {
           var bw = bwBase * (0.62 + rnd() * 0.85);
           var bh = ref * (near ? 0.15 : 0.10) * (0.55 + rnd() * 1.15);
           var x = step, top = hz - bh, cut = 8 + rnd() * 22;
+
+          // Skip anything that would land in the centre channel.
+          if (x + bw > LEFT_END && x < RIGHT_START) {
+            step = RIGHT_START;
+            continue;
+          }
 
           c.fillStyle = near ? FILL[(rnd() * FILL.length) | 0] : '#FFFFFF';
           c.globalAlpha = near ? 1 : 0.55;
@@ -550,36 +557,9 @@
     function frame() {
       if (!running) return;
       t += 0.016;
-      var vpx = w / 2;
 
-      // Bright sky.
-      var g = ctx.createLinearGradient(0, 0, 0, hz);
-      g.addColorStop(0,    '#B9F2FF');
-      g.addColorStop(0.42, '#7FE3FF');
-      g.addColorStop(0.78, '#FFC8F0');
-      g.addColorStop(1,    '#FFF07A');
-      ctx.fillStyle = g;
-      ctx.fillRect(0, 0, w, hz);
-
-      // Flat sun with expanding rings.
-      var sr = Math.min(w, h) * 0.14;
-      ctx.save();
-      ctx.beginPath(); ctx.rect(0, 0, w, hz); ctx.clip();
-      ctx.fillStyle = '#FFE24A';
-      ctx.beginPath(); ctx.arc(vpx, hz - sr * 0.15, sr, 0, Math.PI * 2); ctx.fill();
-      ctx.strokeStyle = LINE; ctx.lineWidth = 4; ctx.stroke();
-      for (var r0 = 0; r0 < 3; r0++) {
-        var pr = ((t * 0.22 + r0 / 3) % 1);
-        ctx.globalAlpha = 0.45 * (1 - pr);
-        ctx.strokeStyle = '#FF2D95';
-        ctx.lineWidth = 6;
-        ctx.beginPath();
-        ctx.arc(vpx, hz - sr * 0.15, sr * (1 + pr * 1.5), 0, Math.PI * 2);
-        ctx.stroke();
-      }
-      ctx.globalAlpha = 1;
-      ctx.restore();
-
+      // The sky fill used to clear the canvas; it lives in CSS now.
+      ctx.clearRect(0, 0, w, h);
       ctx.drawImage(sky, 0, 0, w, h);
 
       // A few windows blink off.
@@ -589,30 +569,6 @@
           ctx.fillStyle = '#EAFF00';
           ctx.fillRect(b.x, b.y, 9, 12);
         }
-      }
-
-      // Ground: flat, bright, with a black horizon keyline.
-      ctx.fillStyle = '#C9F7FF';
-      ctx.fillRect(0, hz, w, h - hz);
-      ctx.strokeStyle = LINE; ctx.lineWidth = 5;
-      ctx.beginPath(); ctx.moveTo(0, hz); ctx.lineTo(w, hz); ctx.stroke();
-
-      // Road as a flat magenta wedge with a keyline and yellow dashes.
-      ctx.fillStyle = '#FF2D95';
-      ctx.beginPath();
-      ctx.moveTo(vpx - 22, hz); ctx.lineTo(vpx + 22, hz);
-      ctx.lineTo(w * 0.96, h);  ctx.lineTo(w * 0.04, h);
-      ctx.closePath(); ctx.fill();
-      ctx.lineWidth = 4; ctx.strokeStyle = LINE; ctx.stroke();
-
-      ctx.strokeStyle = '#EAFF00';
-      for (var d = 0; d < 14; d++) {
-        var z = d + 1 - ((t * 0.8) % 1);
-        var y = hz + (h - hz) * 0.5 / z;
-        if (y > h || y < hz) continue;
-        var wgt = 1 - d / 14;
-        ctx.lineWidth = 2 + wgt * 8;
-        ctx.beginPath(); ctx.moveTo(vpx, y); ctx.lineTo(vpx, y + 8 + wgt * 30); ctx.stroke();
       }
 
       raf = requestAnimationFrame(frame);
