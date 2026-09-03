@@ -6,7 +6,7 @@
   <title>Bryan Gan | Columbia University</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -135,6 +135,52 @@
   </section>
   -->
 
+
+
+  <section id="lab" class="lab">
+    <canvas class="lab-grid" aria-hidden="true"></canvas>
+    <div class="lab-scan" aria-hidden="true"></div>
+
+    <div class="container lab-inner">
+
+      <!-- Capsule: the store-page hero -->
+      <div class="capsule">
+        <span class="hud hud-tl" aria-hidden="true"></span>
+        <span class="hud hud-tr" aria-hidden="true"></span>
+        <span class="hud hud-bl" aria-hidden="true"></span>
+        <span class="hud hud-br" aria-hidden="true"></span>
+
+        <p class="lab-eyebrow"><span class="blip" aria-hidden="true"></span>System online &mdash; build 2026.09</p>
+
+        <h1 class="lab-title glitch" data-text="I UNDERSTAND VIBE CODING.">I UNDERSTAND VIBE CODING.</h1>
+
+        <ul class="spec-row">
+          <li class="spec">
+            <span class="spec-idx">01</span>
+            <span class="spec-name">Fast prototype</span>
+            <span class="spec-bar"><i style="--fill:96%"></i></span>
+          </li>
+          <li class="spec">
+            <span class="spec-idx">02</span>
+            <span class="spec-name">Iterate</span>
+            <span class="spec-bar"><i style="--fill:92%"></i></span>
+          </li>
+          <li class="spec">
+            <span class="spec-idx">03</span>
+            <span class="spec-name">Design</span>
+            <span class="spec-bar"><i style="--fill:88%"></i></span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Store shelf -->
+      <div class="shelf-head">
+        <h2 class="shelf-title">Featured &amp; Recommended</h2>
+        <span class="shelf-count" id="lab-count"></span>
+      </div>
+      <div class="capsule-grid" id="lab-grid"></div>
+    </div>
+  </section>
 
   <section id="kitchen" class="kitchen">
 
@@ -402,6 +448,7 @@
   </script>
 
   <script src="kitchen.js" defer></script>
+  <script src="lab.js" defer></script>
   <script src="site.js" defer></script>
 </body>
 </html>

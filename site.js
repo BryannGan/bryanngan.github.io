@@ -277,6 +277,7 @@
         try { localStorage.setItem('site-mode', mode); } catch (e) {}
       }
       if (mode === 'chef') { renderKitchen(); petalField(document.getElementById('kitchen')); }
+      if (mode === 'dev')  { renderLab(); labGrid(document.querySelector('.lab-grid')); }
     }
 
     Array.prototype.forEach.call(buttons, function (b) {
@@ -457,6 +458,182 @@
     window.addEventListener('resize', debounce(size, 200));
     document.addEventListener('visibilitychange', function () { document.hidden ? stop() : start(); });
     start();
+  }
+
+  /* ── Developer mode ──
+     Perspective grid receding to a horizon, scrolling toward the viewer.
+     Lines are spaced in screen space by projecting evenly-spaced depths,
+     which is what gives the compression toward the horizon. */
+  var labStarted = false;
+  function labGrid(canvas) {
+    if (labStarted || !canvas) return;
+    labStarted = true;
+    var ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = 0, h = 0, t = 0, raf = 0, running = false;
+
+    function size() {
+      var r = canvas.getBoundingClientRect();
+      w = Math.max(1, r.width); h = Math.max(1, r.height);
+      canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function frame() {
+      if (!running) return;
+      t += 0.006;
+      ctx.clearRect(0, 0, w, h);
+
+      var hz = h * 0.46;            // horizon
+      var fl = h * 0.55;            // focal length
+      var eye = 1.15;
+
+      ctx.lineWidth = 1;
+
+      // Depth lines, marching forward so the floor appears to scroll.
+      for (var i = 0; i < 26; i++) {
+        var z = i + 1 - (t % 1);
+        var y = hz + (fl * eye) / z;
+        if (y < hz || y > h + 2) continue;
+        var fade = Math.max(0, 1 - z / 26);
+        ctx.strokeStyle = 'rgba(34, 224, 255,' + (0.05 + fade * 0.20) + ')';
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+      }
+
+      // Radial lines converging on the vanishing point.
+      var cx = w / 2;
+      for (var k = -18; k <= 18; k++) {
+        var xf = cx + k * (w / 14);
+        ctx.strokeStyle = 'rgba(34, 224, 255, 0.11)';
+        ctx.beginPath(); ctx.moveTo(cx, hz); ctx.lineTo(xf, h); ctx.stroke();
+      }
+
+      // Horizon glow.
+      var g = ctx.createLinearGradient(0, hz - 60, 0, hz + 8);
+      g.addColorStop(0, 'rgba(255, 45, 120, 0)');
+      g.addColorStop(1, 'rgba(255, 45, 120, 0.16)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, hz - 60, w, 68);
+
+      raf = requestAnimationFrame(frame);
+    }
+
+    function start() { if (!running) { running = true; raf = requestAnimationFrame(frame); } }
+    function stop() { running = false; cancelAnimationFrame(raf); }
+
+    size();
+    window.addEventListener('resize', debounce(size, 200));
+    document.addEventListener('visibilitychange', function () { document.hidden ? stop() : start(); });
+    start();
+  }
+
+  /* Generated capsule art for builds with no screenshot: a deterministic
+     circuit plate seeded off the title, so each card is distinct but stable
+     between loads. */
+  function circuitPlate(seed) {
+    var c = document.createElement('canvas');
+    c.width = 480; c.height = 270;
+    var x = c.getContext('2d');
+    if (!x) return c;
+
+    var s = 0;
+    for (var i = 0; i < seed.length; i++) s = (s * 31 + seed.charCodeAt(i)) >>> 0;
+    function rnd() { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }
+
+    x.fillStyle = '#0b0e18'; x.fillRect(0, 0, 480, 270);
+    x.strokeStyle = 'rgba(34,224,255,0.16)'; x.lineWidth = 1;
+    for (var gx = 0; gx <= 480; gx += 24) { x.beginPath(); x.moveTo(gx, 0); x.lineTo(gx, 270); x.stroke(); }
+    for (var gy = 0; gy <= 270; gy += 24) { x.beginPath(); x.moveTo(0, gy); x.lineTo(480, gy); x.stroke(); }
+
+    for (var n = 0; n < 16; n++) {
+      var px = Math.floor(rnd() * 20) * 24;
+      var py = Math.floor(rnd() * 11) * 24;
+      x.strokeStyle = rnd() > 0.5 ? 'rgba(34,224,255,0.75)' : 'rgba(255,45,120,0.7)';
+      x.lineWidth = 2;
+      x.beginPath(); x.moveTo(px, py);
+      var steps = 2 + Math.floor(rnd() * 3);
+      for (var st = 0; st < steps; st++) {
+        if (rnd() > 0.5) px += (rnd() > 0.5 ? 24 : -24) * (1 + Math.floor(rnd() * 3));
+        else py += (rnd() > 0.5 ? 24 : -24) * (1 + Math.floor(rnd() * 2));
+        x.lineTo(px, py);
+      }
+      x.stroke();
+      x.fillStyle = 'rgba(216,255,62,0.9)';
+      x.beginPath(); x.arc(px, py, 3, 0, Math.PI * 2); x.fill();
+    }
+    return c;
+  }
+
+  var labBuilt = false;
+  function renderLab() {
+    if (labBuilt) return;
+    var grid = document.getElementById('lab-grid');
+    var data = window.LAB || [];
+    if (!grid || !data.length) return;
+    labBuilt = true;
+
+    var count = document.getElementById('lab-count');
+    if (count) count.textContent = data.length + ' builds';
+
+    data.forEach(function (d) {
+      var cap = document.createElement(d.href ? 'a' : 'div');
+      cap.className = 'cap';
+      if (d.href) {
+        cap.href = d.href;
+        if (/^https?:/.test(d.href)) { cap.target = '_blank'; cap.rel = 'noopener'; }
+      }
+
+      var art = document.createElement('div');
+      art.className = 'cap-art';
+      if (d.art) {
+        var img = document.createElement('img');
+        img.src = 'assets/lab/' + d.art;
+        img.alt = ''; img.loading = 'lazy';
+        art.appendChild(img);
+      } else {
+        art.appendChild(circuitPlate(d.title || 'build'));
+      }
+
+      var st = document.createElement('span');
+      st.className = 'cap-status';
+      st.setAttribute('data-s', d.status || '');
+      st.textContent = d.status || '';
+      art.appendChild(st);
+
+      var yr = document.createElement('span');
+      yr.className = 'cap-year';
+      yr.textContent = d.year || '';
+      art.appendChild(yr);
+      cap.appendChild(art);
+
+      var body = document.createElement('div');
+      body.className = 'cap-body';
+
+      var h3 = document.createElement('h3');
+      h3.className = 'cap-title';
+      h3.textContent = d.title || '';
+      body.appendChild(h3);
+
+      var tl = document.createElement('p');
+      tl.className = 'cap-tagline';
+      tl.textContent = d.tagline || '';
+      body.appendChild(tl);
+
+      if (d.tags && d.tags.length) {
+        var tw = document.createElement('div');
+        tw.className = 'cap-tags';
+        d.tags.forEach(function (tg) {
+          var sp = document.createElement('span');
+          sp.textContent = tg;
+          tw.appendChild(sp);
+        });
+        body.appendChild(tw);
+      }
+      cap.appendChild(body);
+      grid.appendChild(cap);
+    });
   }
 
   function debounce(fn, ms) {
