@@ -235,6 +235,24 @@
     }, { passive: true });
   }
 
+  /* ── Card preview ──
+     preload="none" keeps the front page light; the clip is only fetched
+     when someone actually hovers the card. */
+  function cardPreviews() {
+    document.querySelectorAll('.project-card.has-preview').forEach(function (card) {
+      var v = card.querySelector('video');
+      if (!v) return;
+      card.addEventListener('pointerenter', function () {
+        var play = v.play();
+        if (play && play.catch) play.catch(function () {});
+      });
+      card.addEventListener('pointerleave', function () {
+        v.pause();
+        v.currentTime = 0;
+      });
+    });
+  }
+
   function debounce(fn, ms) {
     var id;
     return function () { clearTimeout(id); id = setTimeout(fn, ms); };
@@ -252,6 +270,7 @@
 
     reveals();
     navTracking();
+    cardPreviews();
 
     // Hero type animates in on load.
     requestAnimationFrame(function () {

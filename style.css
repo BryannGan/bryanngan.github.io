@@ -1113,3 +1113,143 @@ footer {
   .hero-photo img { width: 168px; }
   .hero-body { grid-template-columns: 168px minmax(0, 1fr); gap: 1.5rem; }
 }
+
+/* ── Project card with preview ── */
+.project-card.has-preview {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 1.75rem;
+  align-items: start;
+  padding: 1.5rem;
+}
+
+.card-media {
+  position: relative;
+  border-radius: 3px;
+  overflow: hidden;
+  background: var(--paper-raised);
+  border: 1px solid var(--rule);
+}
+.card-media video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: contain;
+}
+
+.card-media-hint {
+  position: absolute;
+  left: 0.5rem;
+  bottom: 0.5rem;
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  background: rgba(253, 252, 250, 0.82);
+  padding: 0.15rem 0.4rem;
+  border-radius: 2px;
+}
+.motion .card-media-hint { transition: opacity 0.25s; }
+.project-card:hover .card-media-hint { opacity: 0; }
+
+/* Keep the "View details" affordance with the text rather than letting it
+   become a third grid item stranded below the media. */
+.project-card.has-preview::after { content: none; }
+.project-card.has-preview .card-body::after {
+  content: "View details \2192";
+  display: block;
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--clay);
+}
+
+@media (max-width: 760px) {
+  .project-card.has-preview { grid-template-columns: 1fr; gap: 1.1rem; }
+}
+
+/* ── News as a timeline ── */
+.news-list {
+  position: relative;
+  list-style: none;
+  padding: 0;
+  margin-left: 0;
+}
+.news-list li {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 0 1.4rem;
+  align-items: start;
+  position: relative;
+  padding: 0 0 1.15rem 0;
+  margin-bottom: 0;
+  font-size: 0.9rem;
+  color: var(--ink-muted);
+  line-height: 1.55;
+}
+
+/* Rail runs between the date column and the entry, with a tick per item.
+   Drawn per-item so a collapsed list doesn't leave a rail hanging in space. */
+.news-list li::before {
+  content: "";
+  position: absolute;
+  left: 96px;
+  top: 0.62rem;
+  bottom: -0.35rem;
+  width: 1px;
+  background: var(--rule);
+  transform: translateX(-0.7rem);
+}
+.news-list li:last-child::before { bottom: auto; height: 0; }
+
+.news-list li::after {
+  content: "";
+  position: absolute;
+  left: 96px;
+  top: 0.5rem;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--clay);
+  transform: translateX(calc(-0.7rem - 2px));
+}
+
+.news-date {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  padding-top: 0.22rem;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.news-list li.is-hidden { display: none; }
+
+/* ── Publications with figures ── */
+.pub-list li.has-thumb {
+  display: grid;
+  grid-template-columns: 124px minmax(0, 1fr);
+  gap: 1.4rem;
+  align-items: start;
+}
+.pub-thumb img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  background: var(--paper-sunk);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+}
+.pub-meta { display: block; }
+
+@media (max-width: 640px) {
+  .pub-list li.has-thumb { grid-template-columns: 92px minmax(0, 1fr); gap: 1rem; }
+  .news-list li { grid-template-columns: 74px minmax(0, 1fr); gap: 0 1rem; }
+  .news-list li::before,
+  .news-list li::after { left: 74px; }
+}
