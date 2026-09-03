@@ -1252,3 +1252,239 @@ footer {
   .pub-list li.has-thumb { grid-template-columns: 92px minmax(0, 1fr); gap: 1rem; }
   .news-list { --date-col: 76px; --rail-gap: 1.1rem; }
 }
+
+/* ══ Modes ══
+   The site carries three faces off one document. data-mode on <html> selects
+   which sections show and which palette applies. Research is the default and
+   is what renders with no JS at all. */
+
+/* ── Mode switcher ── */
+.nav-container { justify-content: space-between; }
+
+.mode-switch {
+  position: relative;
+  flex: none;
+}
+.mode-switch summary {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  list-style: none;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  user-select: none;
+}
+.mode-switch summary::-webkit-details-marker { display: none; }
+.mode-switch summary:hover { color: var(--ink); border-color: var(--rule-strong); }
+.mode-switch[open] summary { border-color: var(--accent-mode, var(--clay)); }
+
+.mode-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-mode, var(--clay));
+  flex: none;
+}
+
+.mode-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 120;
+  min-width: 232px;
+  list-style: none;
+  margin: 0;
+  padding: 0.3rem;
+  background: var(--paper-raised);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  box-shadow: 0 10px 30px rgba(20, 24, 20, 0.09);
+}
+.mode-menu button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  border-radius: 2px;
+  padding: 0.5rem 0.6rem;
+  cursor: pointer;
+  font-family: inherit;
+  color: inherit;
+}
+.mode-menu button:hover { background: var(--paper-sunk); }
+.mode-menu button[aria-selected="true"] .mode-name { color: var(--accent-mode, var(--clay)); }
+.mode-name {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.mode-note {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--ink-muted);
+  margin-top: 0.1rem;
+}
+
+/* ── Section visibility per mode ── */
+#kitchen { display: none; }
+[data-mode="chef"] #projects,
+[data-mode="chef"] #awards,
+[data-mode="chef"] #publications,
+[data-mode="chef"] #conferences,
+[data-mode="chef"] #service,
+[data-mode="chef"] #news { display: none; }
+[data-mode="chef"] #kitchen { display: block; }
+
+/* ══ Chef mode ══
+   Spring park: cool greens, sunlight, sky. Warmer and higher-key than
+   research mode, but the same structural system underneath. */
+[data-mode="chef"] {
+  --paper:        #fcfdf9;
+  --paper-sunk:   #f2f6ec;
+  --paper-raised: #ffffff;
+
+  --ink:          #1f2a1e;
+  --ink-soft:     #40503d;
+  --ink-muted:    #63735f;
+  --ink-faint:    #97a493;
+
+  --rule:         #e2ebdb;
+  --rule-strong:  #c6d4bd;
+
+  --clay:         #3f7a45;   /* leaf — 4.9:1 on this paper */
+  --clay-hover:   #2f5d34;
+  --clay-fill:    #e4f0dd;
+  --clay-edge:    #c2d9b8;
+
+  --accent-mode:  #3f7a45;
+}
+
+[data-mode="chef"] body { background: var(--paper); }
+
+/* A soft sunlit wash behind the hero, in place of the flow field. */
+[data-mode="chef"] .hero {
+  background:
+    radial-gradient(120% 90% at 12% 0%,  rgba(226, 240, 200, 0.75), transparent 62%),
+    radial-gradient(90% 80% at 92% 18%, rgba(206, 232, 235, 0.68), transparent 60%),
+    radial-gradient(70% 70% at 62% 100%, rgba(249, 236, 196, 0.60), transparent 65%);
+}
+[data-mode="chef"] .hero-field { display: none; }
+
+/* ── Plate grid ──
+   Dense, postcard-tight, deliberately close to a photo feed. */
+.kitchen-lede {
+  color: var(--ink-muted);
+  margin-bottom: 1.5rem;
+  max-width: 56ch;
+}
+
+.plate-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 208px), 1fr));
+  grid-auto-rows: 208px;
+  gap: 6px;
+}
+
+.plate {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  overflow: hidden;
+  background: var(--paper-sunk);
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+}
+.plate.is-tall { grid-row: span 2; }
+
+.plate img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* The reveal. Sits over the photo, keyed off .is-open so pointer and
+   keyboard and touch all drive the same single state. */
+.plate-reveal {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.3rem;
+  padding: 0.85rem;
+  background: linear-gradient(to top, rgba(24, 38, 22, 0.88) 0%, rgba(24, 38, 22, 0.62) 45%, rgba(24, 38, 22, 0.12) 100%);
+  color: #f4f8ef;
+  opacity: 0;
+}
+.plate.is-open .plate-reveal { opacity: 1; }
+
+.plate-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.plate-notes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: rgba(244, 248, 239, 0.9);
+}
+.plate-notes li { margin-top: 0.1rem; }
+
+/* Always-visible name strip, so the grid reads without interaction. */
+.plate-label {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 0.5rem 0.7rem;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(to top, rgba(24, 38, 22, 0.62), transparent);
+}
+.plate.is-open .plate-label { opacity: 0; }
+
+.motion .plate-reveal,
+.motion .plate-label { transition: opacity 0.28s ease; }
+.motion .plate img { transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
+.motion .plate.is-open img { transform: scale(1.04); }
+
+.kitchen-empty {
+  border: 1px dashed var(--rule-strong);
+  border-radius: 3px;
+  padding: 1.5rem;
+  color: var(--ink-muted);
+  font-size: 0.88rem;
+}
+.kitchen-empty .mono-label { display: block; margin-bottom: 0.4rem; }
+.kitchen-empty code {
+  font-family: var(--mono);
+  font-size: 0.82em;
+  background: var(--paper-sunk);
+  padding: 0.1rem 0.3rem;
+  border-radius: 2px;
+}
+
+@media (max-width: 560px) {
+  .plate-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 148px), 1fr)); grid-auto-rows: 148px; }
+}

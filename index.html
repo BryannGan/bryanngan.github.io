@@ -22,6 +22,27 @@
         <li><a href="#conferences">Conferences</a></li>
         <li><a href="#service">Mentoring</a></li>
       </ul>
+
+      <details class="mode-switch" id="mode-switch">
+        <summary aria-label="Switch site mode">
+          <span class="mode-dot" aria-hidden="true"></span>
+          <span class="mode-current">Research</span>
+        </summary>
+        <ul class="mode-menu" role="listbox">
+          <li><button type="button" role="option" data-mode="research">
+            <span class="mode-name">Research</span>
+            <span class="mode-note">Publications, simulation, the PhD</span>
+          </button></li>
+          <li><button type="button" role="option" data-mode="chef">
+            <span class="mode-name">Chef</span>
+            <span class="mode-note">What comes out of the kitchen</span>
+          </button></li>
+          <li><button type="button" role="option" data-mode="dev">
+            <span class="mode-name">Developer</span>
+            <span class="mode-note">Things built fast</span>
+          </button></li>
+        </ul>
+      </details>
     </div>
   </nav>
 
@@ -113,6 +134,22 @@
     </div>
   </section>
   -->
+
+
+  <section id="kitchen" class="kitchen">
+    <div class="container">
+      <h2>Kitchen</h2>
+      <p class="kitchen-lede">
+        Cooking is the other thing I do with my hands. Tap a plate for what went into it.
+      </p>
+      <div class="plate-grid" id="plate-grid"></div>
+      <p class="kitchen-empty" id="kitchen-empty">
+        <span class="mono-label">Awaiting plates</span>
+        Drop photos into <code>assets/kitchen/</code> and add a line for each in
+        <code>kitchen.js</code>.
+      </p>
+    </div>
+  </section>
 
   <section id="news">
     <div class="container">
@@ -284,6 +321,7 @@
     })();
   </script>
 
+  <script src="kitchen.js" defer></script>
   <script src="site.js" defer></script>
 </body>
 </html>

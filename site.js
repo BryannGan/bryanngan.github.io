@@ -253,6 +253,119 @@
     });
   }
 
+  /* ── Modes ──
+     Research is the default and is what a no-JS visitor gets. A ?mode= param
+     wins over the stored choice so a link can open in a given mode. */
+  var MODES = ['research', 'chef', 'dev'];
+  var LABELS = { research: 'Research', chef: 'Chef', dev: 'Developer' };
+
+  function modes() {
+    var box = document.getElementById('mode-switch');
+    if (!box) return;
+
+    var current = box.querySelector('.mode-current');
+    var buttons = box.querySelectorAll('.mode-menu button');
+
+    function apply(mode, remember) {
+      if (MODES.indexOf(mode) === -1) mode = 'research';
+      document.documentElement.setAttribute('data-mode', mode);
+      if (current) current.textContent = LABELS[mode];
+      Array.prototype.forEach.call(buttons, function (b) {
+        b.setAttribute('aria-selected', String(b.dataset.mode === mode));
+      });
+      if (remember) {
+        try { localStorage.setItem('site-mode', mode); } catch (e) {}
+      }
+      if (mode === 'chef') renderKitchen();
+    }
+
+    Array.prototype.forEach.call(buttons, function (b) {
+      b.addEventListener('click', function () {
+        apply(b.dataset.mode, true);
+        box.removeAttribute('open');
+      });
+    });
+
+    // Click-away and Escape close the menu.
+    document.addEventListener('click', function (e) {
+      if (box.hasAttribute('open') && !box.contains(e.target)) box.removeAttribute('open');
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') box.removeAttribute('open');
+    });
+
+    var url = new URLSearchParams(location.search).get('mode');
+    var saved = null;
+    try { saved = localStorage.getItem('site-mode'); } catch (e) {}
+    apply(url || saved || 'research', false);
+  }
+
+  /* ── Plate grid ──
+     Built from window.KITCHEN. Pointer opens on hover; click and keyboard
+     pin it open, so touch works without a hover state to depend on. */
+  var kitchenBuilt = false;
+  function renderKitchen() {
+    if (kitchenBuilt) return;
+    var grid = document.getElementById('plate-grid');
+    var empty = document.getElementById('kitchen-empty');
+    var data = window.KITCHEN || [];
+    if (!grid) return;
+
+    if (!data.length) { if (empty) empty.style.display = 'block'; return; }
+    if (empty) empty.style.display = 'none';
+    kitchenBuilt = true;
+
+    data.forEach(function (d) {
+      var card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'plate' + (d.tall ? ' is-tall' : '');
+      card.setAttribute('aria-expanded', 'false');
+
+      var img = document.createElement('img');
+      img.src = 'assets/kitchen/' + d.src;
+      img.alt = d.name || '';
+      img.loading = 'lazy';
+      card.appendChild(img);
+
+      var label = document.createElement('span');
+      label.className = 'plate-label';
+      label.textContent = d.name || '';
+      card.appendChild(label);
+
+      var reveal = document.createElement('span');
+      reveal.className = 'plate-reveal';
+      var h = document.createElement('span');
+      h.className = 'plate-name';
+      h.textContent = d.name || '';
+      reveal.appendChild(h);
+
+      if (d.notes && d.notes.length) {
+        var ul = document.createElement('ul');
+        ul.className = 'plate-notes';
+        d.notes.forEach(function (n) {
+          var li = document.createElement('li');
+          li.textContent = n;
+          ul.appendChild(li);
+        });
+        reveal.appendChild(ul);
+      }
+      card.appendChild(reveal);
+
+      var pinned = false;
+      function open(on) {
+        card.classList.toggle('is-open', on);
+        card.setAttribute('aria-expanded', String(on));
+      }
+      card.addEventListener('pointerenter', function () { if (!pinned) open(true); });
+      card.addEventListener('pointerleave', function () { if (!pinned) open(false); });
+      card.addEventListener('click', function () { pinned = !pinned; open(pinned); });
+      card.addEventListener('focus', function () { open(true); });
+      card.addEventListener('blur', function () { if (!pinned) open(false); });
+
+      grid.appendChild(card);
+    });
+  }
+
   function debounce(fn, ms) {
     var id;
     return function () { clearTimeout(id); id = setTimeout(fn, ms); };
@@ -271,6 +384,7 @@
     reveals();
     navTracking();
     cardPreviews();
+    modes();
 
     // Hero type animates in on load.
     requestAnimationFrame(function () {
