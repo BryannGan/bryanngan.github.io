@@ -60,7 +60,7 @@
         life: 90 + Math.random() * 260,
         age: Math.random() * 120,
         c: INK[(Math.random() * INK.length) | 0],
-        a: 0.22 + Math.random() * 0.26
+        a: 0.18 + Math.random() * 0.22
       };
     }
 
@@ -106,7 +106,7 @@
       ctx.fillStyle = 'rgba(253, 252, 250, 0.040)';
       ctx.fillRect(0, 0, w, h);
 
-      ctx.lineWidth = 1.9;
+      ctx.lineWidth = 1.45;
       ctx.lineCap = 'round';
 
       for (var i = 0; i < particles.length; i++) {
