@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en" data-state="idle" data-mode="demo">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PET-SAFE / BOUQUET — INTERACTIVE DEMO</title>
+<meta name="description" content="Tap any flower in a bouquet photo: SAM 2 isolates the bloom, a vision model names it, and a static toxicity table says whether it is safe for cats and dogs.">
+<meta property="og:title" content="PET-SAFE / BOUQUET — toxicity diagnostic">
+<meta property="og:description" content="Tap any bloom. SAM 2 isolates it, a vision model names it, a table decides toxicity.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230A0A0A'/%3E%3Crect x='3' y='3' width='10' height='10' fill='%23E4162B'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Archivo:wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+<div class="scanlines" aria-hidden="true"></div>
+<div class="noise" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+
+<header class="masthead">
+  <div class="mast-grid">
+    <div class="mast-id">
+      <span class="glyph">◈</span>
+      <span class="mast-name">PET-SAFE<span class="slash">/</span>BOUQUET</span>
+    </div>
+    <div class="mast-meta">
+      <span data-meta="unit">UNIT / D-01</span>
+      <span class="sep">·</span>
+      <span data-meta="rev">REV 2.1</span>
+      <span class="sep">·</span>
+      <span data-meta="clock">--:--:--</span>
+    </div>
+    <div class="mast-status">
+      <span class="led" id="led"></span>
+      <span id="sysline">SYSTEM NOMINAL</span>
+    </div>
+  </div>
+  <div class="hazard-bar" aria-hidden="true"></div>
+</header>
+
+<main>
+
+<!-- ── SECTION 00 · INTAKE ───────────────────────────────────────────── -->
+<section class="sec sec-intake" id="intake">
+  <div class="sec-rule"><span>00</span><i></i><span>INTAKE · SELECT SPECIMEN</span></div>
+
+  <div class="intake-grid">
+    <div class="intake-copy">
+      <h1 class="macro">
+        <span class="line">IS THIS</span>
+        <span class="line">BOUQUET</span>
+        <span class="line"><em>TOXIC</em></span>
+      </h1>
+      <p class="lede">
+        A flowers-only specialist. Whole-bouquet identification constrained to
+        <data id="lede-species">104</data> catalogued species, then per-bloom
+        segmentation on tap. Toxicity resolved by table lookup — never inferred.
+      </p>
+
+      <dl class="spec">
+        <div><dt>IDENT</dt><dd data-meta="model">gemini-2.5-flash</dd></div>
+        <div><dt>SEGMENT</dt><dd data-meta="segmodel">sam2.1_b</dd></div>
+        <div><dt>TOXICITY</dt><dd>STATIC TABLE · NO INFERENCE</dd></div>
+        <div><dt>CATALOG</dt><dd><span id="spec-species">—</span> SPP · <span id="spec-verified">—</span> ASPCA-VERIFIED</dd></div>
+      </dl>
+
+      <p class="demo-note">
+        <strong>PRECOMPUTED DEMO.</strong> The two model calls and the SAM masks
+        were run ahead of time on these four bouquets and frozen, so this page
+        needs no server and no API key. Everything else — segmentation lookup,
+        reconciliation, the toxicity join, the verdict — is executed live in your
+        browser from the same logic the real app runs.
+      </p>
+    </div>
+
+    <div class="intake-drop">
+      <div class="picker" id="picker"></div>
+      <div class="drop-foot">
+        <span>PETS</span>
+        <div class="petsel" id="petsel">
+          <button type="button" class="pet on" data-pet="cat">CAT</button>
+          <button type="button" class="pet on" data-pet="dog">DOG</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec sec-run" id="run" hidden>
+  <div class="sec-rule"><span>--</span><i></i><span>ANALYSIS</span></div>
+  <div class="runlog" id="runlog"></div>
+</section>
+
+<section class="sec sec-verdict" id="verdict" hidden>
+  <div class="sec-rule"><span>01</span><i></i><span>VERDICT · WHOLE FIELD</span></div>
+
+  <div class="verdict-banner" id="vbanner">
+    <div class="vb-left">
+      <div class="vb-label">STATUS</div>
+      <div class="vb-state" id="vstate">—</div>
+    </div>
+    <div class="vb-right">
+      <p id="vdetail"></p>
+      <div class="vb-counts">
+        <div><span class="num" id="c-types">0</span><span class="cap">TYPES</span></div>
+        <div><span class="num" id="c-toxic">0</span><span class="cap">TOXIC</span></div>
+        <div><span class="num" id="c-located">0</span><span class="cap">LOCATED</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="telemetry" id="telemetry"></div>
+  <div class="cards" id="cards"></div>
+</section>
+
+<section class="sec sec-explore" id="explore" hidden>
+  <div class="sec-rule"><span>02</span><i></i><span>EXPLORE · PER-BLOOM</span></div>
+
+  <div class="explore-grid">
+    <figure class="plate" id="plate">
+      <div class="plate-head">
+        <span>FIELD / TAP TO SEGMENT</span>
+        <span id="plate-dims">—</span>
+      </div>
+      <div class="plate-body" id="plateBody">
+        <img id="photo" alt="Bouquet photo — tap a flower to segment it">
+        <svg id="overlay" preserveAspectRatio="xMidYMid meet"></svg>
+        <div class="reticle" id="reticle"><i></i><i></i><i></i><i></i></div>
+      </div>
+      <figcaption class="plate-foot">
+        <span id="plate-hint">AWAITING INPUT</span>
+        <span id="plate-dec">—</span>
+      </figcaption>
+    </figure>
+
+    <div class="readout" id="readout">
+      <div class="ro-empty" id="roEmpty">
+        <div class="ro-empty-mark">+</div>
+        <p>TAP ANY BLOOM IN THE FIELD.<br>SAM 2 WILL ISOLATE IT, THEN THE
+           IDENTIFIER RUNS ON THE SPOTLIT CROP ALONE.</p>
+      </div>
+
+      <div class="ro-body" id="roBody" hidden>
+        <div class="ro-scales" id="scales"></div>
+        <div class="ro-crop">
+          <img id="focus" alt="Spotlit crop sent to the identifier">
+          <div class="ro-crop-cap">WHAT THE IDENTIFIER SAW</div>
+        </div>
+        <div class="ro-ident">
+          <div class="ro-common" id="roCommon">—</div>
+          <div class="ro-latin" id="roLatin">—</div>
+        </div>
+        <div class="meter" id="roMeter">
+          <div class="meter-head"><span>CONFIDENCE</span><span id="roConf">—</span></div>
+          <div class="meter-track"><div class="meter-fill" id="roFill"></div></div>
+        </div>
+        <div class="ro-recon" id="roRecon"></div>
+        <div class="ro-tox" id="roTox"></div>
+      </div>
+    </div>
+  </div>
+
+  <p class="credit" id="credit"></p>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="hazard-bar" aria-hidden="true"></div>
+  <div class="foot-grid">
+    <p class="foot-warn">
+      <strong>NOT VETERINARY ADVICE.</strong> A demonstration of a computer-vision
+      pipeline, not a safety tool. Suspected ingestion → contact a vet or the Pet
+      Poison Helpline <data>1-855-764-7661</data> immediately.
+    </p>
+    <p class="foot-meta">
+      TOXICITY TABLE PARTIALLY VERIFIED · <span id="foot-verified">—</span> OF
+      <span id="foot-species">—</span> ROWS ASPCA-CONFIRMED<br>
+      IDENTIFICATION IS PROBABILISTIC · TREAT UNKNOWNS AS UNSAFE
+    </p>
+    <p class="foot-mark">©<span id="year">—</span> B. GAN ® UNIT/D-01 ™</p>
+  </div>
+</footer>
+
+<script src="baked.js"></script>
+<script>window.BACKEND = Baked;</script>
+<script src="app.js"></script>
+</body>
+</html>

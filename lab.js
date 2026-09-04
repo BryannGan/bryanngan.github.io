@@ -29,7 +29,15 @@ window.LAB = [
     year: '2026',
     href: 'https://github.com/BryannGan/bryanngan.github.io'
   },
-  { title: 'Project Slot 04', tagline: 'Replace me.', tags: ['TBD'], status: 'IN DEV',    year: '—' },
+  {
+    title: 'Pet-Safe Bouquet Check',
+    tagline: 'Tap any flower in a bouquet. SAM 2 isolates the bloom, a vision model names it, a static table says whether it will hurt your cat.',
+    tags: ['SAM 2', 'Gemini', 'Python', 'Interactive demo'],
+    status: 'LIVE',
+    year: '2026',
+    href: 'flowers/',
+    art: 'flowers.jpg'
+  },
   { title: 'Project Slot 05', tagline: 'Replace me.', tags: ['TBD'], status: 'PROTOTYPE', year: '—' },
   { title: 'Project Slot 06', tagline: 'Replace me.', tags: ['TBD'], status: 'PROTOTYPE', year: '—' }
 ];
