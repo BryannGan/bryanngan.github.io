@@ -2072,14 +2072,22 @@ footer {
 .hero-text {
   position: relative;
 }
+/* The wash had a flat plateau then a short falloff, which drew a visible
+   edge — the copy read as sitting on a card. Feathered instead: peak
+   opacity is lower, the fade runs over a much longer distance, and the
+   box extends well past the text so the boundary lands where there is
+   nothing to frame. */
 .hero-text::before {
   content: "";
   position: absolute;
-  inset: -1.1rem -1.4rem -0.6rem -1.4rem;
+  inset: -3.5rem -5rem -3rem -4rem;
   z-index: -1;
-  background: radial-gradient(70% 78% at 40% 46%,
-    rgba(253, 252, 250, 0.94) 0 52%,
-    rgba(253, 252, 250, 0.72) 74%,
+  background: radial-gradient(64% 70% at 42% 48%,
+    rgba(253, 252, 250, 0.80) 0%,
+    rgba(253, 252, 250, 0.68) 26%,
+    rgba(253, 252, 250, 0.46) 48%,
+    rgba(253, 252, 250, 0.24) 68%,
+    rgba(253, 252, 250, 0.08) 85%,
     rgba(253, 252, 250, 0) 100%);
   pointer-events: none;
 }
@@ -2087,10 +2095,13 @@ footer {
 .hero-name::before {
   content: "";
   position: absolute;
-  inset: -0.4rem -1.2rem -0.2rem -1.2rem;
+  inset: -2.2rem -4.5rem -1.6rem -3.5rem;
   z-index: -1;
-  background: radial-gradient(62% 84% at 34% 50%,
-    rgba(253, 252, 250, 0.92) 0 48%,
+  background: radial-gradient(56% 76% at 36% 50%,
+    rgba(253, 252, 250, 0.82) 0%,
+    rgba(253, 252, 250, 0.66) 28%,
+    rgba(253, 252, 250, 0.40) 52%,
+    rgba(253, 252, 250, 0.16) 74%,
     rgba(253, 252, 250, 0) 100%);
   pointer-events: none;
 }
