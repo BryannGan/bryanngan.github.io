@@ -26,7 +26,7 @@
     // Pointer acts as a vortex seeded into the field. `grip` eases in and out
     // so the disturbance arrives and decays rather than snapping.
     var mx = -1e4, my = -1e4, grip = 0, wanted = 0;
-    var SWIRL_R = 190;
+    var SWIRL_R = 340;
 
     var INK = [
       'rgba(168, 92, 60,',    // clay
@@ -47,7 +47,7 @@
     function seed() {
       // Density scales with area so a wide monitor isn't sparse and a phone
       // isn't melting.
-      var n = Math.round(Math.min(900, Math.max(160, (w * h) / 980)));
+      var n = Math.round(Math.min(1800, Math.max(300, (w * h) / 480)));
       particles = [];
       for (var i = 0; i < n; i++) particles.push(spawn());
       ctx.clearRect(0, 0, w, h);
@@ -60,7 +60,7 @@
         life: 90 + Math.random() * 260,
         age: Math.random() * 120,
         c: INK[(Math.random() * INK.length) | 0],
-        a: 0.13 + Math.random() * 0.20
+        a: 0.10 + Math.random() * 0.16
       };
     }
 
@@ -84,9 +84,12 @@
       var d = Math.sqrt(dx * dx + dy * dy);
       if (d > SWIRL_R || d < 0.001) return a;
 
-      var falloff = (1 - d / SWIRL_R);
-      var weight = falloff * falloff * grip;
-      var tangent = Math.atan2(dy, dx) + Math.PI / 2;
+      var falloff = 1 - d / SWIRL_R;
+      var weight = Math.min(1, falloff * 1.35) * grip;   // near-full over most of the radius
+
+      // Mostly tangential so the flow circulates, with a slight inward pull
+      // so particles visibly wind toward the cursor rather than only orbit.
+      var tangent = Math.atan2(dy, dx) + Math.PI / 2 + 0.34;
 
       // Shortest-path blend between two angles.
       var delta = Math.atan2(Math.sin(tangent - a), Math.cos(tangent - a));
@@ -96,14 +99,14 @@
     function frame() {
       if (!running) return;
       t += 0.0055;
-      grip += (wanted - grip) * 0.055;
+      grip += (wanted - grip) * 0.11;
 
       // Fade toward paper instead of clearing, which leaves trails.
       ctx.globalCompositeOperation = 'source-over';
       ctx.fillStyle = 'rgba(253, 252, 250, 0.034)';
       ctx.fillRect(0, 0, w, h);
 
-      ctx.lineWidth = 1.15;
+      ctx.lineWidth = 0.95;
       ctx.lineCap = 'round';
 
       for (var i = 0; i < particles.length; i++) {
