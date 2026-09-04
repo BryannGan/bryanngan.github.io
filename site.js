@@ -131,6 +131,7 @@
 
     resize();
     window.addEventListener('resize', debounce(resize, 180));
+    observeBox(canvas, resize);
 
     var host = canvas.parentNode;
     host.addEventListener('pointermove', function (e) {
@@ -456,6 +457,7 @@
 
     size();
     window.addEventListener('resize', debounce(size, 200));
+    observeBox(host, size);
     document.addEventListener('visibilitychange', function () { document.hidden ? stop() : start(); });
     start();
   }
@@ -552,22 +554,35 @@
       canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       build();
+      paintStatic();
+    }
+
+    // The skyline is static — only a few windows blink. Repainting the whole
+    // canvas for that meant blitting w*h*dpr^2 pixels 60 times a second
+    // (~543 Mpx/s at dpr 2, which is what made this page crawl on Retina).
+    // Now the skyline is composited once and each frame patches only the
+    // handful of window rectangles that actually change.
+    function paintStatic() {
+      ctx.clearRect(0, 0, w, h);
+      ctx.drawImage(sky, 0, 0, w, h);
+      for (var i = 0; i < blinks.length; i++) blinks[i].on = null;
     }
 
     function frame() {
       if (!running) return;
       t += 0.016;
 
-      // The sky fill used to clear the canvas; it lives in CSS now.
-      ctx.clearRect(0, 0, w, h);
-      ctx.drawImage(sky, 0, 0, w, h);
-
-      // A few windows blink off.
       for (var i = 0; i < blinks.length; i++) {
         var b = blinks[i];
-        if (Math.sin(t * b.s + b.p) > 0.7) {
+        var on = Math.sin(t * b.s + b.p) > 0.7;
+        if (on === b.on) continue;              // nothing to repaint
+        b.on = on;
+        if (on) {
           ctx.fillStyle = '#EAFF00';
           ctx.fillRect(b.x, b.y, 9, 12);
+        } else {
+          // restore just this rectangle from the static buffer
+          ctx.drawImage(sky, b.x * dpr, b.y * dpr, 9 * dpr, 12 * dpr, b.x, b.y, 9, 12);
         }
       }
 
@@ -580,7 +595,13 @@
     size();
     window.addEventListener('resize', debounce(size, 220));
     document.addEventListener('visibilitychange', function () { document.hidden ? stop() : start(); });
-    start();
+    observeBox(canvas, size);
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (es) { es[0].isIntersecting ? start() : stop(); },
+        { threshold: 0 }).observe(canvas);
+    } else {
+      start();
+    }
   }
 
   /* Generated capsule art for builds with no screenshot: a deterministic
@@ -693,6 +714,30 @@
       cap.appendChild(body);
       grid.appendChild(cap);
     });
+  }
+
+  /* A canvas measured while its mode is display:none comes back 0x0, and a
+     window-resize listener never fires on a mode switch — which is why the
+     hero flow field rendered broken after switching back from developer.
+     Re-measure whenever the element's own box changes. */
+  function observeBox(el, onChange) {
+    if (typeof ResizeObserver === 'undefined') return;
+    var last = 0, wasHidden = false;
+    new ResizeObserver(function (entries) {
+      var r = entries[0].contentRect;
+      if (r.width < 2 || r.height < 2) {            // display:none reports 0x0
+        wasHidden = true;
+        return;
+      }
+      var key = Math.round(r.width) * 100000 + Math.round(r.height);
+      // Coming back from hidden at the SAME size gives an unchanged key, so a
+      // size check alone would skip the reseed and leave the previous frame's
+      // trails burned into the canvas. Track the hidden state explicitly.
+      if (key === last && !wasHidden) return;
+      last = key;
+      wasHidden = false;
+      onChange();
+    }).observe(el);
   }
 
   function debounce(fn, ms) {
