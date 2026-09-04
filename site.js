@@ -47,7 +47,7 @@
     function seed() {
       // Density scales with area so a wide monitor isn't sparse and a phone
       // isn't melting.
-      var n = Math.round(Math.min(1800, Math.max(300, (w * h) / 480)));
+      var n = Math.round(Math.min(1150, Math.max(220, (w * h) / 760)));
       particles = [];
       for (var i = 0; i < n; i++) particles.push(spawn());
       ctx.clearRect(0, 0, w, h);
