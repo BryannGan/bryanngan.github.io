@@ -2065,3 +2065,32 @@ footer {
   background: var(--violet);
   clip-path: polygon(28% 0, 100% 0, 100% 100%, 0 100%);
 }
+
+/* With the field this heavy, streamlines were crossing the bio copy. A soft
+   paper wash sits under the text column only — the field stays bold in the
+   margins and around the name, and the paragraph keeps its contrast. */
+.hero-text {
+  position: relative;
+}
+.hero-text::before {
+  content: "";
+  position: absolute;
+  inset: -1.1rem -1.4rem -0.6rem -1.4rem;
+  z-index: -1;
+  background: radial-gradient(70% 78% at 40% 46%,
+    rgba(253, 252, 250, 0.94) 0 52%,
+    rgba(253, 252, 250, 0.72) 74%,
+    rgba(253, 252, 250, 0) 100%);
+  pointer-events: none;
+}
+.hero-name { position: relative; }
+.hero-name::before {
+  content: "";
+  position: absolute;
+  inset: -0.4rem -1.2rem -0.2rem -1.2rem;
+  z-index: -1;
+  background: radial-gradient(62% 84% at 34% 50%,
+    rgba(253, 252, 250, 0.92) 0 48%,
+    rgba(253, 252, 250, 0) 100%);
+  pointer-events: none;
+}
