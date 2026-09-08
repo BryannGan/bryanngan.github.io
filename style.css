@@ -1680,10 +1680,11 @@ footer {
 
 
 
+
 /* ══════════════════════════════════════════════════════════════════
-   DEVELOPER MODE — bright poster
-   Colour is the background; black is only ever an outline. No glow,
-   no dark ground. Splatoon poster logic with cyberpunk geometry.
+   DEVELOPER MODE — the Well
+   Cinematic register: cold near-monochrome, atmosphere, one warm
+   accent. Type is mono and quiet; the scene carries the page.
    ══════════════════════════════════════════════════════════════════ */
 
 #lab { display: none; }
@@ -1699,409 +1700,246 @@ footer {
 [data-mode="dev"] #kitchen { display: none; }
 
 [data-mode="dev"] {
-  --key:     #0B0616;     /* outline only */
-  --yellow:  #EAFF00;
-  --violet:  #7B2FF7;
-  --magenta: #FF2D95;
-  --cyan:    #00E5FF;
-  --sky:     #B9F2FF;
-  --sky-2:   #E4FAFF;
+  --void:    #0a0d12;
+  --void-2:  #10151d;
+  --steel:   #9fb3c8;
+  --ice:     #cfe3f5;
+  --ember:   #ff9a52;
 
-  --paper:        var(--sky-2);
-  --paper-sunk:   #FFFFFF;
-  --paper-raised: #FFFFFF;
-  --ink:          var(--key);
-  --ink-soft:     #2A2540;
-  --ink-muted:    #4E4869;
-  --ink-faint:    #7A7396;
-  --rule:         rgba(11, 6, 22, 0.18);
-  --rule-strong:  rgba(11, 6, 22, 0.4);
-  --clay:         var(--violet);
-  --clay-hover:   #5A18C9;
-  --accent-mode:  var(--violet);
+  --paper:        var(--void);
+  --paper-sunk:   var(--void-2);
+  --paper-raised: #141a24;
+  --ink:          #e8eef6;
+  --ink-soft:     #aebdd0;
+  --ink-muted:    #7d8da0;
+  --ink-faint:    #55637a;
+  --rule:         rgba(159, 179, 200, 0.18);
+  --rule-strong:  rgba(159, 179, 200, 0.34);
+  --clay:         var(--ice);
+  --clay-hover:   #ffffff;
+  --accent-mode:  var(--ember);
 }
 
-[data-mode="dev"] body { background: var(--sky-2); color: var(--key); }
+[data-mode="dev"] body { background: var(--void); color: var(--ink); }
 [data-mode="dev"] #navbar {
-  background: var(--yellow);
-  border-bottom: 4px solid var(--key);
+  background: rgba(10, 13, 18, 0.72);
+  border-bottom: 1px solid var(--rule);
+  backdrop-filter: blur(10px);
 }
-[data-mode="dev"] .scroll-rail i { background: var(--magenta); }
+[data-mode="dev"] .scroll-rail i { background: var(--ember); }
 [data-mode="dev"] .mode-switch summary {
-  border: 3px solid var(--key);
-  color: var(--key);
-  background: #fff;
-  font-weight: 700;
-  box-shadow: 3px 3px 0 var(--key);
+  border: 1px solid var(--rule-strong);
+  color: var(--ink-soft);
+  background: rgba(20, 26, 36, 0.7);
 }
-[data-mode="dev"] .mode-dot { background: var(--magenta); }
-[data-mode="dev"] .mode-menu { background: #fff; border: 3px solid var(--key); box-shadow: 5px 5px 0 var(--key); }
+[data-mode="dev"] .mode-dot { background: var(--ember); }
+[data-mode="dev"] .mode-menu { background: #141a24; border-color: var(--rule-strong); }
+[data-mode="dev"] .mode-menu button:hover { background: rgba(159,179,200,0.08); }
 
-.lab {
-  position: relative;
-  min-height: 100vh;
-  padding: 6rem 0 0;
+.lab { position: relative; background: var(--void); padding: 0; }
+
+/* ── Scroll track: tall, with a sticky viewport-height stage ── */
+.well-track { position: relative; height: 560vh; }
+.well-stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
   overflow: hidden;
-  background: var(--sky-2);
+  background:
+    radial-gradient(120% 80% at 50% 8%, rgba(52, 86, 122, 0.30), transparent 62%),
+    radial-gradient(90% 70% at 82% 96%, rgba(255, 154, 82, 0.12), transparent 60%),
+    var(--void);
 }
-.grid-city { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
-.lab-inner { position: relative; z-index: 3; }
+.well-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 
-/* Halftone reads as printed dots on bright ground. */
-.halftone {
-  position: absolute; inset: 0; z-index: 1; pointer-events: none;
-  background-image: radial-gradient(circle at 50% 50%, rgba(11, 6, 22, 0.16) 1.1px, transparent 1.5px);
-  background-size: 6px 6px;
-}
-.vignette { display: none; }
-
-/* ── Side pattern, bright ── */
-.edge {
-  position: absolute; top: 0; width: 24vw; height: 86vh;
-  z-index: 2; pointer-events: none;
-  background-image:
-    repeating-linear-gradient(-45deg, rgba(255, 45, 149, 0.55) 0 6px, transparent 6px 22px),
-    repeating-linear-gradient(90deg,  rgba(123, 47, 247, 0.40) 0 2px, transparent 2px 30px),
-    radial-gradient(circle at 50% 50%, rgba(11, 6, 22, 0.30) 1.6px, transparent 2px);
-  background-size: auto, auto, 13px 13px;
-}
-.edge-l { left: 0;  -webkit-mask-image: linear-gradient(90deg,  #000 0%, #000 30%, transparent 100%); mask-image: linear-gradient(90deg,  #000 0%, #000 30%, transparent 100%); }
-.edge-r { right: 0; -webkit-mask-image: linear-gradient(270deg, #000 0%, #000 30%, transparent 100%); mask-image: linear-gradient(270deg, #000 0%, #000 30%, transparent 100%); }
-
-/* Keeps the centre channel flat so the headline and pillars lead. */
-.centre-clear {
-  position: absolute; top: 0; left: 0; right: 0; height: 64vh;
-  z-index: 2; pointer-events: none;
-  background: radial-gradient(50% 58% at 50% 26%, rgba(228, 250, 255, 0.96) 0 52%, rgba(228, 250, 255, 0.6) 78%, transparent 100%);
+/* Film grain and vignette, done in CSS so no post-processing pass is needed. */
+.well-stage::after {
+  content: "";
+  position: absolute; inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 78% at 50% 46%, transparent 42%, rgba(4, 6, 10, 0.72) 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.22'/%3E%3C/svg%3E");
+  mix-blend-mode: soft-light;
+  opacity: 0.85;
 }
 
-/* ── Masthead ── */
-.lab-head { position: relative; padding: 2rem 0 3.25rem; }
-.field { position: absolute; z-index: -1; pointer-events: none; border: 4px solid var(--key); }
-.field-y { top: -16%; left: -24%; width: 30%; height: 62%; background: var(--yellow);  clip-path: polygon(0 0, 100% 0, 76% 100%, 0 100%); }
-.field-p { top: 42%;  right: -24%; width: 32%; height: 76%; background: var(--violet);  clip-path: polygon(24% 0, 100% 0, 100% 100%, 0 100%); }
-.field-m { display: none; }
-
-.lab-eyebrow {
-  display: inline-flex; align-items: center; gap: 0.5rem;
-  font-family: var(--mono); font-size: 0.64rem; font-weight: 700;
-  letter-spacing: 0.24em; text-transform: uppercase;
-  color: var(--key); background: var(--cyan);
-  border: 3px solid var(--key);
-  padding: 0.3rem 0.7rem; margin-bottom: 1.3rem;
-  box-shadow: 4px 4px 0 var(--key);
+/* ── Head: quiet type over the scene ── */
+.well-head {
+  position: absolute;
+  left: 0; right: 0; top: 12vh;
+  z-index: 3;
+  padding: 0 clamp(1.5rem, 6vw, 5rem);
+  pointer-events: none;
 }
-.blip { width: 7px; height: 7px; border-radius: 50%; background: var(--magenta); border: 2px solid var(--key); }
-.motion .blip { animation: blip 1.4s steps(1) infinite; }
-@keyframes blip { 0%,60% { opacity: 1; } 61%,100% { opacity: 0.15; } }
-
-/* Band + headline: the highest-contrast pairing on the page. */
-.title-band {
-  position: absolute; left: -50vw; right: -50vw; top: 3.2rem;
-  height: 6rem; z-index: -1;
-  background: var(--yellow);
-  border-top: 4px solid var(--key);
-  border-bottom: 4px solid var(--key);
-  transform: skewY(-1.6deg);
+[data-mode="dev"] .lab-title {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: clamp(1.7rem, 3.4vw, 2.9rem);
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: #fff;
+  text-align: center;
+  margin: 0 0 1.6rem;
+  text-shadow: 0 2px 40px rgba(0, 0, 0, 0.7);
 }
-.title-band::after {
-  content: ""; position: absolute; left: 0; right: 0; bottom: -18px;
-  height: 14px; background: var(--magenta);
-  border-bottom: 4px solid var(--key);
-}
-.lab-title {
-  font-family: "Bungee", var(--mono), monospace;
-  font-weight: 400;
-  font-size: min(4.3rem, 6vw);
-  line-height: 1.02; letter-spacing: 0.01em;
-  white-space: nowrap;
-  color: var(--key);
-  text-shadow: 4px 4px 0 var(--magenta), 8px 8px 0 var(--violet);
-  margin-bottom: 2.6rem;
-}
-.glitch { position: relative; }
-.glitch::before, .glitch::after {
-  content: attr(data-text); position: absolute; inset: 0;
-  pointer-events: none; opacity: 0; text-shadow: none;
-}
-.glitch::before { color: var(--magenta); }
-.glitch::after  { color: var(--cyan); }
-.motion .glitch::before { animation: glitch-a 6s infinite; }
-.motion .glitch::after  { animation: glitch-b 6s infinite; }
-@keyframes glitch-a {
-  0%,90%,100% { opacity: 0; transform: none; clip-path: none; }
-  91% { opacity: 1; transform: translate(-6px, 2px); clip-path: inset(10% 0 62% 0); }
-  94% { opacity: 1; transform: translate(5px, -3px); clip-path: inset(66% 0 10% 0); }
-  97% { opacity: 1; transform: translate(-3px, 0);   clip-path: inset(40% 0 38% 0); }
-}
-@keyframes glitch-b {
-  0%,90%,100% { opacity: 0; transform: none; clip-path: none; }
-  92%   { opacity: 1; transform: translate(6px, -2px); clip-path: inset(26% 0 48% 0); }
-  95.5% { opacity: 1; transform: translate(-5px, 3px); clip-path: inset(72% 0 6% 0); }
-  98.5% { opacity: 1; transform: translate(2px, 0);    clip-path: inset(4% 0 78% 0); }
-}
-
-/* ── Pillars: solid colour chips with hard shadows ── */
 .spec-row {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 232px), 1fr));
-  gap: 1.15rem; list-style: none; padding: 0; margin: 0; border: 0;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 2.4rem;
+  list-style: none; margin: 0; padding: 0; border: 0;
 }
-.spec {
-  display: flex; align-items: center; gap: 0.7rem;
-  padding: 0.9rem 1.15rem;
-  background: #fff;
-  border: 4px solid var(--key);
-  box-shadow: 6px 6px 0 var(--key);
-}
-.spec:nth-child(1) { background: var(--cyan); }
-.spec:nth-child(2) { background: var(--yellow); }
-.spec:nth-child(3) { background: var(--magenta); }
+.spec { display: flex; align-items: baseline; gap: 0.5rem; padding: 0; background: none; border: 0; box-shadow: none; }
 .spec-idx {
-  font-family: var(--mono); font-size: 0.76rem; font-weight: 700;
-  color: var(--key);
-  background: #fff; border: 2px solid var(--key);
-  padding: 0.05rem 0.3rem;
+  font-family: var(--mono); font-size: 0.6rem; font-weight: 500;
+  letter-spacing: 0.16em; color: var(--ember);
 }
 .spec-name {
-  font-family: "Bungee", var(--mono), monospace;
-  font-size: 0.95rem; letter-spacing: 0.02em; text-transform: uppercase;
-  color: var(--key); white-space: nowrap;
+  font-family: var(--mono); font-size: 0.68rem; font-weight: 500;
+  letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-soft);
 }
-.spec:nth-child(3) .spec-name { color: #fff; }
 
-/* ── Shelf ── */
+.well-cue {
+  position: absolute;
+  left: 50%; bottom: 2.4rem;
+  transform: translateX(-50%);
+  z-index: 3;
+  font-family: var(--mono); font-size: 0.6rem;
+  letter-spacing: 0.26em; text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.motion .well-cue { transition: opacity 0.4s; }
+.well-cue.is-gone { opacity: 0; }
+
+.well-meter {
+  position: absolute;
+  right: 1.6rem; top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  width: 2px; height: 34vh;
+  background: rgba(159, 179, 200, 0.14);
+}
+.well-meter i {
+  display: block; width: 100%; height: 100%;
+  background: linear-gradient(180deg, var(--ice), var(--ember));
+  transform: scaleY(0);
+  transform-origin: 50% 0;
+}
+
+/* ── HUD: labels projected off each locked piece ── */
+.hud-lines {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  z-index: 2; pointer-events: none;
+  overflow: visible;
+}
+.hud-line {
+  fill: none;
+  stroke: rgba(207, 227, 245, 0.42);
+  stroke-width: 1;
+  opacity: 0;
+}
+.hud-line.is-in { opacity: 1; transition: opacity 0.45s ease; }
+
+.hud { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.hud-label {
+  position: absolute;
+  top: 0; left: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  max-width: 15rem;
+  padding: 0.3rem 0.1rem;
+  color: var(--ink-soft);
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+.hud-label.is-in { opacity: 1; pointer-events: auto; transition: opacity 0.5s ease; }
+.hud-label.is-left { transform-origin: 0 50%; }
+.hud-label:not(.is-left) { flex-direction: row-reverse; text-align: right; margin-left: -15rem; }
+.hud-idx {
+  font-family: var(--mono); font-size: 0.58rem; font-weight: 500;
+  letter-spacing: 0.14em; color: var(--ember); flex: none;
+}
+.hud-body { display: block; }
+.hud-title {
+  display: block;
+  font-size: 0.82rem; font-weight: 600; letter-spacing: -0.01em; color: #fff;
+}
+.hud-tag {
+  display: block; margin-top: 0.1rem;
+  font-family: var(--mono); font-size: 0.58rem;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint);
+}
+.hud-label:hover .hud-title { color: var(--ember); }
+
+.well-fallback { position: absolute; inset: auto 0 20% 0; text-align: center; color: var(--ink-soft); }
+
+/* ── Shelf below: quiet, so the scene stays the event ── */
+[data-mode="dev"] .lab-inner { position: relative; z-index: 2; padding-top: 4rem; padding-bottom: 5rem; }
 .shelf-head {
-  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
-  margin: 3.5rem 0 1.4rem; padding: 0.6rem 1rem;
-  background: var(--violet);
-  border: 4px solid var(--key);
-  box-shadow: 6px 6px 0 var(--key);
+  display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
+  padding-bottom: 0.6rem; margin-bottom: 1.3rem;
+  border-bottom: 1px solid var(--rule);
+  background: none; box-shadow: none;
 }
 [data-mode="dev"] .shelf-title {
-  font-family: "Bungee", var(--mono), monospace;
-  font-size: 0.95rem; letter-spacing: 0.03em; text-transform: uppercase;
-  color: #fff; border: 0; padding: 0; margin: 0; display: block;
+  font-family: var(--mono); font-size: 0.68rem; font-weight: 500;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--ink-soft); border: 0; padding: 0; margin: 0; display: block;
 }
 [data-mode="dev"] .shelf-title::before { content: none; }
-.shelf-count { font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.14em; color: var(--yellow); font-weight: 700; }
+.shelf-count { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.14em; color: var(--ink-faint); }
 
-.capsule-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 20px;
-}
-
-/* ── Cards ── */
+.capsule-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 290px), 1fr)); gap: 14px; }
 .cap {
   position: relative; display: block; padding: 0; text-align: left;
-  color: var(--key); background: #fff;
-  border: 4px solid var(--key);
-  box-shadow: 7px 7px 0 var(--key);
+  color: var(--ink);
+  background: var(--paper-raised);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  overflow: hidden;
 }
-.motion .cap { transition: transform 0.2s cubic-bezier(0.22,1,0.36,1), box-shadow 0.2s; }
-.cap:hover { transform: translate(-4px, -4px); box-shadow: 12px 12px 0 var(--magenta); }
-.cap-art { position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: #fff; border-bottom: 4px solid var(--key); }
+.motion .cap { transition: border-color 0.25s, transform 0.3s cubic-bezier(0.22,1,0.36,1); }
+.cap:hover { border-color: rgba(255, 154, 82, 0.55); transform: translateY(-3px); }
+.cap-art { position: relative; aspect-ratio: 16/9; overflow: hidden; background: var(--void-2); border-bottom: 1px solid var(--rule); }
 .cap-art img, .cap-art canvas { width: 100%; height: 100%; object-fit: cover; display: block; }
-.cap-art::after { content: none; }
-
+.cap-art::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(10,13,18,0.88), transparent 62%); }
 .cap-status {
-  position: absolute; top: 10px; left: 10px; z-index: 2;
-  font-family: var(--mono); font-size: 0.58rem; font-weight: 700;
-  letter-spacing: 0.14em; padding: 0.2rem 0.5rem;
-  color: var(--key); background: var(--yellow); border: 3px solid var(--key);
+  position: absolute; top: 9px; left: 9px; z-index: 2;
+  font-family: var(--mono); font-size: 0.55rem; font-weight: 600;
+  letter-spacing: 0.16em; padding: 0.16rem 0.42rem;
+  color: var(--void); background: var(--ice);
 }
-.cap-status[data-s="LIVE"]      { background: var(--cyan); }
-.cap-status[data-s="SHIPPED"]   { background: var(--cyan); }
-.cap-status[data-s="IN DEV"]    { background: var(--magenta); color: #fff; }
-.cap-status[data-s="PROTOTYPE"] { background: var(--violet);  color: #fff; }
-.cap-year {
-  position: absolute; top: 11px; right: 11px; z-index: 2;
-  font-family: var(--mono); font-size: 0.62rem; font-weight: 700;
-  color: var(--key); background: #fff; border: 2px solid var(--key); padding: 0 0.3rem;
-}
-.cap-body { position: relative; z-index: 2; padding: 1rem 1.15rem 1.25rem; }
-.cap-title { font-family: "Bungee", var(--mono), monospace; font-size: 1.02rem; color: var(--key); margin-bottom: 0.45rem; }
-.cap-tagline { font-size: 0.86rem; line-height: 1.5; color: var(--ink-soft); margin-bottom: 0.75rem; }
-.cap-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.cap-status[data-s="IN DEV"], .cap-status[data-s="PROTOTYPE"] { background: rgba(159,179,200,0.28); color: var(--ink); }
+.cap-year { position: absolute; top: 10px; right: 11px; z-index: 2; font-family: var(--mono); font-size: 0.58rem; color: var(--ink-faint); }
+.cap-body { position: relative; z-index: 2; padding: 0.9rem 1rem 1.1rem; }
+.cap-title { font-family: var(--sans); font-size: 0.95rem; font-weight: 600; color: #fff; margin-bottom: 0.35rem; letter-spacing: -0.01em; }
+.cap-tagline { font-size: 0.82rem; line-height: 1.5; color: var(--ink-soft); margin-bottom: 0.65rem; }
+.cap-tags { display: flex; flex-wrap: wrap; gap: 5px; }
 .cap-tags span {
-  font-family: var(--mono); font-size: 0.6rem; font-weight: 600;
-  padding: 0.16rem 0.44rem; color: var(--key);
-  background: var(--sky); border: 2px solid var(--key);
+  font-family: var(--mono); font-size: 0.57rem; letter-spacing: 0.08em;
+  padding: 0.14rem 0.4rem; color: var(--ink-muted);
+  background: rgba(159,179,200,0.06); border: 1px solid var(--rule);
 }
 .cap-flood-note {
-  position: absolute; right: 1.15rem; bottom: 1.25rem; z-index: 3;
-  font-family: var(--mono); font-size: 0.6rem; font-weight: 700;
-  letter-spacing: 0.12em; text-transform: uppercase; color: var(--magenta); opacity: 0;
+  position: absolute; right: 1rem; bottom: 1.1rem; z-index: 3;
+  font-family: var(--mono); font-size: 0.57rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--ember); opacity: 0;
 }
 .motion .cap-flood-note { transition: opacity 0.18s; }
 .cap:hover .cap-flood-note { opacity: 1; }
 
-/* ── Bottom band ── */
-.lab-foot { position: relative; z-index: 3; margin-top: 5rem; padding-top: 5rem; overflow: hidden; }
-.foot-field { position: absolute; z-index: 0; pointer-events: none; border: 4px solid var(--key); }
-.foot-field-m { bottom: 0; left: -14%;  width: 42%; height: 74%; background: var(--magenta); clip-path: polygon(0 22%, 100% 0, 76% 100%, 0 100%); }
-.foot-field-p { bottom: 0; right: -12%; width: 40%; height: 88%; background: var(--violet);  clip-path: polygon(24% 0, 100% 16%, 100% 100%, 0 100%); }
-.foot-field-y { bottom: 34%; left: 34%; width: 20%; height: 26%; background: var(--yellow);  clip-path: polygon(0 0, 100% 18%, 84% 100%, 10% 76%); }
-.foot-skyline { position: relative; z-index: 1; display: block; width: 100%; height: 190px; }
-.foot-skyline .towers path { stroke: var(--key); stroke-width: 4; }
-.foot-skyline .crowns path { stroke: var(--key); stroke-width: 4; fill: none; filter: none; }
-.foot-rule {
-  position: relative; z-index: 2; height: 14px;
-  background: repeating-linear-gradient(-45deg, var(--yellow) 0 16px, var(--key) 16px 32px);
-  border-top: 4px solid var(--key);
-}
-[data-mode="dev"] footer:not(.lab-foot) { display: none; }
+[data-mode="dev"] footer { border-top: 1px solid var(--rule); }
 
-@media (max-width: 720px) {
-  .lab-title { font-size: 7.2vw; }
-  .edge { width: 32vw; }
-  .foot-skyline { height: 120px; }
+@media (max-width: 760px) {
+  .well-track { height: 420vh; }
+  .hud-label { max-width: 10rem; }
+  .hud-label:not(.is-left) { margin-left: -10rem; }
+  .well-meter { right: 0.7rem; height: 24vh; }
 }
-@media (prefers-reduced-motion: reduce) { .grid-city { display: none; } }
-
-/* ── Let the line lead ──
-   The side pattern ran at full strength straight past the headline and the
-   pillars, so the eye had nowhere to settle. It now carries a second,
-   vertical mask that thins it right through that band and returns below —
-   pattern still frames both edges, but it hands focus to the type. */
-.edge {
-  height: 96vh;
-  -webkit-mask-composite: source-in;
-  mask-composite: intersect;
-  background-image:
-    repeating-linear-gradient(-45deg, rgba(255, 45, 149, 0.42) 0 6px, transparent 6px 24px),
-    repeating-linear-gradient(90deg,  rgba(123, 47, 247, 0.30) 0 2px, transparent 2px 34px),
-    radial-gradient(circle at 50% 50%, rgba(11, 6, 22, 0.22) 1.5px, transparent 2px);
-  background-size: auto, auto, 14px 14px;
-}
-.edge-l {
-  -webkit-mask-image:
-    linear-gradient(90deg, #000 0%, #000 26%, transparent 100%),
-    linear-gradient(180deg, #000 0%, rgba(0,0,0,0.30) 18%, rgba(0,0,0,0.08) 34%, rgba(0,0,0,0.08) 48%, #000 76%);
-  mask-image:
-    linear-gradient(90deg, #000 0%, #000 26%, transparent 100%),
-    linear-gradient(180deg, #000 0%, rgba(0,0,0,0.30) 18%, rgba(0,0,0,0.08) 34%, rgba(0,0,0,0.08) 48%, #000 76%);
-}
-.edge-r {
-  -webkit-mask-image:
-    linear-gradient(270deg, #000 0%, #000 26%, transparent 100%),
-    linear-gradient(180deg, #000 0%, rgba(0,0,0,0.30) 18%, rgba(0,0,0,0.08) 34%, rgba(0,0,0,0.08) 48%, #000 76%);
-  mask-image:
-    linear-gradient(270deg, #000 0%, #000 26%, transparent 100%),
-    linear-gradient(180deg, #000 0%, rgba(0,0,0,0.30) 18%, rgba(0,0,0,0.08) 34%, rgba(0,0,0,0.08) 48%, #000 76%);
-}
-
-/* Clear channel widened and dropped to cover the pillar row, not just the
-   headline — the pillars are the second read and need flat ground too. */
-.centre-clear {
-  height: 72vh;
-  background: linear-gradient(180deg,
-    rgba(228, 250, 255, 0) 0%,
-    rgba(228, 250, 255, 0.55) 16%,
-    rgba(228, 250, 255, 0.96) 30%,
-    rgba(228, 250, 255, 0.96) 52%,
-    rgba(228, 250, 255, 0.55) 66%,
-    rgba(228, 250, 255, 0) 100%);
-}
-
-/* Halftone thins out across the same band. */
-.halftone {
-  -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,0.18) 30%, rgba(0,0,0,0.18) 50%, #000 74%);
-  mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,0.18) 30%, rgba(0,0,0,0.18) 50%, #000 74%);
-}
-
-/* Colour fields step further outboard so nothing crowds the pillars. */
-.field-y { top: -18%; left: -28%; width: 28%; height: 58%; }
-.field-p { top: 52%;  right: -28%; width: 30%; height: 70%; }
-
-/* Sky moves from canvas to CSS so the gradient still covers the cleared
-   centre channel now that the canvas only paints the outer flanks. */
-[data-mode="dev"] .lab {
-  background:
-    linear-gradient(180deg,
-      #B9F2FF 0%,
-      #9EEBFF 26%,
-      #DFF6FF 52%,
-      #E4FAFF 74%,
-      #E4FAFF 100%);
-}
-
-/* Headline steps down a size, and the band tightens with it now that the
-   eyebrow above it is gone. */
-.lab-title {
-  font-size: min(3.3rem, 4.6vw);
-  text-shadow: 3px 3px 0 var(--magenta), 6px 6px 0 var(--violet);
-  margin-bottom: 2.2rem;
-}
-.title-band { top: 2.2rem; height: 4.6rem; }
-.lab-head { padding: 2.6rem 0 3rem; }
-
-/* Headline centred and stepped down again. The band loses its skew — a
-   tilted bar can't read as symmetric no matter where the type sits — and
-   becomes a level full-bleed rule with the line centred inside it. */
-.lab-title {
-  font-size: min(2.6rem, 3.6vw);
-  text-align: center;
-  margin-bottom: 2.4rem;
-  text-shadow: 3px 3px 0 var(--magenta), 6px 6px 0 var(--violet);
-}
-.title-band {
-  top: 2.4rem;
-  height: 4rem;
-  transform: none;
-}
-.title-band::after { bottom: -16px; height: 12px; }
-.lab-head { padding: 2.4rem 0 3rem; }
-
-/* With the headline centred, the two colour fields sat at different heights
-   and read as a mistake. Mirrored: same band, same size, opposite edges. */
-.field-y {
-  top: 42%; left: -26%; right: auto;
-  width: 28%; height: 64%;
-  background: var(--yellow);
-  clip-path: polygon(0 0, 100% 0, 72% 100%, 0 100%);
-}
-.field-p {
-  top: 42%; right: -26%; left: auto;
-  width: 28%; height: 64%;
-  background: var(--violet);
-  clip-path: polygon(28% 0, 100% 0, 100% 100%, 0 100%);
-}
-
-/* With the field this heavy, streamlines were crossing the bio copy. A soft
-   paper wash sits under the text column only — the field stays bold in the
-   margins and around the name, and the paragraph keeps its contrast. */
-.hero-text {
-  position: relative;
-}
-/* The wash had a flat plateau then a short falloff, which drew a visible
-   edge — the copy read as sitting on a card. Feathered instead: peak
-   opacity is lower, the fade runs over a much longer distance, and the
-   box extends well past the text so the boundary lands where there is
-   nothing to frame. */
-.hero-text::before {
-  content: "";
-  position: absolute;
-  inset: -3.5rem -5rem -3rem -4rem;
-  z-index: -1;
-  background: radial-gradient(64% 70% at 42% 48%,
-    rgba(253, 252, 250, 0.80) 0%,
-    rgba(253, 252, 250, 0.68) 26%,
-    rgba(253, 252, 250, 0.46) 48%,
-    rgba(253, 252, 250, 0.24) 68%,
-    rgba(253, 252, 250, 0.08) 85%,
-    rgba(253, 252, 250, 0) 100%);
-  pointer-events: none;
-}
-.hero-name { position: relative; }
-.hero-name::before {
-  content: "";
-  position: absolute;
-  inset: -2.2rem -4.5rem -1.6rem -3.5rem;
-  z-index: -1;
-  background: radial-gradient(56% 76% at 36% 50%,
-    rgba(253, 252, 250, 0.82) 0%,
-    rgba(253, 252, 250, 0.66) 28%,
-    rgba(253, 252, 250, 0.40) 52%,
-    rgba(253, 252, 250, 0.16) 74%,
-    rgba(253, 252, 250, 0) 100%);
-  pointer-events: none;
+@media (prefers-reduced-motion: reduce) {
+  .well-track { height: 100vh; }
 }
