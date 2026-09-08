@@ -19,7 +19,8 @@ window.LAB = [
     tags: ['Python', 'SimVascular', 'CMA-ES', 'Open source'],
     status: 'SHIPPED',
     year: '2026',
-    href: 'https://github.com/BryannGan/MIROS'
+    href: 'https://github.com/BryannGan/MIROS',
+    art: 'miros.jpg'
   },
   {
     title: 'This Site',
