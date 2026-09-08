@@ -1958,3 +1958,17 @@ footer {
 .spec-row { gap: 0.6rem 3rem; }
 .spec-idx  { font-size: 0.7rem; }
 .spec-name { font-size: 0.86rem; letter-spacing: 0.14em; }
+
+/* Rebalance the head: the pillars were reading as a caption under the title
+   rather than as three claims of their own. Title down a step, pillars up. */
+[data-mode="dev"] .lab-title {
+  font-size: clamp(1.8rem, 3.8vw, 3.2rem);
+  margin-bottom: 2.2rem;
+}
+.spec-row { gap: 0.7rem 3.4rem; }
+.spec-idx  { font-size: 0.8rem; }
+.spec-name {
+  font-size: 1.12rem;
+  letter-spacing: 0.1em;
+  color: var(--ink);
+}
