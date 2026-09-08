@@ -22,8 +22,8 @@ const PACKING = [
   [[0, 0], [1, 0], [2, 0], [2, 1]],   // J across the floor, turning up
   [[3, 0], [3, 1], [3, 2], [2, 2]],   // L up the right wall, turning in
   [[0, 1], [1, 1], [0, 2], [1, 2]],   // O filling the left pocket
-  [[0, 3], [1, 3], [2, 3], [3, 3]],   // I capping row 3
-  [[0, 4], [1, 4], [2, 4], [3, 4]]    // I capping row 4
+  [[0, 3], [1, 3], [2, 3], [1, 4]],   // T on row 3, stem up
+  [[3, 3], [3, 4], [2, 4], [2, 5]]    // S climbing the right, leaving a ragged top
 ];
 const WELL_W = 4;
 
@@ -277,7 +277,7 @@ export function mountWell(opts) {
     line.setAttribute('class', 'hud-line');
     lines.appendChild(line);
 
-    return { el, line, piece: p };
+    return { el, line, piece: p, left: i % 2 === 0 };
   });
 
   /* ── Sizing ── */
@@ -419,8 +419,8 @@ export function mountWell(opts) {
       const sx = (v.x * 0.5 + 0.5) * w;
       const sy = (-v.y * 0.5 + 0.5) * h;
 
-      // Labels alight on whichever side the piece leans, clamped inside frame.
-      const left = sx < w * 0.5;
+      // Side is assigned per piece, not derived from projected position.
+      const left = L.left;
       const lx = left ? Math.max(24, w * 0.07) : Math.min(w - 24, w * 0.93);
       const ly = Math.min(h - 40, Math.max(40, sy));
 
