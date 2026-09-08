@@ -1943,3 +1943,18 @@ footer {
 @media (prefers-reduced-motion: reduce) {
   .well-track { height: 100vh; }
 }
+
+/* Head sits centred in the frame and reads larger — it is the first thing
+   on the page, before the stack starts building underneath it. */
+.well-head {
+  top: 50%;
+  transform: translateY(-50%);
+}
+[data-mode="dev"] .lab-title {
+  font-size: clamp(2.1rem, 4.6vw, 4rem);
+  letter-spacing: -0.035em;
+  margin-bottom: 2rem;
+}
+.spec-row { gap: 0.6rem 3rem; }
+.spec-idx  { font-size: 0.7rem; }
+.spec-name { font-size: 0.86rem; letter-spacing: 0.14em; }

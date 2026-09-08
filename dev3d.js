@@ -256,7 +256,7 @@ export function mountWell(opts) {
     if (opts.head) {
       const fade = clamp01((progress - 0.06) / 0.16);
       opts.head.style.opacity = String(1 - fade);
-      opts.head.style.transform = 'translateY(' + (-fade * 26) + 'px)';
+      opts.head.style.transform = 'translateY(calc(-50% - ' + (fade * 26) + 'px))';
     }
 
     if (dirty) {
