@@ -326,10 +326,19 @@
       card.className = 'plate' + (d.size ? ' is-' + d.size : '');
       card.setAttribute('aria-expanded', 'false');
 
+      // Two derivatives per photo (tools/media.py): 420 wide for a single
+      // tile, 840 for big/wide/tall ones. `sizes` mirrors the grid so the
+      // browser picks the small one wherever it can.
+      var stem = 'assets/kitchen/' + d.src.replace(/\.webp$/, '');
       var img = document.createElement('img');
-      img.src = 'assets/kitchen/' + d.src;
+      img.src = stem + '-840.webp';
+      img.srcset = stem + '-420.webp 420w, ' + stem + '-840.webp 840w';
+      img.sizes = (d.size === 'big' || d.size === 'wide') ? '(max-width: 700px) 92vw, 420px'
+                : d.size === 'tall' ? '(max-width: 700px) 45vw, 320px'
+                : '(max-width: 700px) 45vw, 210px';
       img.alt = d.name || '';
       img.loading = 'lazy';
+      img.decoding = 'async';
       card.appendChild(img);
 
       var label = document.createElement('span');
@@ -668,7 +677,8 @@
       if (d.art) {
         var img = document.createElement('img');
         img.src = 'assets/lab/' + d.art;
-        img.alt = ''; img.loading = 'lazy';
+        img.alt = ''; img.loading = 'lazy'; img.decoding = 'async';
+        img.width = 960; img.height = 540;
         art.appendChild(img);
       } else {
         art.appendChild(circuitPlate(d.title || 'build'));

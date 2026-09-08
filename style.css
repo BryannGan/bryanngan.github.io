@@ -1,3 +1,37 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   Fonts — self-hosted IBM Plex (OFL, see fonts/LICENSE.txt)
+   Latin subsets only, same files Google Fonts serves, but from this origin:
+   no third-party DNS/TLS on the critical path, and the site keeps its type
+   where fonts.googleapis.com is slow or blocked. Plex Sans is one variable
+   file covering 400–700; Mono and Serif are static weights.
+   ══════════════════════════════════════════════════════════════════════════ */
+@font-face {
+  font-family: "IBM Plex Sans";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("fonts/plex-sans-var.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face { font-family: "IBM Plex Mono"; font-style: normal; font-weight: 400; font-display: swap; src: url("fonts/plex-mono-400.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "IBM Plex Mono"; font-style: normal; font-weight: 500; font-display: swap; src: url("fonts/plex-mono-500.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "IBM Plex Mono"; font-style: normal; font-weight: 600; font-display: swap; src: url("fonts/plex-mono-600.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "IBM Plex Mono"; font-style: normal; font-weight: 700; font-display: swap; src: url("fonts/plex-mono-700.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "IBM Plex Serif"; font-style: normal; font-weight: 400; font-display: swap; src: url("fonts/plex-serif-400.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "IBM Plex Serif"; font-style: normal; font-weight: 600; font-display: swap; src: url("fonts/plex-serif-600.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "IBM Plex Serif"; font-style: italic; font-weight: 400; font-display: swap; src: url("fonts/plex-serif-400i.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+/* Metric-matched fallbacks. While a Plex file is still in flight, text is set
+   in the system font scaled and re-metricked to occupy the same space Plex
+   will, so the swap does not move the layout (measured CLS on the chef page
+   went from 0.17 to ~0 with these). Values come from frequency-weighted
+   advance widths and the vertical metrics of each pair; recompute them if a
+   font file changes. Browsers without size-adjust fall through to the plain
+   family names that follow in each stack. */
+@font-face { font-family: "Plex Sans Fallback";  src: local("Arial"), local("Helvetica"); size-adjust: 101.57%; ascent-override: 100.92%; descent-override: 27.07%; line-gap-override: 0%; }
+@font-face { font-family: "Plex Mono Fallback";  src: local("Menlo"), local("Courier New"); size-adjust: 99.7%; ascent-override: 102.7%; descent-override: 27.55%; line-gap-override: 0%; }
+@font-face { font-family: "Plex Serif Fallback"; src: local("Georgia"); size-adjust: 106.79%; ascent-override: 95.99%; descent-override: 25.75%; line-gap-override: 0%; }
+
 /* ── Reset & Base ── */
 *, *::before, *::after {
   margin: 0;
@@ -44,8 +78,8 @@
   --slate-ink:    #4a6480;   /*  5.6:1 */
 
   /* Type */
-  --sans: "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
-  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --sans: "IBM Plex Sans", "Plex Sans Fallback", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "IBM Plex Mono", "Plex Mono Fallback", ui-monospace, "SF Mono", Menlo, monospace;
 
   /* Aliases (legacy) */
   --bg:           var(--paper);
@@ -1448,6 +1482,13 @@ footer {
 }
 .plate-notes li { margin-top: 0.1rem; }
 
+/* Before site.js fills the grid it is empty and the footer sits in the
+   viewport; reserve four rows so nothing on screen moves when the plates
+   land, and keep the "awaiting plates" note for the genuinely-empty case
+   (site.js shows it explicitly when the manifest has no entries). */
+[data-mode="chef"] .plate-grid:empty { min-height: 850px; }
+[data-mode="chef"] .plate-grid:empty + .kitchen-empty { display: none; }
+
 /* Always-visible name strip, so the grid reads without interaction. */
 .plate-label {
   position: absolute;
@@ -1549,7 +1590,7 @@ footer {
 }
 
 .kitchen-title {
-  font-family: "IBM Plex Serif", Georgia, serif;
+  font-family: "IBM Plex Serif", "Plex Serif Fallback", Georgia, serif;
   font-size: clamp(2.6rem, 8vw, 5.2rem);
   font-weight: 400;
   line-height: 0.98;
@@ -1559,7 +1600,7 @@ footer {
 }
 
 [data-mode="chef"] .kitchen-lede {
-  font-family: "IBM Plex Serif", Georgia, serif;
+  font-family: "IBM Plex Serif", "Plex Serif Fallback", Georgia, serif;
   font-size: 1.04rem;
   line-height: 1.6;
   color: var(--ink-soft);
@@ -1595,7 +1636,7 @@ footer {
   background: linear-gradient(to top, rgba(24, 44, 24, 0.90) 0%, rgba(28, 52, 28, 0.62) 48%, rgba(30, 56, 30, 0.06) 100%);
 }
 [data-mode="chef"] .plate-name {
-  font-family: "IBM Plex Serif", Georgia, serif;
+  font-family: "IBM Plex Serif", "Plex Serif Fallback", Georgia, serif;
   font-size: 1.02rem;
   font-weight: 600;
 }

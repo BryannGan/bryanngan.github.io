@@ -7,8 +7,10 @@
    status  : SHIPPED | LIVE | IN DEV | PROTOTYPE | ARCHIVED
    year    : string
    href    : optional link
-   art     : optional image in assets/lab/. Omit and the card renders a
-             generated circuit plate instead, which is the intended look
+   art     : optional image in assets/lab/ — a 960x540 WebP made with
+             `python3 tools/media.py lab <source image>`, which crops to 16:9
+             and names the output after the source. Omit and the card renders
+             a generated circuit plate instead, which is the intended look
              for anything without a screenshot yet.
 
    The last three are deliberate placeholders — replace them. */
@@ -20,7 +22,7 @@ window.LAB = [
     status: 'SHIPPED',
     year: '2026',
     href: 'https://github.com/BryannGan/MIROS',
-    art: 'miros.jpg'
+    art: 'miros.webp'
   },
   {
     title: 'This Site',
@@ -28,7 +30,8 @@ window.LAB = [
     tags: ['Vanilla JS', 'Canvas', 'CSS'],
     status: 'LIVE',
     year: '2026',
-    href: 'https://github.com/BryannGan/bryanngan.github.io'
+    href: 'https://github.com/BryannGan/bryanngan.github.io',
+    art: 'site.webp'
   },
   {
     title: 'Pet-Safe Bouquet Check',
@@ -37,7 +40,7 @@ window.LAB = [
     status: 'LIVE',
     year: '2026',
     href: 'flowers/',
-    art: 'flowers.jpg'
+    art: 'flowers.webp'
   },
   {
     title: 'Hangul Trainer',
@@ -46,7 +49,7 @@ window.LAB = [
     status: 'LIVE',
     year: '2026',
     href: 'hangul/',
-    art: 'hangul.jpg'
+    art: 'hangul.webp'
   },
   { title: 'Project Slot 06', tagline: 'Replace me.', tags: ['TBD'], status: 'PROTOTYPE', year: '—' }
 ];

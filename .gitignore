@@ -1,3 +1,9 @@
 .DS_Store
 .playwright/
 .playwright-cli/
+
+# Working notes — local only, never published. HANDOFF.md is the architecture
+# and decision record the next session should read; it lives beside the code
+# on purpose, but the repo is public so it stays untracked.
+HANDOFF.md
+NOTES.md
