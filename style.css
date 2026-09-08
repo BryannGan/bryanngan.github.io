@@ -1977,3 +1977,8 @@ footer {
    moving flow field behind it. Near-black takes it to 15:1, so it holds
    whatever the streamlines are doing underneath. */
 .hero-text .profile-bio { color: var(--ink); }
+
+/* Pillars up again — they carry as much of the claim as the title does. */
+.spec-row { gap: 0.8rem 3.8rem; }
+.spec-idx  { font-size: 0.92rem; }
+.spec-name { font-size: 1.42rem; letter-spacing: 0.07em; }
