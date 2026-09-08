@@ -1972,3 +1972,8 @@ footer {
   letter-spacing: 0.1em;
   color: var(--ink);
 }
+
+/* Bio was on --ink-muted, which clears WCAG on flat paper but not against a
+   moving flow field behind it. Near-black takes it to 15:1, so it holds
+   whatever the streamlines are doing underneath. */
+.hero-text .profile-bio { color: var(--ink); }
