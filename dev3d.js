@@ -48,53 +48,121 @@ const LOOKS = [
    roughness map, so the light breaks up across a face instead of reading as
    flat plastic. No image files, no extra requests. */
 const texCache = {};
-function surfaceMap(kind) {
-  if (texCache[kind]) return texCache[kind];
-  const S = 128;
+
+/* Draws the pattern as a HEIGHT field. Everything else is derived from it. */
+function heightField(kind, S) {
   const c = document.createElement('canvas');
   c.width = c.height = S;
   const x = c.getContext('2d');
-
   x.fillStyle = '#808080';
   x.fillRect(0, 0, S, S);
 
   if (kind === 'brushed') {
-    for (let i = 0; i < 900; i++) {
+    for (let i = 0; i < 1500; i++) {
       const y = Math.random() * S;
-      const v = 110 + Math.random() * 90;
+      const v = 118 + Math.random() * 68;
       x.strokeStyle = 'rgb(' + v + ',' + v + ',' + v + ')';
-      x.lineWidth = 0.5 + Math.random();
-      x.beginPath(); x.moveTo(0, y); x.lineTo(S, y + (Math.random() - 0.5) * 3); x.stroke();
+      x.lineWidth = 0.4 + Math.random() * 0.9;
+      x.beginPath(); x.moveTo(0, y); x.lineTo(S, y + (Math.random() - 0.5) * 4); x.stroke();
     }
   } else if (kind === 'grid') {
-    x.strokeStyle = '#5a5a5a'; x.lineWidth = 1;
-    for (let g = 0; g <= S; g += 16) {
+    // Recessed channels with raised pads — reads as machined plate.
+    x.strokeStyle = '#6a6a6a'; x.lineWidth = 2;
+    for (let g = 0; g <= S; g += 32) {
       x.beginPath(); x.moveTo(g, 0); x.lineTo(g, S); x.stroke();
       x.beginPath(); x.moveTo(0, g); x.lineTo(S, g); x.stroke();
     }
-    x.fillStyle = '#b4b4b4';
-    for (let gx = 8; gx < S; gx += 32) for (let gy = 8; gy < S; gy += 32) x.fillRect(gx - 2, gy - 2, 4, 4);
-  } else if (kind === 'speckle') {
-    for (let i = 0; i < 2600; i++) {
-      const v = Math.random() > 0.5 ? 200 : 60;
-      x.fillStyle = 'rgba(' + v + ',' + v + ',' + v + ',0.5)';
-      x.fillRect(Math.random() * S, Math.random() * S, 1.6, 1.6);
+    x.fillStyle = '#a4a4a4';
+    for (let gx = 16; gx < S; gx += 32) for (let gy = 16; gy < S; gy += 32) {
+      x.beginPath(); x.arc(gx, gy, 4.5, 0, Math.PI * 2); x.fill();
     }
-  } else {                                   // matte — soft blotches
-    for (let i = 0; i < 220; i++) {
-      const v = 100 + Math.random() * 70;
-      x.fillStyle = 'rgba(' + v + ',' + v + ',' + v + ',0.25)';
+  } else if (kind === 'speckle') {
+    for (let i = 0; i < 3200; i++) {
+      const r = 0.8 + Math.random() * 2.6;
+      const v = Math.random() > 0.5 ? 168 : 96;
+      x.fillStyle = 'rgba(' + v + ',' + v + ',' + v + ',0.45)';
+      x.beginPath(); x.arc(Math.random() * S, Math.random() * S, r, 0, Math.PI * 2); x.fill();
+    }
+  } else {                                   // matte — soft cast blotches
+    for (let i = 0; i < 300; i++) {
+      const v = 108 + Math.random() * 52;
+      x.fillStyle = 'rgba(' + v + ',' + v + ',' + v + ',0.20)';
       x.beginPath();
-      x.arc(Math.random() * S, Math.random() * S, 3 + Math.random() * 12, 0, Math.PI * 2);
+      x.arc(Math.random() * S, Math.random() * S, 4 + Math.random() * 16, 0, Math.PI * 2);
       x.fill();
     }
   }
+  return { canvas: c, ctx: x, S };
+}
 
-  const t = new THREE.CanvasTexture(c);
-  t.wrapS = t.wrapT = THREE.RepeatWrapping;
-  t.repeat.set(1.15, 1.15);
-  texCache[kind] = t;
-  return t;
+/* Sobel the height field into a tangent-space normal map. This is what makes
+   the faces stop reading as flat colour: the shading now varies per texel
+   because the normals do, rather than only the specular response. */
+function normalFrom(height, strength) {
+  const { S } = height;
+  const src = height.ctx.getImageData(0, 0, S, S).data;
+  const out = document.createElement('canvas');
+  out.width = out.height = S;
+  const ox = out.getContext('2d');
+  const img = ox.createImageData(S, S);
+  const at = (X, Y) => src[(((Y + S) % S) * S + ((X + S) % S)) * 4] / 255;
+
+  for (let y = 0; y < S; y++) {
+    for (let x = 0; x < S; x++) {
+      const dx = (at(x - 1, y - 1) + 2 * at(x - 1, y) + at(x - 1, y + 1))
+               - (at(x + 1, y - 1) + 2 * at(x + 1, y) + at(x + 1, y + 1));
+      const dy = (at(x - 1, y - 1) + 2 * at(x, y - 1) + at(x + 1, y - 1))
+               - (at(x - 1, y + 1) + 2 * at(x, y + 1) + at(x + 1, y + 1));
+      let nx = dx * strength, ny = dy * strength, nz = 1;
+      const len = Math.hypot(nx, ny, nz);
+      nx /= len; ny /= len; nz /= len;
+      const i = (y * S + x) * 4;
+      img.data[i]     = (nx * 0.5 + 0.5) * 255;
+      img.data[i + 1] = (ny * 0.5 + 0.5) * 255;
+      img.data[i + 2] = (nz * 0.5 + 0.5) * 255;
+      img.data[i + 3] = 255;
+    }
+  }
+  ox.putImageData(img, 0, 0);
+  return out;
+}
+
+function surfaceMaps(kind) {
+  if (texCache[kind]) return texCache[kind];
+  const S = 256;
+  const height = heightField(kind, S);
+
+  const rough = new THREE.CanvasTexture(height.canvas);
+  const normal = new THREE.CanvasTexture(normalFrom(height, kind === 'grid' ? 2.2 : 1.3));
+  for (const t of [rough, normal]) {
+    t.wrapS = t.wrapT = THREE.RepeatWrapping;
+    t.repeat.set(2.6, 2.6);
+    t.anisotropy = 4;
+  }
+  texCache[kind] = { rough, normal };
+  return texCache[kind];
+}
+
+/* Chamfered cube. Sharp box corners have no facet to catch a highlight, so
+   every edge died into the neighbouring face. Rounding the corners gives each
+   edge a bright rim and the stack reads as objects rather than a painted wall.
+   three.js keeps RoundedBoxGeometry in examples/, so it is built here. */
+function roundedBox(size, radius, seg) {
+  const g = new THREE.BoxGeometry(size, size, size, seg, seg, seg);
+  const pos = g.attributes.position;
+  const half = size / 2 - radius;
+  const v = new THREE.Vector3();
+  for (let i = 0; i < pos.count; i++) {
+    v.fromBufferAttribute(pos, i);
+    const ix = Math.max(-half, Math.min(half, v.x));
+    const iy = Math.max(-half, Math.min(half, v.y));
+    const iz = Math.max(-half, Math.min(half, v.z));
+    const dx = v.x - ix, dy = v.y - iy, dz = v.z - iz;
+    const d = Math.hypot(dx, dy, dz) || 1;
+    pos.setXYZ(i, ix + (dx / d) * radius, iy + (dy / d) * radius, iz + (dz / d) * radius);
+  }
+  g.computeVertexNormals();
+  return g;
 }
 
 export function mountWell(opts) {
@@ -112,6 +180,8 @@ export function mountWell(opts) {
     canvas, antialias: true, alpha: true, powerPreference: 'high-performance'
   });
   renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.75));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.32;
 
@@ -151,6 +221,13 @@ export function mountWell(opts) {
 
   const key = new THREE.DirectionalLight(0xeaf3ff, 2.6);
   key.position.set(6, 14, 8);
+  key.castShadow = true;
+  key.shadow.mapSize.set(1024, 1024);
+  key.shadow.camera.left = -12; key.shadow.camera.right = 12;
+  key.shadow.camera.top = 16;   key.shadow.camera.bottom = -4;
+  key.shadow.camera.near = 1;   key.shadow.camera.far = 44;
+  key.shadow.bias = -0.0016;
+  key.shadow.normalBias = 0.02;
   scene.add(key);
 
   const rim = new THREE.DirectionalLight(0xffb27a, 2.0);
@@ -182,30 +259,36 @@ export function mountWell(opts) {
     new THREE.MeshStandardMaterial({ color: 0x0d131b, roughness: 0.92, metalness: 0.1 })
   );
   floor.position.y = -0.02;
+  floor.receiveShadow = true;
   scene.add(floor);
 
   /* ── Pieces ── */
-  const CUBE = new THREE.BoxGeometry(0.94, 0.94, 0.94);
-  const EDGES = new THREE.EdgesGeometry(CUBE);
+  const CUBE = roundedBox(0.94, 0.075, 3);
+  // Edge overlay is taken from a plain box so the wireframe stays crisp —
+  // running EdgesGeometry over the chamfered mesh produces a mess of facets.
+  const EDGES = new THREE.EdgesGeometry(new THREE.BoxGeometry(0.94, 0.94, 0.94));
 
   const pieces = items.map((item, i) => {
     const cells = cellsFor(i);
     const look = LOOKS[i % LOOKS.length];
     const group = new THREE.Group();
 
-    const map = surfaceMap(item.tex || look.tex);
+    const maps = surfaceMaps(item.tex || look.tex);
     const body = new THREE.MeshStandardMaterial({
       color: item.color || look.color,
       roughness: look.rough,
       metalness: look.metal,
-      roughnessMap: map,
-      metalnessMap: map,
-      envMapIntensity: 0.5,
+      roughnessMap: maps.rough,
+      aoMap: maps.rough,
+      aoMapIntensity: 0.25,
+      normalMap: maps.normal,
+      normalScale: new THREE.Vector2(0.32, 0.32),
+      envMapIntensity: 0.6,
       emissive: 0x000000,
       emissiveIntensity: 1
     });
     const edge = new THREE.LineBasicMaterial({
-      color: 0xffffff, transparent: true, opacity: 0.32
+      color: 0xffffff, transparent: true, opacity: 0.14
     });
 
     // Cells are absolute in the well; the group origin is the piece centroid
@@ -217,6 +300,8 @@ export function mountWell(opts) {
     cells.forEach(([c, r]) => {
       const m = new THREE.Mesh(CUBE, body);
       m.position.set(c - cx, r - cy, 0);
+      m.castShadow = true;
+      m.receiveShadow = true;
       group.add(m);
       const l = new THREE.LineSegments(EDGES, edge);
       l.position.copy(m.position);
@@ -361,7 +446,7 @@ export function mountWell(opts) {
       // Lift the piece's own hue rather than pushing every piece to one colour.
       u.body.color.copy(u.baseColor).offsetHSL(0, u.hover * 0.10, u.hover * 0.16);
       u.body.emissive.copy(u.baseColor).multiplyScalar(0.30 * u.hover);
-      u.edge.opacity = 0.24 + t * 0.14 + u.hover * 0.55;
+      u.edge.opacity = 0.10 + t * 0.06 + u.hover * 0.45;
     }
 
     // Camera rises with the build and pulls back only enough to keep the
