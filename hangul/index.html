@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>한글 · Hangul Trainer</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <span class="brand-kr">한글</span>
+    <span class="brand-en">Hangul Trainer</span>
+  </div>
+  <nav class="tabs" id="tabs">
+    <button data-view="learn"   class="tab">Learn</button>
+    <button data-view="chart"   class="tab">Chart</button>
+    <button data-view="build"   class="tab">Syllables</button>
+    <button data-view="batchim" class="tab">Batchim</button>
+    <button data-view="rules"   class="tab">Rules</button>
+    <button data-view="words"   class="tab">Words</button>
+    <button data-view="verbs"   class="tab">Verbs</button>
+    <button data-view="sent"    class="tab">Sentences</button>
+    <button data-view="drill"   class="tab">Practice</button>
+    <button data-view="stats"   class="tab">Progress</button>
+  </nav>
+  <div class="top-right">
+    <div class="vol" id="volWrap">
+      <button id="volIcon" class="ghost icon" title="Mute  ·  M" aria-label="Mute">&#128266;</button>
+      <input type="range" id="volSlider" min="0" max="100" step="1" value="50"
+             aria-label="Playback volume" title="Playback volume, independent of your system volume  ·  [ and ]">
+      <span id="volLabel">100%</span>
+    </div>
+    <button id="romToggle" class="ghost" title="Show or hide romanization  ·  R">
+      <span class="dot"></span><span id="romLabel">Romanization off</span>
+    </button>
+    <button id="themeToggle" class="ghost icon" title="Light / dark">◐</button>
+  </div>
+</header>
+
+<div id="audioWarn" class="audio-warn" hidden>
+  <strong>Audio files aren’t loading.</strong>
+  <span>Falling back to your browser’s speech engine. For the pre-recorded voice, open the folder and double-click <code>start.command</code>.</span>
+  <button class="ghost sm" onclick="this.parentNode.hidden=true">Dismiss</button>
+</div>
+
+<main id="main">
+
+  <!-- ═══════════════════════════════════════════════════ LEARN ═══ -->
+  <section class="view" data-view="learn">
+    <div class="intro">
+      <h1>Hangul is a system, not an alphabet to memorise</h1>
+      <p>Sejong designed these shapes in 1443 to be learnable in a morning. Consonants are pictures of your mouth. Vowels are built from three strokes. Adding a stroke adds a puff of air; doubling a letter tightens it. Learn the seven groups below in order and the other thirty-odd letters come almost free.</p>
+    </div>
+    <div class="lesson-rail" id="lessonRail"></div>
+    <div id="lessonBody"></div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════ CHART ═══ -->
+  <section class="view" data-view="chart">
+    <div class="intro">
+      <h1>The complete chart</h1>
+      <p>All forty letters on one screen. Click any letter to hear it; click again for its name. The arrows show what each letter is derived from — the whole logic of the script in one picture.</p>
+    </div>
+    <div id="chartBody"></div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════ SYLLABLES ═══ -->
+  <section class="view" data-view="build">
+    <div class="intro">
+      <h1>Blocks, not letters</h1>
+      <p>Korean stacks letters into square syllable blocks. Reading fluently means seeing the block, not decoding its parts. Build one below, or work across the full grid — every one of the 399 combinations has real recorded audio.</p>
+    </div>
+    <div id="builder"></div>
+    <div id="gridBody"></div>
+  </section>
+
+  <!-- ═════════════════════════════════════════════════ BATCHIM ═══ -->
+  <section class="view" data-view="batchim">
+    <div class="intro">
+      <h1>받침 — the closing consonant</h1>
+      <p>The single biggest stumbling block for self-taught readers. Twenty-seven different letters can sit at the bottom of a block, but they only make <strong>seven</strong> sounds. And none of them are released — you form the shape and stop, without letting a vowel leak out after it.</p>
+    </div>
+    <div id="batchimBody"></div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════ RULES ═══ -->
+  <section class="view" data-view="rules">
+    <div class="intro">
+      <h1>Why it isn’t said how it’s spelled</h1>
+      <p>Korean spelling preserves the <em>meaning</em> of a word, then seven rules reshape it in the mouth. Once you know them, the gap between the page and the sound closes. Play both sides of each example and listen for the shift.</p>
+    </div>
+    <div id="rulesBody"></div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════ WORDS ═══ -->
+  <section class="view" data-view="words">
+    <div class="intro">
+      <h1>Words</h1>
+      <p>Four graded reading sets, then everyday vocabulary by topic. Read each word aloud <em>before</em> you play it — the guess is where the learning happens. Search matches Hangul, romanization or the English meaning.</p>
+    </div>
+    <div id="wordsBody"></div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════ VERBS ═══ -->
+  <section class="view" data-view="verbs">
+    <div class="intro">
+      <h1>Verbs, and how they bend</h1>
+      <p>Korean verbs carry the tense, the politeness and often the whole sentence. Every one of them ends in 다 in the dictionary, and everything else is built by swapping that ending. Learn the seven rules below and 170 verbs become a few thousand usable forms.</p>
+    </div>
+    <div id="verbRules"></div>
+    <div id="verbBody"></div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════ SENTENCES ═══ -->
+  <section class="view" data-view="sent">
+    <div class="intro">
+      <h1>Putting it together</h1>
+      <p>Korean marks each part of a sentence with a particle rather than by where it sits, and the verb always comes last. Once that clicks, sentences stop being word order to memorise and become slots to fill.</p>
+    </div>
+    <div id="sentBody"></div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════ PRACTICE ═══ -->
+  <section class="view" data-view="drill">
+    <div id="drillHome"></div>
+    <div id="drillSession" hidden></div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════ PROGRESS ═══ -->
+  <section class="view" data-view="stats">
+    <div class="intro">
+      <h1>Progress</h1>
+      <p>Everything you review is scheduled by a spaced-repetition algorithm: get it right and it comes back later, miss it and it comes back sooner. Your data lives in this browser — export it regularly if it matters to you.</p>
+    </div>
+    <div id="statsBody"></div>
+  </section>
+
+</main>
+
+<div id="toast" class="toast" hidden></div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
