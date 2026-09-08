@@ -13,16 +13,89 @@
        pointer actually changed something */
 import * as THREE from './vendor/three.module.min.js';
 
-const SHAPES = {
-  // offsets in cells, origin at piece centre
-  I: [[-1.5, 0], [-0.5, 0], [0.5, 0], [1.5, 0]],
-  O: [[-0.5, 0.5], [0.5, 0.5], [-0.5, -0.5], [0.5, -0.5]],
-  T: [[-1, 0], [0, 0], [1, 0], [0, -1]],
-  L: [[-0.5, 1], [-0.5, 0], [-0.5, -1], [0.5, -1]],
-  S: [[-1, -0.5], [0, -0.5], [0, 0.5], [1, 0.5]],
-  J: [[0.5, 1], [0.5, 0], [0.5, -1], [-0.5, -1]]
-};
-const ORDER = ['I', 'L', 'T', 'S', 'O', 'J'];
+/* Packing, not a random pile.
+   Cells are [col, row] in a 4-wide well, row 0 at the bottom. The first five
+   pieces tile rows 0-4 exactly — 5 tetrominoes, 20 cells, no gaps — so the
+   stack closes into a solid slab instead of a scatter. Anything beyond five
+   lands as a clean bar on the next row up. */
+const PACKING = [
+  [[0, 0], [1, 0], [2, 0], [2, 1]],   // J across the floor, turning up
+  [[3, 0], [3, 1], [3, 2], [2, 2]],   // L up the right wall, turning in
+  [[0, 1], [1, 1], [0, 2], [1, 2]],   // O filling the left pocket
+  [[0, 3], [1, 3], [2, 3], [3, 3]],   // I capping row 3
+  [[0, 4], [1, 4], [2, 4], [3, 4]]    // I capping row 4
+];
+const WELL_W = 4;
+
+function cellsFor(i) {
+  if (i < PACKING.length) return PACKING[i];
+  const row = 5 + (i - PACKING.length);
+  return [[0, row], [1, row], [2, row], [3, row]];
+}
+
+/* Material identity per project. Muted enough to stay cinematic — these read
+   as anodised, brushed and glazed surfaces, not as primaries. */
+const LOOKS = [
+  { color: 0x5f9bd8, rough: 0.32, metal: 0.55, tex: 'brushed' },  // steel blue
+  { color: 0xe0ae3c, rough: 0.40, metal: 0.50, tex: 'grid'    },  // brass
+  { color: 0x2fc0a8, rough: 0.26, metal: 0.24, tex: 'speckle' },  // teal glaze
+  { color: 0xd66e8c, rough: 0.54, metal: 0.12, tex: 'matte'   },  // rose ceramic
+  { color: 0x8b74e0, rough: 0.32, metal: 0.38, tex: 'brushed' },  // violet
+  { color: 0xd4ab78, rough: 0.62, metal: 0.10, tex: 'matte'   }   // sand
+];
+
+/* Procedural surface maps. Drawn once into a small canvas and reused as a
+   roughness map, so the light breaks up across a face instead of reading as
+   flat plastic. No image files, no extra requests. */
+const texCache = {};
+function surfaceMap(kind) {
+  if (texCache[kind]) return texCache[kind];
+  const S = 128;
+  const c = document.createElement('canvas');
+  c.width = c.height = S;
+  const x = c.getContext('2d');
+
+  x.fillStyle = '#808080';
+  x.fillRect(0, 0, S, S);
+
+  if (kind === 'brushed') {
+    for (let i = 0; i < 900; i++) {
+      const y = Math.random() * S;
+      const v = 110 + Math.random() * 90;
+      x.strokeStyle = 'rgb(' + v + ',' + v + ',' + v + ')';
+      x.lineWidth = 0.5 + Math.random();
+      x.beginPath(); x.moveTo(0, y); x.lineTo(S, y + (Math.random() - 0.5) * 3); x.stroke();
+    }
+  } else if (kind === 'grid') {
+    x.strokeStyle = '#5a5a5a'; x.lineWidth = 1;
+    for (let g = 0; g <= S; g += 16) {
+      x.beginPath(); x.moveTo(g, 0); x.lineTo(g, S); x.stroke();
+      x.beginPath(); x.moveTo(0, g); x.lineTo(S, g); x.stroke();
+    }
+    x.fillStyle = '#b4b4b4';
+    for (let gx = 8; gx < S; gx += 32) for (let gy = 8; gy < S; gy += 32) x.fillRect(gx - 2, gy - 2, 4, 4);
+  } else if (kind === 'speckle') {
+    for (let i = 0; i < 2600; i++) {
+      const v = Math.random() > 0.5 ? 200 : 60;
+      x.fillStyle = 'rgba(' + v + ',' + v + ',' + v + ',0.5)';
+      x.fillRect(Math.random() * S, Math.random() * S, 1.6, 1.6);
+    }
+  } else {                                   // matte — soft blotches
+    for (let i = 0; i < 220; i++) {
+      const v = 100 + Math.random() * 70;
+      x.fillStyle = 'rgba(' + v + ',' + v + ',' + v + ',0.25)';
+      x.beginPath();
+      x.arc(Math.random() * S, Math.random() * S, 3 + Math.random() * 12, 0, Math.PI * 2);
+      x.fill();
+    }
+  }
+
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(1.15, 1.15);
+  texCache[kind] = t;
+  return t;
+}
 
 export function mountWell(opts) {
   const stage = opts.stage;
@@ -40,18 +113,43 @@ export function mountWell(opts) {
   });
   renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.75));
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.35;
+  renderer.toneMappingExposure = 1.32;
 
   const scene = new THREE.Scene();
   scene.fog = new THREE.FogExp2(0x0a0d12, 0.032);
+
+  {
+    const ec = document.createElement('canvas');
+    ec.width = 256; ec.height = 128;
+    const ex = ec.getContext('2d');
+    const g = ex.createLinearGradient(0, 0, 0, 128);
+    g.addColorStop(0.00, '#0a1420');   // zenith
+    g.addColorStop(0.42, '#33546f');   // upper sky
+    g.addColorStop(0.52, '#8fb4d4');   // horizon band, the specular highlight
+    g.addColorStop(0.60, '#7a4a2e');   // warm underside
+    g.addColorStop(1.00, '#0b0c10');   // ground
+    ex.fillStyle = g; ex.fillRect(0, 0, 256, 128);
+    // A couple of bright patches so reflections have something to travel across.
+    ex.fillStyle = 'rgba(255,255,255,0.32)';
+    ex.beginPath(); ex.ellipse(70, 52, 26, 9, 0, 0, Math.PI * 2); ex.fill();
+    ex.fillStyle = 'rgba(255,186,130,0.24)';
+    ex.beginPath(); ex.ellipse(196, 60, 20, 7, 0, 0, Math.PI * 2); ex.fill();
+
+    const envTex = new THREE.CanvasTexture(ec);
+    envTex.mapping = THREE.EquirectangularReflectionMapping;
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    scene.environment = pmrem.fromEquirectangular(envTex).texture;
+    pmrem.dispose();
+    envTex.dispose();
+  }
 
   const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 200);
 
   /* ── Light: cold key, warm rim, dim fill. Kept to three so the frame cost
         stays flat regardless of how many pieces are on screen. ── */
-  scene.add(new THREE.HemisphereLight(0xa8c8ea, 0x121a24, 0.95));
+  scene.add(new THREE.HemisphereLight(0xbcd8f2, 0x1a2430, 1.25));
 
-  const key = new THREE.DirectionalLight(0xeaf3ff, 3.1);
+  const key = new THREE.DirectionalLight(0xeaf3ff, 2.6);
   key.position.set(6, 14, 8);
   scene.add(key);
 
@@ -60,9 +158,17 @@ export function mountWell(opts) {
   scene.add(rim);
 
   // Cool bounce from beneath so the undersides don't go to pure black.
-  const fill = new THREE.DirectionalLight(0x5f86b5, 0.9);
+  const fill = new THREE.DirectionalLight(0x5f86b5, 0.8);
   fill.position.set(-3, -6, 5);
   scene.add(fill);
+
+  // Two close point lights travel with the stack. Metals need something to
+  // reflect — with only distant directionals the brushed and grid maps had
+  // nothing to catch and read as flat paint.
+  const spark = new THREE.PointLight(0xbfe0ff, 26, 26, 2);
+  scene.add(spark);
+  const sparkWarm = new THREE.PointLight(0xffb98a, 18, 22, 2);
+  scene.add(sparkWarm);
 
   /* ── Floor: a faint grid the stack lands on, fading into fog ── */
   const grid = new THREE.GridHelper(70, 70, 0x2b3a4d, 0x18222e);
@@ -83,33 +189,48 @@ export function mountWell(opts) {
   const EDGES = new THREE.EdgesGeometry(CUBE);
 
   const pieces = items.map((item, i) => {
-    const shape = SHAPES[ORDER[i % ORDER.length]];
+    const cells = cellsFor(i);
+    const look = LOOKS[i % LOOKS.length];
     const group = new THREE.Group();
 
+    const map = surfaceMap(item.tex || look.tex);
     const body = new THREE.MeshStandardMaterial({
-      color: 0xb9cde2, roughness: 0.26, metalness: 0.42,
-      emissive: 0x16222f, emissiveIntensity: 1
+      color: item.color || look.color,
+      roughness: look.rough,
+      metalness: look.metal,
+      roughnessMap: map,
+      metalnessMap: map,
+      envMapIntensity: 0.5,
+      emissive: 0x000000,
+      emissiveIntensity: 1
     });
-    const edge = new THREE.LineBasicMaterial({ color: 0xe6f2ff, transparent: true, opacity: 0.5 });
+    const edge = new THREE.LineBasicMaterial({
+      color: 0xffffff, transparent: true, opacity: 0.32
+    });
 
-    shape.forEach(([cx, cy]) => {
+    // Cells are absolute in the well; the group origin is the piece centroid
+    // so it spins about itself on the way down and still lands on the grid.
+    let cx = 0, cy = 0;
+    cells.forEach(([c, r]) => { cx += c; cy += r; });
+    cx /= cells.length; cy /= cells.length;
+
+    cells.forEach(([c, r]) => {
       const m = new THREE.Mesh(CUBE, body);
-      m.position.set(cx, cy, 0);
+      m.position.set(c - cx, r - cy, 0);
       group.add(m);
       const l = new THREE.LineSegments(EDGES, edge);
       l.position.copy(m.position);
       group.add(l);
     });
 
-    // Where the piece comes to rest: stacked bottom-up, alternating offset so
-    // the stack reads as a built structure rather than a column.
-    const restY = 0.9 + i * 2.05;
-    const restX = (i % 2 === 0 ? -1 : 1) * (0.7 + (i % 3) * 0.5);
+    const restX = cx - (WELL_W - 1) / 2;      // centre the well on the origin
+    const restY = cy + 0.5;
 
     group.userData = {
       item, body, edge, index: i,
       restY, restX,
-      startY: restY + 22 + i * 2,
+      baseColor: new THREE.Color(item.color || look.color),
+      startY: restY + 20 + i * 1.6,
       spin: (i % 2 ? 1 : -1) * (0.6 + (i % 3) * 0.35),
       hover: 0, lock: 0
     };
@@ -118,7 +239,7 @@ export function mountWell(opts) {
     return group;
   });
 
-  const stackTop = 0.9 + (pieces.length - 1) * 2.05;
+  const stackTop = Math.max(...pieces.map(p => p.userData.restY)) + 1.2;
 
   /* ── Dust: cheap depth cue, one draw call ── */
   const dustN = 260;
@@ -237,18 +358,25 @@ export function mountWell(opts) {
       u.hover += (hv - u.hover) * 0.16;
       if (Math.abs(hv - u.hover) > 0.002) dirty = true;
 
-      u.body.color.setHSL(0.57, 0.16 + u.hover * 0.24, 0.62 + u.hover * 0.18);
-      u.body.emissiveIntensity = 1 + u.hover * 2.2;
-      u.body.emissive.setHex(u.hover > 0.02 ? 0x2b4a63 : 0x0a1018);
-      u.edge.opacity = 0.42 + t * 0.2 + u.hover * 0.4;
+      // Lift the piece's own hue rather than pushing every piece to one colour.
+      u.body.color.copy(u.baseColor).offsetHSL(0, u.hover * 0.10, u.hover * 0.16);
+      u.body.emissive.copy(u.baseColor).multiplyScalar(0.30 * u.hover);
+      u.edge.opacity = 0.24 + t * 0.14 + u.hover * 0.55;
     }
 
-    // Camera pulls back and rises as the stack grows.
-    const cy = 4.5 + progress * (stackTop * 0.72);
-    const cz = 15 + progress * 12;
-    const orbit = -0.5 + progress * 1.05 + parX * 0.5;
-    camera.position.set(Math.sin(orbit) * cz, cy + parY * 2.2, Math.cos(orbit) * cz);
-    camera.lookAt(0, Math.min(cy - 1.5, stackTop * 0.55), 0);
+    // Camera rises with the build and pulls back only enough to keep the
+    // whole slab in frame. Sized against stackTop so it stays framed if the
+    // number of projects changes.
+    const cy = 1.6 + progress * (stackTop * 0.62);
+    const cz = stackTop * 1.55 + progress * stackTop * 0.55;
+    const orbit = -0.62 + progress * 1.15 + parX * 0.45;
+    camera.position.set(Math.sin(orbit) * cz, cy + parY * 1.6, Math.cos(orbit) * cz);
+    camera.lookAt(0, 0.7 + progress * stackTop * 0.42, 0);
+
+    // Keep the practicals near whatever is currently being built.
+    const focus = 1.2 + progress * stackTop * 0.85;
+    spark.position.set(3.4, focus + 2.6, 4.2);
+    sparkWarm.position.set(-4.0, focus - 0.6, -3.2);
 
     dust.rotation.y += 0.0006;
 
