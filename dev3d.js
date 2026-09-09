@@ -361,10 +361,15 @@ export function mountWell(opts) {
      wait above the frame until you scroll. Against the old black ground that
      was fine — a dark void reads as deliberate. A lit room reads as unfinished.
 
-     So a dozen unlabelled blanks drift in the room at rest and fade out as
-     the build takes over. They are deliberately neutral: the six project
-     colours carry identity, and giving these the same palette would imply
-     they mean something. They are set dressing, and they say so. */
+     So ten unlabelled blanks drift in the room at rest and fade out as the
+     build takes over.
+
+     They get their own cube, not the project one. The project cube is 0.99 on
+     a 1.0 grid with a small chamfer, because those pieces tile into a solid
+     slab and any gap would show the floor through the joints. These never
+     tile, so they want the opposite: a wider gap and a rounder chamfer, which
+     is what puts a visible groove between the cells and a highlight along
+     every edge. Without that they read as flat paper cut-outs. */
   const AMB_SHAPES = [
     [[0, 0], [1, 0], [2, 0], [2, 1]],
     [[0, 0], [0, 1], [1, 1], [1, 2]],
@@ -372,55 +377,104 @@ export function mountWell(opts) {
     [[0, 0], [1, 0], [2, 0], [1, 1]],
     [[1, 0], [2, 0], [0, 1], [1, 1]]
   ];
-  const AMB_TONES = [0xd6ccbc, 0xe3dbcd, 0xc9bfae];
+  /* Mostly warm neutral so the labelled pieces keep colour identity, but not
+     colourless — an all-white field reads as unfinished greyboxing. Three
+     accents, spaced around the ring so at least one is in frame. */
+  const AMB_TONES = [0xdcd3c4, 0xc9553f, 0xe4dcce, 0xcbc0ae, 0x5a83a8, 0xded6c7,
+                     0xc9bfad, 0x3f8d7d, 0xe1d9cb, 0xd2c8b7];
+  const AMB_TEX   = ['matte', 'brushed', 'speckle', 'matte', 'brushed',
+                     'speckle', 'matte', 'brushed', 'matte', 'speckle'];
+  const AMB_CUBE = roundedBox(0.88, 0.11, 3);
+  const AMB_SCALE = 0.62;
   const ambRng = makeRng(0x2f19);
   const ambientRoot = new THREE.Group();
   scene.add(ambientRoot);
 
   const ambient = [];
-  for (let i = 0; i < 10; i++) {
+  let nearIdx = 0;
+  for (let i = 0; i < 14; i++) {
     const cells = AMB_SHAPES[i % AMB_SHAPES.length];
     let ax = 0, ay = 0;
     cells.forEach(([c, r]) => { ax += c; ay += r; });
     ax /= cells.length; ay /= cells.length;
 
+    // Same procedural surface treatment as the project pieces. Plain matte
+    // colour reads as untextured plastic once the ground is this bright.
+    const maps = surfaceMaps(AMB_TEX[i % AMB_TEX.length]);
     const mat = new THREE.MeshStandardMaterial({
       color: AMB_TONES[i % AMB_TONES.length],
-      roughness: 0.66, metalness: 0.03, envMapIntensity: 0.20,
+      roughness: 0.62, metalness: 0.05, envMapIntensity: 0.22,
+      roughnessMap: maps.rough,
+      normalMap: maps.normal,
+      normalScale: new THREE.Vector2(0.18, 0.18),
       transparent: true, opacity: 0
     });
+
     const g = new THREE.Group();
+    const local = [];
     let far = 0;
     cells.forEach(([c, r]) => {
-      const m = new THREE.Mesh(CUBE, mat);
+      const m = new THREE.Mesh(AMB_CUBE, mat);
       m.position.set(c - ax, r - ay, 0);
       m.castShadow = true; m.receiveShadow = true;
       g.add(m);
-      far = Math.max(far, Math.hypot(m.position.x, m.position.y));
+      local.push(m.position.clone());
+      far = Math.max(far, m.position.length());
     });
-    /* Scaled down, for two reasons. They are set dressing and should not
-       read at the same weight as a labelled project piece. And the floor
-       clamp works off the bounding sphere — a piece can never sit lower than
-       its own radius — so at full size nothing could come near the ground and
-       every blank was stuck in the top of the frame. */
-    const AMB_SCALE = 0.68;
     g.scale.setScalar(AMB_SCALE);
+
     g.userData = {
-      mat,
-      // Outermost cube centre plus that cube's half-diagonal, scaled with the
-      // group. Everything below keeps pieces apart by this, so nothing
-      // intersects and nothing sinks through the floor.
-      radius: (far + 0.99 * 0.87) * AMB_SCALE,
+      mat, local,
+      // Bounding radius, used for separation only. The floor uses the true
+      // lowest corner instead — see settleAmbient.
+      radius: (far + 0.88 * 0.87) * AMB_SCALE,
+      cubeDrop: 0.88 * 0.87 * AMB_SCALE,
       // Golden angle: keying radius and height off the same index as the
       // angle makes them correlate, and the pieces bunch into one arc.
       a: i * 2.39996,
-      rad: 3.3 + ((i * 7) % 4) * 1.45,
-      y0: 1.30 + ((i * 3) % 5) * 0.52,
-      depth: -0.6 - ((i * 5) % 4) * 1.15,
-      bob: 0.12 + ambRng() * 0.15,
+      /* Two bands, placed in different spaces.
+
+         The far band rides a world-space ring around the origin, which is
+         where the stack builds — that is the background.
+
+         The near band is placed relative to the camera axis instead, because
+         a world ring cannot reliably put anything in the foreground. The view
+         cone is narrow: about 3 units of half-width at 5 units of depth, so a
+         ring wide enough to pass near the lens (6.6+) puts its pieces far off
+         to the sides, and a ring narrow enough to stay in frame never gets
+         close. Measured it — every near piece was 4+ units lateral of the
+         axis, i.e. off screen. Depth, lateral offset and drop below the axis
+         are chosen directly, so these land under the type by construction.
+
+         They ride with the camera, which is fine here: the camera barely
+         moves before they have faded out. */
+      near: i % 3 === 0,
+      rad: 3.6 + ((i * 7) % 4) * 0.95,
+      y0: 2.55 + ((i * 3) % 5) * 0.46,
+      depth: -1.6 - ((i * 5) % 4) * 0.85,
+      /* Near band, in camera space, keyed off its own running index rather
+         than i. Keying off i meant the moduli collided: pieces 0 and 12 drew
+         the same depth, the same lateral offset and the same drop, so they
+         sat inside one another permanently — the separation pass shoved them
+         apart and the placement put them straight back every frame. The audit
+         caught it as a half-unit of overlap that never resolved. */
+      /* Alternating left and right, never near the middle.
+
+         Below the type is not available to them. The floor is at y = 0 and
+         the camera sits at about y = 1.6, so there is only ~1.6 units of
+         world beneath eye level; a piece of this radius resting on the floor
+         still projects a top edge above the headline's lower bound, at any
+         depth. Trying to seat them under the text just produced one parked
+         squarely across it. The frame edges are the space that exists, which
+         is where the reference composition puts them too. */
+      camT:    5.2 + nearIdx * 0.66,
+      camLat: (nearIdx % 2 ? 1 : -1) * (2.45 + (nearIdx % 3) * 0.42),
+      camDrop: 1.45 + (nearIdx % 3) * 0.28,
+      bob: 0.10 + ambRng() * 0.14,
       phase: ambRng() * 6.283,
       spin: new THREE.Vector3((ambRng() - .5) * 0.22, (ambRng() - .5) * 0.30, (ambRng() - .5) * 0.18)
     };
+    if (g.userData.near) nearIdx++;
     g.rotation.set(ambRng() * 3, ambRng() * 3, ambRng() * 3);
     ambientRoot.add(g);
     ambient.push(g);
@@ -518,7 +572,6 @@ export function mountWell(opts) {
 
   const clamp01 = v => Math.min(1, Math.max(0, v));
   const easeOut = t => 1 - Math.pow(1 - t, 3);
-  const smooth = t => t * t * (3 - 2 * t);
 
   /* The headline's exclusion zone, measured from the real elements.
 
@@ -558,56 +611,91 @@ export function mountWell(opts) {
      resolving one can break another — and the loop ends on separation and
      the floor clamp, since a piece cutting through another or sinking into
      the ground is worse than one grazing the type. */
-  const AMB_SOFT = 0.20;
-  const av = new THREE.Vector3(), aRight = new THREE.Vector3(), aUp = new THREE.Vector3();
+  const av = new THREE.Vector3(), aRight = new THREE.Vector3(), aUp = new THREE.Vector3(), aFwd = new THREE.Vector3();
 
   function updateAmbient(tSec, fade) {
     ambientRoot.visible = fade > 0.004;
     if (!ambientRoot.visible) return;
 
+    const fwd = aFwd, right = aRight, up = aUp;
+    right.setFromMatrixColumn(camera.matrixWorld, 0);
+    up.setFromMatrixColumn(camera.matrixWorld, 1);
+    fwd.setFromMatrixColumn(camera.matrixWorld, 2).negate();
+
     for (const g of ambient) {
       const d = g.userData;
       d.mat.opacity = fade;
       const a = d.a + tSec * 0.055;
-      g.position.set(
-        Math.cos(a) * d.rad,
-        d.y0 + Math.sin(tSec * 0.5 + d.phase) * d.bob,
-        Math.sin(a) * d.rad * 0.55 + d.depth
-      );
+      if (d.near) {
+        // Down the view axis, then across and down from it.
+        const lat = d.camLat + Math.sin(tSec * 0.12 + d.phase) * 0.55;
+        g.position.copy(camera.position)
+          .addScaledVector(fwd, d.camT)
+          .addScaledVector(right, lat)
+          .addScaledVector(up, -d.camDrop + Math.sin(tSec * 0.5 + d.phase) * d.bob);
+      } else {
+        g.position.set(
+          Math.cos(a) * d.rad,
+          d.y0 + Math.sin(tSec * 0.5 + d.phase) * d.bob,
+          Math.sin(a) * d.rad * 0.55 + d.depth
+        );
+      }
       if (!reduced) {
         g.rotation.x += d.spin.x * 0.016;
         g.rotation.y += d.spin.y * 0.016;
         g.rotation.z += d.spin.z * 0.016;
       }
+
+      /* Lowest corner under the current rotation, cached for the solver.
+
+         The floor test uses this rather than the bounding sphere. The sphere
+         is what separation needs, but as a floor test it is far too
+         conservative — it can never let a piece sit nearer the ground than
+         its own radius, which pinned every blank above eye level and left the
+         foreground empty. */
+      let low = Infinity;
+      for (const p of d.local) {
+        av.copy(p).applyEuler(g.rotation).multiplyScalar(AMB_SCALE);
+        if (av.y < low) low = av.y;
+      }
+      d.minY = -low + d.cubeDrop;
     }
 
     const z0 = safeZone();
     const p0 = camera.projectionMatrix.elements[0], p5 = camera.projectionMatrix.elements[5];
-    aRight.setFromMatrixColumn(camera.matrixWorld, 0);
-    aUp.setFromMatrixColumn(camera.matrixWorld, 1);
 
-    for (let pass = 0; pass < 4; pass++) {
-      if (z0) for (const g of ambient) {
-        av.copy(g.position).applyMatrix4(camera.matrixWorldInverse);
-        if (av.z > -0.5) continue;                       // behind the lens
-        const dist = -av.z;
-        const nx = (av.x * p0) / dist, ny = (av.y * p5) / dist;
-        // Inflate the zone by part of the piece's projected size: testing
-        // only its centre lets a wide piece hang over the words. Only part,
-        // because the camera sits close here — a piece's full projected
-        // radius is about half the screen, and inflating by all of it grew
-        // the zone past the viewport and swept every blank out of frame.
-        const rx = z0.rx + (g.userData.radius * p0) / dist * 0.45;
-        const ry = z0.ry + (g.userData.radius * p5) / dist * 0.45;
-        let ux = (nx - z0.cx) / rx, uy = (ny - z0.cy) / ry;
-        const dd = Math.hypot(ux, uy), edge = 1 + AMB_SOFT;
-        if (dd >= edge) continue;
-        const m = dd <= 1 ? 1 : smooth((edge - dd) / AMB_SOFT);
-        if (dd < 1e-3) { ux = 0.86; uy = -0.5; } else { ux /= dd; uy /= dd; }
-        g.position.addScaledVector(aRight, ux * (dist / p0) * rx * 0.30 * m);
-        g.position.addScaledVector(aUp,    uy * (dist / p5) * ry * 0.30 * m);
-      }
+    /* Floor and lens clamps, as a step the solver can repeat.
 
+       They used to run once, after every pass had finished, which meant the
+       last thing to touch a position was the floor — and lifting a piece off
+       the ground can push it into a neighbour that separation had already
+       resolved. The audit saw exactly that: a quarter-unit of overlap that
+       never cleared. Running them inside each pass lets separation answer,
+       and the final call after the loop keeps the floor inviolable. */
+    const clampAmbient = () => {
+      for (const g of ambient) {
+        const d = g.userData;
+        // d.minY is the piece's true lowest corner, computed once per frame
+        // in the placement pass — it only depends on rotation, which does not
+        // change inside the solver. Recomputing it per pass cost 22 fps.
+        if (g.position.y < d.minY) g.position.y = d.minY;
+
+        // And never so near the lens that one blank swallows the frame. This
+        // used to be radius + 4.2, which pushed the whole near band back out
+        // of the foreground it exists to fill.
+        av.copy(g.position).sub(camera.position);
+        const dc = av.length(), minC = d.radius + 1.9;
+        if (dc > 1e-4 && dc < minC) g.position.copy(camera.position).addScaledVector(av.multiplyScalar(1 / dc), minC);
+    }
+    };
+
+    /* Ambient separation, as a reusable step so the final block can end on
+       it. Constraints can conflict here — the type wants a piece one way, its
+       neighbour wants it another — and something has to yield last. It is
+       this one that wins, because a piece visibly cutting through another is
+       a defect, whereas a piece grazing the margin around the type is a
+       composition nit the horizontal pass has already minimised. */
+    const separateAmbient = () => {
       for (let i = 0; i < ambient.length; i++) {
         const A = ambient[i], ra = A.userData.radius;
         for (let j = i + 1; j < ambient.length; j++) {
@@ -622,6 +710,52 @@ export function mountWell(opts) {
           B.position.x += dx * push; B.position.y += dy * push; B.position.z += dz * push;
         }
       }
+    };
+
+    for (let pass = 0; pass < 5; pass++) {
+      if (z0) for (const g of ambient) {
+        av.copy(g.position).applyMatrix4(camera.matrixWorldInverse);
+        if (av.z > -0.5) continue;                       // behind the lens
+        const dist = -av.z;
+        const nx = (av.x * p0) / dist, ny = (av.y * p5) / dist;
+        /* A bounding sphere badly overstates an L or S tetromino — the
+           sphere covers corners the geometry never reaches. That is the right
+           error for separation, where being generous just means a little air.
+           It is the wrong error here: at 100% the effective text box grew to
+           most of the screen width and the edge band was ejected every frame.
+           Half of it matches the silhouette much more closely. */
+        const pr = g.userData.radius * 0.5;
+        const px = (pr * p0) / dist, py = (pr * p5) / dist;
+
+        /* Minimum-translation box test, not a radial push out of an ellipse.
+
+           The ellipse version inflated the zone by the piece's projected
+           radius, which is fine for something far away and catastrophic up
+           close: a piece three units from the lens projects a radius of about
+           half the screen, so the inflated zone covered the whole viewport
+           and every foreground blank was flung out of frame. That is why the
+           near band kept vanishing and the space under the headline stayed
+           empty.
+
+           Overlapping the two boxes and moving along the shallower axis only
+           does what is actually wanted — a piece grazing the underside of the
+           type slides down just far enough to clear it, and keeps its place
+           in the composition. */
+        const ox = (z0.rx + px) - Math.abs(nx - z0.cx);
+        if (ox <= 0) continue;
+        const oy = (z0.ry + py) - Math.abs(ny - z0.cy);
+        if (oy <= 0) continue;
+
+        if (oy <= ox) {
+          const dir = (ny >= z0.cy) ? 1 : -1;
+          g.position.addScaledVector(aUp, dir * oy * (dist / p5) * 0.85);
+        } else {
+          const dir = (nx >= z0.cx) ? 1 : -1;
+          g.position.addScaledVector(aRight, dir * ox * (dist / p0) * 0.85);
+        }
+      }
+
+      clampAmbient();
 
       // Project pieces win: the blanks move around them, never the reverse.
       for (const g of ambient) {
@@ -634,15 +768,31 @@ export function mountWell(opts) {
           g.position.x += (dx / d) * push; g.position.y += (dy / d) * push; g.position.z += (dz / d) * push;
         }
       }
+      separateAmbient();
     }
 
-    for (const g of ambient) {
-      const rg = g.userData.radius;
-      if (g.position.y < rg) g.position.y = rg;          // floor is y = 0
-      // And never so near the lens that one blank swallows the frame.
-      av.copy(g.position).sub(camera.position);
-      const dc = av.length(), minC = rg + 4.2;
-      if (dc > 1e-4 && dc < minC) g.position.copy(camera.position).addScaledVector(av.multiplyScalar(1 / dc), minC);
+    clampAmbient();
+
+    /* One last pass on the type, horizontal only.
+
+       The solver ends on separation and the floor clamp, either of which can
+       nudge a piece back across the headline — and it did, leaving one parked
+       on the title. A sideways-only correction cannot undo the floor clamp,
+       so it is safe to run last, and the type always wins. */
+    if (z0) for (let pass = 0; pass < 3; pass++) {
+      for (const g of ambient) {
+        av.copy(g.position).applyMatrix4(camera.matrixWorldInverse);
+        if (av.z > -0.5) continue;
+        const dist = -av.z;
+        const nx = (av.x * p0) / dist, ny = (av.y * p5) / dist;
+        const pr = g.userData.radius * 0.5;   // silhouette, not bounding sphere
+        const ox = (z0.rx + (pr * p0) / dist) - Math.abs(nx - z0.cx);
+        if (ox <= 0) continue;
+        if ((z0.ry + (pr * p5) / dist) - Math.abs(ny - z0.cy) <= 0) continue;
+        g.position.addScaledVector(aRight, (nx >= z0.cx ? 1 : -1) * ox * (dist / p0) * 0.6);
+      }
+      separateAmbient();
+      clampAmbient();
     }
   }
 
