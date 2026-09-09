@@ -382,12 +382,19 @@ export function mountWell(opts) {
     [[0, 0], [1, 0], [2, 0], [1, 1]],
     [[1, 0], [2, 0], [0, 1], [1, 1]]
   ];
-  /* Roughly half accented. All-neutral read as unfinished greyboxing; these
-     stay muted enough that the labelled project pieces still own the colour. */
+  /* Mostly coloured now — rust, blue, teal, purple and amber — with a few
+     neutrals left as rests. All-neutral read as unfinished greyboxing, and
+     half-and-half still read as mostly white. Everything is muted and of
+     similar value so the labelled project pieces keep the loudest colour.
+
+     Ordered so no two neighbouring indices share a family: index maps to a
+     golden-angle position, so a run of one colour here becomes a clump of it
+     on screen. */
   const AMB_TONES = [
-    0xdcd3c4, 0xc9553f, 0xe4dcce, 0x5a83a8, 0xcbc0ae, 0x3f8d7d, 0xded6c7,
-    0xb8683d, 0xd2c8b7, 0x4f7a9c, 0xe1d9cb, 0x4f8f7f, 0xd8cfbf, 0xc9553f,
-    0xcbc0ae, 0x5a83a8, 0xe4dcce, 0x3f8d7d, 0xd2c8b7, 0xb8683d
+    0xdcd3c4, 0xc9553f, 0x5a83a8, 0xe4dcce, 0x7a63b8, 0x3f8d7d, 0xc9a53a,
+    0xcbc0ae, 0xb8683d, 0x4f7a9c, 0x6a55a0, 0xe1d9cb, 0x4f8f7f, 0xb8942e,
+    0xd2c8b7, 0xc9553f, 0x7a63b8, 0x5a83a8, 0xd8cfbf, 0xc9a53a, 0x3f8d7d,
+    0x6a55a0, 0xdcd3c4, 0xb8683d, 0x4f7a9c, 0xb8942e
   ];
   const AMB_TEX = ['matte', 'brushed', 'speckle', 'matte', 'brushed', 'speckle'];
 
@@ -400,7 +407,10 @@ export function mountWell(opts) {
      rounder chamfer to catch light along it. */
   const AMB_CUBE = roundedBox(0.96, 0.105, 3);
   const AMB_SCALE = 0.78;
-  const AMB_COUNT = 26;
+  /* 24, not 23: the radius band is picked by (i * 7) % 8, so a multiple of
+     eight covers every band the same number of times. At 23 the coverage went
+     lopsided and the cloud visibly bunched toward the middle. */
+  const AMB_COUNT = 24;
   const ambRng = makeRng(0x2f19);
   const ambientRoot = new THREE.Group();
   scene.add(ambientRoot);
@@ -443,10 +453,11 @@ export function mountWell(opts) {
       // corner instead, since a sphere can never let a piece near the ground.
       radius: (far + 0.96 * 0.87) * AMB_SCALE,
       cubeDrop: 0.96 * 0.87 * AMB_SCALE,
-      a: i * 2.39996,                                  // golden angle
-      rad: 3.6 + ((i * 7) % 8) * 1.35,
+      // Base position in the ground plane. The cloud is re-centred on the
+      // origin after the loop, then rotated rigidly — see below.
+      bx: Math.cos(i * 2.39996) * (3.6 + ((i * 7) % 8) * 1.35),
+      bz: Math.sin(i * 2.39996) * (3.6 + ((i * 7) % 8) * 1.35) * (0.55 + ((i * 11) % 5) * 0.13),
       y0: 1.1 + ((i * 5) % 9) * 0.60,
-      depth: -0.6 - ((i * 11) % 8) * 1.5,
       bob: 0.10 + ambRng() * 0.16,
       phase: ambRng() * 6.283,
       spin: new THREE.Vector3((ambRng() - .5) * 0.20, (ambRng() - .5) * 0.28, (ambRng() - .5) * 0.16)
@@ -454,6 +465,25 @@ export function mountWell(opts) {
     g.rotation.set(ambRng() * 3, ambRng() * 3, ambRng() * 3);
     ambientRoot.add(g);
     ambient.push(g);
+  }
+
+  /* Centre the cloud on the point the camera actually looks at.
+
+     Each piece used to carry a `depth` offset that only ever pushed it away
+     from the lens, so the whole cloud's centre of mass sat about six units
+     behind the aim point — measured at (-0.97, 3.57, -5.74) against a look-at
+     of (0, 0.7, 0). On screen that reads as the drift being off-centre and
+     weighted to one side, which it was.
+
+     Subtracting the mean of the base positions fixes it exactly, and because
+     every piece then orbits the origin at the same angular rate, the cloud is
+     a rigid rotation about that centre — so it stays centred for all time
+     rather than only at t = 0. */
+  {
+    let mx = 0, mz = 0;
+    for (const g of ambient) { mx += g.userData.bx; mz += g.userData.bz; }
+    mx /= ambient.length; mz /= ambient.length;
+    for (const g of ambient) { g.userData.bx -= mx; g.userData.bz -= mz; }
   }
 
   /* ── Dust: cheap depth cue, one draw call ── */
@@ -569,7 +599,7 @@ export function mountWell(opts) {
       l = Math.min(l, q.left - box.left); r = Math.max(r, q.right - box.left);
       t = Math.min(t, q.top - box.top);   b = Math.max(b, q.bottom - box.top);
     }
-    const px = w * 0.03, py = h * 0.05;
+    const px = w * 0.045, py = h * 0.075;   // breathing room around the glyphs
     l -= px; r += px; t -= py; b += py;
     return (zoneVal = {
       cx: ((l + r) / 2 / w) * 2 - 1,
@@ -612,11 +642,12 @@ export function mountWell(opts) {
     for (const g of ambient) {
       const d = g.userData;
       d.mat.opacity = fade;
-      const a = d.a + tSec * 0.05;
+      // Rigid rotation of the mean-centred cloud about the aim point.
+      const th = tSec * 0.05, ct = Math.cos(th), st = Math.sin(th);
       g.position.set(
-        Math.cos(a) * d.rad,
+        d.bx * ct + d.bz * st,
         d.y0 + Math.sin(tSec * 0.5 + d.phase) * d.bob,
-        Math.sin(a) * d.rad * 0.6 + d.depth
+        -d.bx * st + d.bz * ct
       );
       if (!reduced) {
         g.rotation.x += d.spin.x * 0.016;
@@ -645,10 +676,13 @@ export function mountWell(opts) {
         if (av.z < -0.5) {
           const dist = -av.z;
           const nx = (av.x * p0) / dist, ny = (av.y * p5) / dist;
-          // Half the bounding radius: a sphere badly overstates an L
-          // tetromino, and at full radius the effective text box covered most
-          // of the screen and flung every piece out of frame.
-          const pr = d.radius * 0.5;
+          /* A fraction of the bounding radius, not all of it: a sphere badly
+             overstates an L tetromino, and at full radius the effective text
+             box covered most of the screen and flung every piece out of
+             frame. That was measured when the hero camera sat eight units
+             out; it now stands back at about fourteen, so projected radii are
+             smaller and this can afford to be stricter. */
+          const pr = d.radius * 0.78;
           const ox = (z0.rx + (pr * p0) / dist) - Math.abs(nx - z0.cx);
           const oy = (z0.ry + (pr * p5) / dist) - Math.abs(ny - z0.cy);
           if (ox > 0 && oy > 0) need = (nx >= z0.cx ? 1 : -1) * ox * (dist / p0);
@@ -669,6 +703,18 @@ export function mountWell(opts) {
           const d = Math.sqrt(d2), push = min - d;
           g.position.x += (dx / d) * push; g.position.y += (dy / d) * push; g.position.z += (dz / d) * push;
         }
+      }
+
+      /* Never so near the lens that one blank swallows the frame. Dropped
+         during the port from the standalone study, where the camera sits far
+         enough back that it never mattered; here the camera is about eight
+         units out and pitching it up for the hero brought near pieces into
+         shot at enormous size. Unlike the type test this correction fades to
+         zero at its threshold, so it stays smooth. */
+      for (const g of ambient) {
+        av.copy(g.position).sub(camera.position);
+        const dc = av.length(), minC = g.userData.radius + 5.0;
+        if (dc > 1e-4 && dc < minC) g.position.copy(camera.position).addScaledVector(av.multiplyScalar(1 / dc), minC);
       }
 
       for (const g of ambient) {
@@ -741,10 +787,29 @@ export function mountWell(opts) {
     // Closer than it was: the slab sat small in a large empty room once the
     // ground went light, because there is no longer a dark surround to make
     // it feel big.
-    const cz = stackTop * 1.24 + progress * stackTop * 0.40;
+    let cz = stackTop * 1.24 + progress * stackTop * 0.40;
     const orbit = -0.62 + progress * 1.15 + parX * 0.45;
-    camera.position.set(Math.sin(orbit) * cz, cy + parY * 1.6, Math.cos(orbit) * cz);
-    camera.lookAt(0, 0.7 + progress * stackTop * 0.42, 0);
+
+    /* Hero lift: pitch the camera up while the blanks are on screen, so the
+       floor sits far lower in frame.
+
+       The floor cannot simply be moved down — it is the plane the stack lands
+       on, and the lowest cubes rest within a hundredth of a unit of it. What
+       reads as "the floor is too high" is really the horizon, and the horizon
+       is set by camera pitch, not by the plane's height. Aiming higher during
+       the hero drops the floor down the frame and opens the space around the
+       type; it eases back to the signed-off build framing well before the
+       first piece lands, so the build itself is untouched. */
+    const hero = clamp01(1 - progress / 0.14);
+    const heroLift = 1.7 * hero;
+    /* Stand further back for the hero too. The cloud spans radius 3.6 to 13
+       around the origin while the build camera sits only about 8 out, so a
+       good third of the blanks pass between the lens and the aim point and
+       fill the frame. Backing off puts the whole cloud in front of the
+       camera, which is what makes it read as a room rather than a pile-up. */
+    cz += 5.6 * hero;
+    camera.position.set(Math.sin(orbit) * cz, cy + parY * 1.6 + heroLift * 0.30, Math.cos(orbit) * cz);
+    camera.lookAt(0, 0.7 + progress * stackTop * 0.42 + heroLift, 0);
     camera.updateMatrixWorld();
     camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
 
