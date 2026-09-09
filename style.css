@@ -1740,30 +1740,40 @@ footer {
 [data-mode="dev"] #contact,
 [data-mode="dev"] #kitchen { display: none; }
 
-[data-mode="dev"] {
-  --void:    #0a0d12;
-  --void-2:  #10151d;
-  --steel:   #9fb3c8;
-  --ice:     #cfe3f5;
-  --ember:   #ff9a52;
+/* Developer mode is a lit studio, not a dark void.
 
-  --paper:        var(--void);
-  --paper-sunk:   var(--void-2);
-  --paper-raised: #141a24;
-  --ink:          #e8eef6;
-  --ink-soft:     #aebdd0;
-  --ink-muted:    #7d8da0;
-  --ink-faint:    #55637a;
-  --rule:         rgba(159, 179, 200, 0.18);
-  --rule-strong:  rgba(159, 179, 200, 0.34);
-  --clay:         var(--ice);
-  --clay-hover:   #ffffff;
+   It ran near-monochrome dark for a long time and cycled through several
+   "too dark / not colourful enough" passes; the note in the handoff was that
+   on a dark ground bright colour can only appear as glow, and glow reads dim
+   however far saturation is pushed. The fix was always to change the ground,
+   which is what this is. The pieces are now lit objects in a bright room
+   casting real shadows, so their colour is surface colour.
+
+   Ratios below are measured against --paper (#efe9e0). */
+[data-mode="dev"] {
+  --room:    #efe9e0;
+  --room-2:  #e6dfd4;
+  --steel:   #6b7a8a;
+  --ice:     #2c3540;
+  --ember:   #a84711;   /*  4.9:1 — measured, safe for text and links */
+
+  --paper:        var(--room);
+  --paper-sunk:   var(--room-2);
+  --paper-raised: #f6f2ea;
+  --ink:          #1a1712;   /* 15.6:1 */
+  --ink-soft:     #4a443c;   /*  8.4:1 */
+  --ink-muted:    #6b6459;   /*  4.9:1 */
+  --ink-faint:    #9a9285;   /*  2.6:1 — decorative only */
+  --rule:         rgba(60, 50, 38, 0.16);
+  --rule-strong:  rgba(60, 50, 38, 0.30);
+  --clay:         var(--ember);
+  --clay-hover:   #7d340a;
   --accent-mode:  var(--ember);
 }
 
 [data-mode="dev"] body { background: var(--void); color: var(--ink); }
 [data-mode="dev"] #navbar {
-  background: rgba(10, 13, 18, 0.72);
+  background: rgba(239, 233, 224, 0.78);
   border-bottom: 1px solid var(--rule);
   backdrop-filter: blur(10px);
 }
@@ -1771,11 +1781,11 @@ footer {
 [data-mode="dev"] .mode-switch summary {
   border: 1px solid var(--rule-strong);
   color: var(--ink-soft);
-  background: rgba(20, 26, 36, 0.7);
+  background: rgba(246, 242, 234, 0.82);
 }
 [data-mode="dev"] .mode-dot { background: var(--ember); }
-[data-mode="dev"] .mode-menu { background: #141a24; border-color: var(--rule-strong); }
-[data-mode="dev"] .mode-menu button:hover { background: rgba(159,179,200,0.08); }
+[data-mode="dev"] .mode-menu { background: #f6f2ea; border-color: var(--rule-strong); }
+[data-mode="dev"] .mode-menu button:hover { background: rgba(60,50,38,0.06); }
 
 .lab { position: relative; background: var(--void); padding: 0; }
 
@@ -1787,9 +1797,9 @@ footer {
   height: 100vh;
   overflow: hidden;
   background:
-    radial-gradient(120% 80% at 50% 8%, rgba(52, 86, 122, 0.30), transparent 62%),
-    radial-gradient(90% 70% at 82% 96%, rgba(255, 154, 82, 0.12), transparent 60%),
-    var(--void);
+    radial-gradient(120% 80% at 50% 4%, rgba(255, 252, 246, 0.9), transparent 58%),
+    radial-gradient(95% 70% at 78% 98%, rgba(196, 85, 26, 0.07), transparent 62%),
+    var(--room);
 }
 .well-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 
@@ -1799,10 +1809,10 @@ footer {
   position: absolute; inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(120% 78% at 50% 46%, transparent 42%, rgba(4, 6, 10, 0.72) 100%),
+    radial-gradient(125% 82% at 50% 44%, transparent 52%, rgba(74, 60, 42, 0.20) 100%),
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.22'/%3E%3C/svg%3E");
-  mix-blend-mode: soft-light;
-  opacity: 0.85;
+  mix-blend-mode: multiply;
+  opacity: 0.5;
 }
 
 /* ── Head: quiet type over the scene ── */
@@ -1819,10 +1829,10 @@ footer {
   font-size: clamp(1.7rem, 3.4vw, 2.9rem);
   letter-spacing: -0.03em;
   line-height: 1.05;
-  color: #fff;
+  color: var(--ink);
   text-align: center;
   margin: 0 0 1.6rem;
-  text-shadow: 0 2px 40px rgba(0, 0, 0, 0.7);
+  text-shadow: none;
 }
 .spec-row {
   display: flex;
@@ -1859,7 +1869,7 @@ footer {
   transform: translateY(-50%);
   z-index: 3;
   width: 2px; height: 34vh;
-  background: rgba(159, 179, 200, 0.14);
+  background: rgba(60, 50, 38, 0.14);
 }
 .well-meter i {
   display: block; width: 100%; height: 100%;
@@ -1877,7 +1887,7 @@ footer {
 }
 .hud-line {
   fill: none;
-  stroke: rgba(207, 227, 245, 0.42);
+  stroke: rgba(60, 50, 38, 0.38);
   stroke-width: 1;
   opacity: 0;
 }
@@ -1907,7 +1917,7 @@ footer {
 .hud-body { display: block; }
 .hud-title {
   display: block;
-  font-size: 0.82rem; font-weight: 600; letter-spacing: -0.01em; color: #fff;
+  font-size: 0.82rem; font-weight: 600; letter-spacing: -0.01em; color: var(--ink);
 }
 .hud-tag {
   display: block; margin-top: 0.1rem;
@@ -1944,26 +1954,26 @@ footer {
   overflow: hidden;
 }
 .motion .cap { transition: border-color 0.25s, transform 0.3s cubic-bezier(0.22,1,0.36,1); }
-.cap:hover { border-color: rgba(255, 154, 82, 0.55); transform: translateY(-3px); }
-.cap-art { position: relative; aspect-ratio: 16/9; overflow: hidden; background: var(--void-2); border-bottom: 1px solid var(--rule); }
+.cap:hover { border-color: rgba(196, 85, 26, 0.55); transform: translateY(-3px); }
+.cap-art { position: relative; aspect-ratio: 16/9; overflow: hidden; background: var(--room-2); border-bottom: 1px solid var(--rule); }
 .cap-art img, .cap-art canvas { width: 100%; height: 100%; object-fit: cover; display: block; }
-.cap-art::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(10,13,18,0.88), transparent 62%); }
+.cap-art::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(28,22,14,0.72), transparent 58%); }
 .cap-status {
   position: absolute; top: 9px; left: 9px; z-index: 2;
   font-family: var(--mono); font-size: 0.55rem; font-weight: 600;
   letter-spacing: 0.16em; padding: 0.16rem 0.42rem;
-  color: var(--void); background: var(--ice);
+  color: var(--room); background: var(--ice);
 }
-.cap-status[data-s="IN DEV"], .cap-status[data-s="PROTOTYPE"] { background: rgba(159,179,200,0.28); color: var(--ink); }
+.cap-status[data-s="IN DEV"], .cap-status[data-s="PROTOTYPE"] { background: rgba(60,50,38,0.16); color: var(--ink); }
 .cap-year { position: absolute; top: 10px; right: 11px; z-index: 2; font-family: var(--mono); font-size: 0.58rem; color: var(--ink-faint); }
 .cap-body { position: relative; z-index: 2; padding: 0.9rem 1rem 1.1rem; }
-.cap-title { font-family: var(--sans); font-size: 0.95rem; font-weight: 600; color: #fff; margin-bottom: 0.35rem; letter-spacing: -0.01em; }
+.cap-title { font-family: var(--sans); font-size: 0.95rem; font-weight: 600; color: var(--ink); margin-bottom: 0.35rem; letter-spacing: -0.01em; }
 .cap-tagline { font-size: 0.82rem; line-height: 1.5; color: var(--ink-soft); margin-bottom: 0.65rem; }
 .cap-tags { display: flex; flex-wrap: wrap; gap: 5px; }
 .cap-tags span {
   font-family: var(--mono); font-size: 0.57rem; letter-spacing: 0.08em;
   padding: 0.14rem 0.4rem; color: var(--ink-muted);
-  background: rgba(159,179,200,0.06); border: 1px solid var(--rule);
+  background: rgba(60,50,38,0.05); border: 1px solid var(--rule);
 }
 .cap-flood-note {
   position: absolute; right: 1rem; bottom: 1.1rem; z-index: 3;

@@ -33,16 +33,40 @@ function cellsFor(i) {
   return [[0, row], [1, row], [2, row], [3, row]];
 }
 
-/* Material identity per project. Muted enough to stay cinematic — these read
-   as anodised, brushed and glazed surfaces, not as primaries. */
+/* Material identity per project. These read as anodised, brushed and glazed
+   surfaces, not as primaries.
+
+   Deepened when the ground went from black to a lit room. The old values
+   were picked to hold up against a void, where a mid-tone is the brightest
+   thing in frame; drop the same colour onto cream at studio exposure and it
+   washes out to pastel — the pieces went from anodised to sugared almonds.
+   Roughness is up and metalness down for the same reason: a strong
+   environment blows out polished chamfers into white rims. */
 const LOOKS = [
-  { color: 0x5f9bd8, rough: 0.32, metal: 0.55, tex: 'brushed' },  // steel blue
-  { color: 0xe0ae3c, rough: 0.40, metal: 0.50, tex: 'grid'    },  // brass
-  { color: 0x2fc0a8, rough: 0.26, metal: 0.24, tex: 'speckle' },  // teal glaze
-  { color: 0xd66e8c, rough: 0.54, metal: 0.12, tex: 'matte'   },  // rose ceramic
-  { color: 0x8b74e0, rough: 0.32, metal: 0.38, tex: 'brushed' },  // violet
-  { color: 0xd4ab78, rough: 0.62, metal: 0.10, tex: 'matte'   }   // sand
+  { color: 0x466a89, rough: 0.58, metal: 0.10, tex: 'brushed' },  // steel blue
+  { color: 0x94702a, rough: 0.62, metal: 0.10, tex: 'grid'    },  // brass
+  { color: 0x3a7466, rough: 0.54, metal: 0.06, tex: 'speckle' },  // teal glaze
+  { color: 0x8b5163, rough: 0.68, metal: 0.03, tex: 'matte'   },  // rose ceramic
+  { color: 0x5e5285, rough: 0.58, metal: 0.08, tex: 'brushed' },  // violet
+  { color: 0x8d744c, rough: 0.72, metal: 0.02, tex: 'matte'   }   // sand
 ];
+
+/* Everything generated here runs off this, never Math.random.
+
+   The grain, the speckle and the dust used the global RNG, so every reload
+   produced a slightly different scene: the surfaces re-scattered and the
+   motes landed somewhere new. It is a small difference per element and a
+   noticeable one in aggregate — the page never looked the same twice, which
+   reads as clutter rather than as texture. A fixed seed makes the build
+   identical on every visit, and makes a visual regression something you can
+   actually compare against a screenshot. */
+function makeRng(seed) {
+  let s = seed >>> 0;
+  return function () {
+    s = (s * 1664525 + 1013904223) >>> 0;
+    return s / 4294967296;
+  };
+}
 
 /* Procedural surface maps. Drawn once into a small canvas and reused as a
    roughness map, so the light breaks up across a face instead of reading as
@@ -57,13 +81,17 @@ function heightField(kind, S) {
   x.fillStyle = '#808080';
   x.fillRect(0, 0, S, S);
 
+  let seed = 0;
+  for (let i = 0; i < kind.length; i++) seed = (seed * 31 + kind.charCodeAt(i)) >>> 0;
+  const rnd = makeRng(seed + 0x9e37);
+
   if (kind === 'brushed') {
     for (let i = 0; i < 1500; i++) {
-      const y = Math.random() * S;
-      const v = 118 + Math.random() * 68;
+      const y = rnd() * S;
+      const v = 118 + rnd() * 68;
       x.strokeStyle = 'rgb(' + v + ',' + v + ',' + v + ')';
-      x.lineWidth = 0.4 + Math.random() * 0.9;
-      x.beginPath(); x.moveTo(0, y); x.lineTo(S, y + (Math.random() - 0.5) * 4); x.stroke();
+      x.lineWidth = 0.4 + rnd() * 0.9;
+      x.beginPath(); x.moveTo(0, y); x.lineTo(S, y + (rnd() - 0.5) * 4); x.stroke();
     }
   } else if (kind === 'grid') {
     // Recessed channels with raised pads — reads as machined plate.
@@ -78,17 +106,17 @@ function heightField(kind, S) {
     }
   } else if (kind === 'speckle') {
     for (let i = 0; i < 3200; i++) {
-      const r = 0.8 + Math.random() * 2.6;
-      const v = Math.random() > 0.5 ? 168 : 96;
+      const r = 0.8 + rnd() * 2.6;
+      const v = rnd() > 0.5 ? 168 : 96;
       x.fillStyle = 'rgba(' + v + ',' + v + ',' + v + ',0.45)';
-      x.beginPath(); x.arc(Math.random() * S, Math.random() * S, r, 0, Math.PI * 2); x.fill();
+      x.beginPath(); x.arc(rnd() * S, rnd() * S, r, 0, Math.PI * 2); x.fill();
     }
   } else {                                   // matte — soft cast blotches
     for (let i = 0; i < 300; i++) {
-      const v = 108 + Math.random() * 52;
+      const v = 108 + rnd() * 52;
       x.fillStyle = 'rgba(' + v + ',' + v + ',' + v + ',0.20)';
       x.beginPath();
-      x.arc(Math.random() * S, Math.random() * S, 4 + Math.random() * 16, 0, Math.PI * 2);
+      x.arc(rnd() * S, rnd() * S, 4 + rnd() * 16, 0, Math.PI * 2);
       x.fill();
     }
   }
@@ -181,29 +209,31 @@ export function mountWell(opts) {
   });
   renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.75));
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  // VSM blurs the penumbra. PCF gave a hard stencil edge, which on a light
+  // ground reads as a sticker rather than a shadow.
+  renderer.shadowMap.type = THREE.VSMShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.32;
+  renderer.toneMappingExposure = 0.86;
 
   const scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2(0x0a0d12, 0.032);
+  scene.fog = new THREE.FogExp2(0xefe9e0, 0.020);
 
   {
     const ec = document.createElement('canvas');
     ec.width = 256; ec.height = 128;
     const ex = ec.getContext('2d');
     const g = ex.createLinearGradient(0, 0, 0, 128);
-    g.addColorStop(0.00, '#0a1420');   // zenith
-    g.addColorStop(0.42, '#33546f');   // upper sky
-    g.addColorStop(0.52, '#8fb4d4');   // horizon band, the specular highlight
-    g.addColorStop(0.60, '#7a4a2e');   // warm underside
-    g.addColorStop(1.00, '#0b0c10');   // ground
+    g.addColorStop(0.00, '#fffdf9');   // ceiling bounce
+    g.addColorStop(0.42, '#f3ece1');   // upper wall
+    g.addColorStop(0.52, '#f7f1e6');   // the softbox band, i.e. the highlight
+    g.addColorStop(0.60, '#e8ddcc');   // warm lower wall
+    g.addColorStop(1.00, '#d9d0c2');   // floor bounce
     ex.fillStyle = g; ex.fillRect(0, 0, 256, 128);
     // A couple of bright patches so reflections have something to travel across.
-    ex.fillStyle = 'rgba(255,255,255,0.32)';
-    ex.beginPath(); ex.ellipse(70, 52, 26, 9, 0, 0, Math.PI * 2); ex.fill();
-    ex.fillStyle = 'rgba(255,186,130,0.24)';
-    ex.beginPath(); ex.ellipse(196, 60, 20, 7, 0, 0, Math.PI * 2); ex.fill();
+    ex.fillStyle = 'rgba(255,255,255,0.55)';
+    ex.beginPath(); ex.ellipse(70, 50, 30, 11, 0, 0, Math.PI * 2); ex.fill();
+    ex.fillStyle = 'rgba(120,104,86,0.20)';
+    ex.beginPath(); ex.ellipse(196, 64, 22, 8, 0, 0, Math.PI * 2); ex.fill();
 
     const envTex = new THREE.CanvasTexture(ec);
     envTex.mapping = THREE.EquirectangularReflectionMapping;
@@ -217,56 +247,56 @@ export function mountWell(opts) {
 
   /* ── Light: cold key, warm rim, dim fill. Kept to three so the frame cost
         stays flat regardless of how many pieces are on screen. ── */
-  scene.add(new THREE.HemisphereLight(0xbcd8f2, 0x1a2430, 1.25));
+  scene.add(new THREE.HemisphereLight(0xfff6ea, 0xc4b8a6, 0.40));
 
-  const key = new THREE.DirectionalLight(0xeaf3ff, 2.6);
-  key.position.set(6, 14, 8);
+  const key = new THREE.DirectionalLight(0xfff4e8, 4.0);
+  key.position.set(-7, 17, 9);
   key.castShadow = true;
-  key.shadow.mapSize.set(1024, 1024);
-  key.shadow.camera.left = -12; key.shadow.camera.right = 12;
-  key.shadow.camera.top = 16;   key.shadow.camera.bottom = -4;
-  key.shadow.camera.near = 1;   key.shadow.camera.far = 44;
-  key.shadow.bias = -0.0016;
+  key.shadow.mapSize.set(2048, 2048);
+  key.shadow.radius = 5;
+  key.shadow.blurSamples = 16;
+  key.shadow.camera.left = -14; key.shadow.camera.right = 14;
+  key.shadow.camera.top = 18;   key.shadow.camera.bottom = -6;
+  key.shadow.camera.near = 1;   key.shadow.camera.far = 52;
+  key.shadow.bias = -0.0009;
   key.shadow.normalBias = 0.02;
   scene.add(key);
 
-  const rim = new THREE.DirectionalLight(0xffb27a, 2.0);
-  rim.position.set(-9, 4, -7);
+  // Warm light coming back off the floor, so undersides carry colour.
+  const bounce = new THREE.DirectionalLight(0xffd8b8, 0.55);
+  bounce.position.set(5, -8, 6);
+  scene.add(bounce);
+
+  const rim = new THREE.DirectionalLight(0xdfeaff, 0.6);
+  rim.position.set(9, 5, -8);
   scene.add(rim);
 
-  // Cool bounce from beneath so the undersides don't go to pure black.
-  const fill = new THREE.DirectionalLight(0x5f86b5, 0.8);
-  fill.position.set(-3, -6, 5);
-  scene.add(fill);
-
-  // Two close point lights travel with the stack. Metals need something to
-  // reflect — with only distant directionals the brushed and grid maps had
-  // nothing to catch and read as flat paint.
-  const spark = new THREE.PointLight(0xbfe0ff, 26, 26, 2);
-  scene.add(spark);
-  const sparkWarm = new THREE.PointLight(0xffb98a, 18, 22, 2);
-  scene.add(sparkWarm);
-
   /* ── Floor: a faint grid the stack lands on, fading into fog ── */
-  const grid = new THREE.GridHelper(70, 70, 0x2b3a4d, 0x18222e);
+  const grid = new THREE.GridHelper(70, 70, 0xb9ad9c, 0xcfc5b6);
   grid.material.transparent = true;
-  grid.material.opacity = 0.5;
+  grid.material.opacity = 0.26;
   grid.position.y = -0.001;
   scene.add(grid);
 
   const floor = new THREE.Mesh(
     new THREE.CircleGeometry(38, 48).rotateX(-Math.PI / 2),
-    new THREE.MeshStandardMaterial({ color: 0x0d131b, roughness: 0.92, metalness: 0.1 })
+    new THREE.MeshStandardMaterial({ color: 0xe2dacd, roughness: 0.97, metalness: 0 })
   );
   floor.position.y = -0.02;
   floor.receiveShadow = true;
   scene.add(floor);
 
   /* ── Pieces ── */
-  const CUBE = roundedBox(0.94, 0.075, 3);
+  /* Cells are on a 1.0 grid, so a 0.94 cube leaves a 0.06 seam between
+     neighbours. Against the old black ground those seams read as shadow and
+     the slab looked solid; against a lit room they show the bright floor
+     through every joint, and the stack turned into a sheet of separate tiles
+     with white halos. At 0.99 the faces meet and only the chamfer groove
+     remains, which is the seam the design actually wanted. */
+  const CUBE = roundedBox(0.99, 0.06, 3);
   // Edge overlay is taken from a plain box so the wireframe stays crisp —
   // running EdgesGeometry over the chamfered mesh produces a mess of facets.
-  const EDGES = new THREE.EdgesGeometry(new THREE.BoxGeometry(0.94, 0.94, 0.94));
+  const EDGES = new THREE.EdgesGeometry(new THREE.BoxGeometry(0.99, 0.99, 0.99));
 
   const pieces = items.map((item, i) => {
     const cells = cellsFor(i);
@@ -282,13 +312,13 @@ export function mountWell(opts) {
       aoMap: maps.rough,
       aoMapIntensity: 0.25,
       normalMap: maps.normal,
-      normalScale: new THREE.Vector2(0.32, 0.32),
-      envMapIntensity: 0.6,
+      normalScale: new THREE.Vector2(0.20, 0.20),
+      envMapIntensity: 0.24,
       emissive: 0x000000,
       emissiveIntensity: 1
     });
     const edge = new THREE.LineBasicMaterial({
-      color: 0xffffff, transparent: true, opacity: 0.14
+      color: 0x2a2219, transparent: true, opacity: 0
     });
 
     // Cells are absolute in the well; the group origin is the piece centroid
@@ -329,15 +359,16 @@ export function mountWell(opts) {
   /* ── Dust: cheap depth cue, one draw call ── */
   const dustN = 260;
   const dustPos = new Float32Array(dustN * 3);
+  const dustRng = makeRng(0x51ed);
   for (let i = 0; i < dustN; i++) {
-    dustPos[i * 3] = (Math.random() - 0.5) * 44;
-    dustPos[i * 3 + 1] = Math.random() * 30;
-    dustPos[i * 3 + 2] = (Math.random() - 0.5) * 44;
+    dustPos[i * 3] = (dustRng() - 0.5) * 44;
+    dustPos[i * 3 + 1] = dustRng() * 30;
+    dustPos[i * 3 + 2] = (dustRng() - 0.5) * 44;
   }
   const dustGeo = new THREE.BufferGeometry();
   dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPos, 3));
   const dust = new THREE.Points(dustGeo, new THREE.PointsMaterial({
-    color: 0x9fc4e8, size: 0.06, transparent: true, opacity: 0.5, depthWrite: false
+    color: 0x7d7263, size: 0.055, transparent: true, opacity: 0.30, depthWrite: false
   }));
   scene.add(dust);
 
@@ -446,22 +477,25 @@ export function mountWell(opts) {
       // Lift the piece's own hue rather than pushing every piece to one colour.
       u.body.color.copy(u.baseColor).offsetHSL(0, u.hover * 0.10, u.hover * 0.16);
       u.body.emissive.copy(u.baseColor).multiplyScalar(0.30 * u.hover);
-      u.edge.opacity = 0.10 + t * 0.06 + u.hover * 0.45;
+      // Wireframe overlay is hover-only now. It existed to put a crisp
+      // white edge on each cube against the void; on the lit ground the same
+      // lines read as a bright halo tracing every block, because the sharp
+      // box edges sit just outside the chamfered mesh. Rendering it only
+      // under the pointer keeps the hover affordance and drops the halo.
+      u.edge.opacity = u.hover * 0.34;
     }
 
     // Camera rises with the build and pulls back only enough to keep the
     // whole slab in frame. Sized against stackTop so it stays framed if the
     // number of projects changes.
     const cy = 1.6 + progress * (stackTop * 0.62);
-    const cz = stackTop * 1.55 + progress * stackTop * 0.55;
+    // Closer than it was: the slab sat small in a large empty room once the
+    // ground went light, because there is no longer a dark surround to make
+    // it feel big.
+    const cz = stackTop * 1.24 + progress * stackTop * 0.40;
     const orbit = -0.62 + progress * 1.15 + parX * 0.45;
     camera.position.set(Math.sin(orbit) * cz, cy + parY * 1.6, Math.cos(orbit) * cz);
     camera.lookAt(0, 0.7 + progress * stackTop * 0.42, 0);
-
-    // Keep the practicals near whatever is currently being built.
-    const focus = 1.2 + progress * stackTop * 0.85;
-    spark.position.set(3.4, focus + 2.6, 4.2);
-    sparkWarm.position.set(-4.0, focus - 0.6, -3.2);
 
     dust.rotation.y += 0.0006;
 
