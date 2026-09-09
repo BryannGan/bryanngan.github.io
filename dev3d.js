@@ -400,12 +400,16 @@ export function mountWell(opts) {
 
   /* Their own cube, and the size is load-bearing.
 
-     The project cube is 0.99 on a 1.0 grid, because those tile into a solid
-     slab and any gap shows the floor through the joints. These never tile, so
-     a groove between cells is wanted — but 0.88 was far too generous and read
-     as four loose blocks rather than one piece. 0.96 leaves a hairline, with a
-     rounder chamfer to catch light along it. */
-  const AMB_CUBE = roundedBox(0.96, 0.105, 3);
+     Cells sit on a 1.0 grid, so the visible joint between two cells is the
+     leftover space PLUS both chamfers — and the chamfer is the part that
+     catches you out. At 0.96 with a 0.105 chamfer the flat face is only 0.75
+     across, so the joint opened to a quarter of a cell and you could see the
+     room straight through it: four loose blocks, not one piece.
+
+     1.01 makes adjacent cells overlap slightly, so nothing can show through
+     at any angle, and the chamfer alone forms the groove. Keep the size above
+     1.0 for that reason; shrink it and the gaps come back. */
+  const AMB_CUBE = roundedBox(1.01, 0.085, 3);
   const AMB_SCALE = 0.78;
   /* 24, not 23: the radius band is picked by (i * 7) % 8, so a multiple of
      eight covers every band the same number of times. At 23 the coverage went
@@ -451,8 +455,8 @@ export function mountWell(opts) {
       mat, local,
       // Bounding radius, for separation. The floor uses the true lowest
       // corner instead, since a sphere can never let a piece near the ground.
-      radius: (far + 0.96 * 0.87) * AMB_SCALE,
-      cubeDrop: 0.96 * 0.87 * AMB_SCALE,
+      radius: (far + 1.01 * 0.87) * AMB_SCALE,
+      cubeDrop: 1.01 * 0.87 * AMB_SCALE,
       // Base position in the ground plane. The cloud is re-centred on the
       // origin after the loop, then rotated rigidly — see below.
       bx: Math.cos(i * 2.39996) * (3.6 + ((i * 7) % 8) * 1.35),
