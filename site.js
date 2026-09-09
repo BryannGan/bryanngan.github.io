@@ -272,7 +272,14 @@
 
     function apply(mode, remember) {
       if (MODES.indexOf(mode) === -1) mode = 'research';
+      var changed = document.documentElement.getAttribute('data-mode') !== mode;
       document.documentElement.setAttribute('data-mode', mode);
+      // A switch is a new page as far as the visitor is concerned, so it
+      // starts at the top. Left alone, the old scroll offset survives: chef
+      // is shorter than research and lands at its bottom, and dev lands
+      // partway into the well's scroll track. Only on a user switch — the
+      // initial apply() must not fight the browser's scroll restoration.
+      if (remember && changed) window.scrollTo({ top: 0, behavior: 'instant' });
       if (current) current.textContent = LABELS[mode];
       Array.prototype.forEach.call(buttons, function (b) {
         b.setAttribute('aria-selected', String(b.dataset.mode === mode));
