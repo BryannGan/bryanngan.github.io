@@ -356,6 +356,76 @@ export function mountWell(opts) {
 
   const stackTop = Math.max(...pieces.map(p => p.userData.restY)) + 1.2;
 
+  /* ── Ambient pieces ──
+     The room is empty until the first project piece drops, because all five
+     wait above the frame until you scroll. Against the old black ground that
+     was fine — a dark void reads as deliberate. A lit room reads as unfinished.
+
+     So a dozen unlabelled blanks drift in the room at rest and fade out as
+     the build takes over. They are deliberately neutral: the six project
+     colours carry identity, and giving these the same palette would imply
+     they mean something. They are set dressing, and they say so. */
+  const AMB_SHAPES = [
+    [[0, 0], [1, 0], [2, 0], [2, 1]],
+    [[0, 0], [0, 1], [1, 1], [1, 2]],
+    [[0, 0], [1, 0], [0, 1], [1, 1]],
+    [[0, 0], [1, 0], [2, 0], [1, 1]],
+    [[1, 0], [2, 0], [0, 1], [1, 1]]
+  ];
+  const AMB_TONES = [0xd6ccbc, 0xe3dbcd, 0xc9bfae];
+  const ambRng = makeRng(0x2f19);
+  const ambientRoot = new THREE.Group();
+  scene.add(ambientRoot);
+
+  const ambient = [];
+  for (let i = 0; i < 10; i++) {
+    const cells = AMB_SHAPES[i % AMB_SHAPES.length];
+    let ax = 0, ay = 0;
+    cells.forEach(([c, r]) => { ax += c; ay += r; });
+    ax /= cells.length; ay /= cells.length;
+
+    const mat = new THREE.MeshStandardMaterial({
+      color: AMB_TONES[i % AMB_TONES.length],
+      roughness: 0.66, metalness: 0.03, envMapIntensity: 0.20,
+      transparent: true, opacity: 0
+    });
+    const g = new THREE.Group();
+    let far = 0;
+    cells.forEach(([c, r]) => {
+      const m = new THREE.Mesh(CUBE, mat);
+      m.position.set(c - ax, r - ay, 0);
+      m.castShadow = true; m.receiveShadow = true;
+      g.add(m);
+      far = Math.max(far, Math.hypot(m.position.x, m.position.y));
+    });
+    /* Scaled down, for two reasons. They are set dressing and should not
+       read at the same weight as a labelled project piece. And the floor
+       clamp works off the bounding sphere — a piece can never sit lower than
+       its own radius — so at full size nothing could come near the ground and
+       every blank was stuck in the top of the frame. */
+    const AMB_SCALE = 0.68;
+    g.scale.setScalar(AMB_SCALE);
+    g.userData = {
+      mat,
+      // Outermost cube centre plus that cube's half-diagonal, scaled with the
+      // group. Everything below keeps pieces apart by this, so nothing
+      // intersects and nothing sinks through the floor.
+      radius: (far + 0.99 * 0.87) * AMB_SCALE,
+      // Golden angle: keying radius and height off the same index as the
+      // angle makes them correlate, and the pieces bunch into one arc.
+      a: i * 2.39996,
+      rad: 3.3 + ((i * 7) % 4) * 1.45,
+      y0: 1.30 + ((i * 3) % 5) * 0.52,
+      depth: -0.6 - ((i * 5) % 4) * 1.15,
+      bob: 0.12 + ambRng() * 0.15,
+      phase: ambRng() * 6.283,
+      spin: new THREE.Vector3((ambRng() - .5) * 0.22, (ambRng() - .5) * 0.30, (ambRng() - .5) * 0.18)
+    };
+    g.rotation.set(ambRng() * 3, ambRng() * 3, ambRng() * 3);
+    ambientRoot.add(g);
+    ambient.push(g);
+  }
+
   /* ── Dust: cheap depth cue, one draw call ── */
   const dustN = 260;
   const dustPos = new Float32Array(dustN * 3);
@@ -435,6 +505,8 @@ export function mountWell(opts) {
   });
 
   /* ── Scroll ── */
+  if (location.search.indexOf('audit') >= 0) window.__well = { ambient, pieces };
+  const T0 = performance.now();
   let progress = 0, dirty = true;
   function readScroll() {
     const r = stage.parentElement.getBoundingClientRect();
@@ -446,6 +518,133 @@ export function mountWell(opts) {
 
   const clamp01 = v => Math.min(1, Math.max(0, v));
   const easeOut = t => 1 - Math.pow(1 - t, 3);
+  const smooth = t => t * t * (3 - 2 * t);
+
+  /* The headline's exclusion zone, measured from the real elements.
+
+     Hard-coding an ellipse would drift out of register the moment the type
+     resized, and the title and pillars are both clamp()-scaled. Measuring the
+     live boxes keeps the opening locked to the words at any viewport, and
+     keeps working if the copy changes length. Cached per canvas size. */
+  let zoneKey = '', zoneVal = null;
+  function safeZone() {
+    const k = w + 'x' + h;
+    if (zoneVal !== null && zoneKey === k) return zoneVal;
+    zoneKey = k;
+    const els = [document.querySelector('.lab-title'), document.querySelector('.spec-row')].filter(Boolean);
+    if (!els.length) return (zoneVal = false);
+    const box = canvas.getBoundingClientRect();
+    let l = Infinity, r = -Infinity, t = Infinity, b = -Infinity;
+    for (const el of els) {
+      const q = el.getBoundingClientRect();
+      l = Math.min(l, q.left - box.left); r = Math.max(r, q.right - box.left);
+      t = Math.min(t, q.top - box.top);   b = Math.max(b, q.bottom - box.top);
+    }
+    const px = w * 0.03, py = h * 0.05;
+    l -= px; r += px; t -= py; b += py;
+    return (zoneVal = {
+      cx: ((l + r) / 2 / w) * 2 - 1,
+      cy: -(((t + b) / 2 / h) * 2 - 1),
+      rx: (r - l) / w,
+      ry: (b - t) / h
+    });
+  }
+
+  /* Ambient drift, and the three rules it has to respect: stay off the
+     headline, stay out of each other, stay on the floor.
+
+     Each rule is a positional correction applied to positions rebuilt from
+     the orbit every frame, so nothing accumulates. They are iterated because
+     resolving one can break another — and the loop ends on separation and
+     the floor clamp, since a piece cutting through another or sinking into
+     the ground is worse than one grazing the type. */
+  const AMB_SOFT = 0.20;
+  const av = new THREE.Vector3(), aRight = new THREE.Vector3(), aUp = new THREE.Vector3();
+
+  function updateAmbient(tSec, fade) {
+    ambientRoot.visible = fade > 0.004;
+    if (!ambientRoot.visible) return;
+
+    for (const g of ambient) {
+      const d = g.userData;
+      d.mat.opacity = fade;
+      const a = d.a + tSec * 0.055;
+      g.position.set(
+        Math.cos(a) * d.rad,
+        d.y0 + Math.sin(tSec * 0.5 + d.phase) * d.bob,
+        Math.sin(a) * d.rad * 0.55 + d.depth
+      );
+      if (!reduced) {
+        g.rotation.x += d.spin.x * 0.016;
+        g.rotation.y += d.spin.y * 0.016;
+        g.rotation.z += d.spin.z * 0.016;
+      }
+    }
+
+    const z0 = safeZone();
+    const p0 = camera.projectionMatrix.elements[0], p5 = camera.projectionMatrix.elements[5];
+    aRight.setFromMatrixColumn(camera.matrixWorld, 0);
+    aUp.setFromMatrixColumn(camera.matrixWorld, 1);
+
+    for (let pass = 0; pass < 4; pass++) {
+      if (z0) for (const g of ambient) {
+        av.copy(g.position).applyMatrix4(camera.matrixWorldInverse);
+        if (av.z > -0.5) continue;                       // behind the lens
+        const dist = -av.z;
+        const nx = (av.x * p0) / dist, ny = (av.y * p5) / dist;
+        // Inflate the zone by part of the piece's projected size: testing
+        // only its centre lets a wide piece hang over the words. Only part,
+        // because the camera sits close here — a piece's full projected
+        // radius is about half the screen, and inflating by all of it grew
+        // the zone past the viewport and swept every blank out of frame.
+        const rx = z0.rx + (g.userData.radius * p0) / dist * 0.45;
+        const ry = z0.ry + (g.userData.radius * p5) / dist * 0.45;
+        let ux = (nx - z0.cx) / rx, uy = (ny - z0.cy) / ry;
+        const dd = Math.hypot(ux, uy), edge = 1 + AMB_SOFT;
+        if (dd >= edge) continue;
+        const m = dd <= 1 ? 1 : smooth((edge - dd) / AMB_SOFT);
+        if (dd < 1e-3) { ux = 0.86; uy = -0.5; } else { ux /= dd; uy /= dd; }
+        g.position.addScaledVector(aRight, ux * (dist / p0) * rx * 0.30 * m);
+        g.position.addScaledVector(aUp,    uy * (dist / p5) * ry * 0.30 * m);
+      }
+
+      for (let i = 0; i < ambient.length; i++) {
+        const A = ambient[i], ra = A.userData.radius;
+        for (let j = i + 1; j < ambient.length; j++) {
+          const B = ambient[j];
+          const min = ra + B.userData.radius + 0.15;
+          let dx = B.position.x - A.position.x, dy = B.position.y - A.position.y, dz = B.position.z - A.position.z;
+          const d2 = dx * dx + dy * dy + dz * dz;
+          if (d2 >= min * min || d2 === 0) continue;
+          const d = Math.sqrt(d2), push = (min - d) * 0.58;
+          dx /= d; dy /= d; dz /= d;
+          A.position.x -= dx * push; A.position.y -= dy * push; A.position.z -= dz * push;
+          B.position.x += dx * push; B.position.y += dy * push; B.position.z += dz * push;
+        }
+      }
+
+      // Project pieces win: the blanks move around them, never the reverse.
+      for (const g of ambient) {
+        const min = g.userData.radius + 2.2;
+        for (const p of pieces) {
+          let dx = g.position.x - p.position.x, dy = g.position.y - p.position.y, dz = g.position.z - p.position.z;
+          const d2 = dx * dx + dy * dy + dz * dz;
+          if (d2 >= min * min || d2 === 0) continue;
+          const d = Math.sqrt(d2), push = min - d;
+          g.position.x += (dx / d) * push; g.position.y += (dy / d) * push; g.position.z += (dz / d) * push;
+        }
+      }
+    }
+
+    for (const g of ambient) {
+      const rg = g.userData.radius;
+      if (g.position.y < rg) g.position.y = rg;          // floor is y = 0
+      // And never so near the lens that one blank swallows the frame.
+      av.copy(g.position).sub(camera.position);
+      const dc = av.length(), minC = rg + 4.2;
+      if (dc > 1e-4 && dc < minC) g.position.copy(camera.position).addScaledVector(av.multiplyScalar(1 / dc), minC);
+    }
+  }
 
   function frame() {
     raf = requestAnimationFrame(frame);
@@ -496,6 +695,19 @@ export function mountWell(opts) {
     const orbit = -0.62 + progress * 1.15 + parX * 0.45;
     camera.position.set(Math.sin(orbit) * cz, cy + parY * 1.6, Math.cos(orbit) * cz);
     camera.lookAt(0, 0.7 + progress * stackTop * 0.42, 0);
+    camera.updateMatrixWorld();
+    camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
+
+    /* The blanks hold the room before the build and clear out once it starts,
+       so they never compete with the labelled stack.
+
+       This is the one thing on the page that animates without being driven by
+       scroll or pointer, so it has to force a redraw while it is visible —
+       the renderer is otherwise strictly on-demand. It stops as soon as the
+       fade completes, which is well inside the first screen of scrolling. */
+    const ambFade = clamp01(1 - (progress - 0.02) / 0.18);
+    updateAmbient((performance.now() - T0) / 1000, ambFade);
+    if (!reduced && ambFade > 0.004) dirty = true;
 
     dust.rotation.y += 0.0006;
 
