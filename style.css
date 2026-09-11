@@ -1851,16 +1851,45 @@ footer {
   letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-soft);
 }
 
+/* The scroll cue is the only instruction on the page, and the whole mode is
+   inert until it is followed — nothing builds, and none of the projects are
+   named, until you scroll. At 0.6rem on --ink-faint it was set as decoration
+   and read as decoration. It is bigger now and on --ink-muted, which is the
+   lightest ink that still clears 4.5:1 against the room, plus a chevron that
+   nudges downward so the direction is not left to the wording alone.
+
+   The chevron is a pseudo-element, so the markup stays as it was and this
+   cannot leak into research or chef mode — nothing else on the site uses
+   .well-cue. */
 .well-cue {
   position: absolute;
-  left: 50%; bottom: 2.4rem;
+  left: 50%; bottom: 2.2rem;
   transform: translateX(-50%);
   z-index: 3;
-  font-family: var(--mono); font-size: 0.6rem;
-  letter-spacing: 0.26em; text-transform: uppercase;
-  color: var(--ink-faint);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.62rem;
+  font-family: var(--mono);
+  font-size: clamp(0.76rem, 0.95vw, 0.92rem);
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-muted);   /* 4.9:1 */
+}
+.well-cue::after {
+  content: "";
+  width: 9px; height: 9px;
+  border-right: 1.6px solid currentColor;
+  border-bottom: 1.6px solid currentColor;
+  transform: rotate(45deg);
 }
 .motion .well-cue { transition: opacity 0.4s; }
+.motion .well-cue::after { animation: cue-nudge 1.9s ease-in-out infinite; }
+@keyframes cue-nudge {
+  0%, 100% { transform: rotate(45deg) translate(0, 0); }
+  50%      { transform: rotate(45deg) translate(3px, 3px); }
+}
 .well-cue.is-gone { opacity: 0; }
 
 .well-meter {
