@@ -287,16 +287,26 @@ export function mountWell(opts) {
   scene.add(floor);
 
   /* ── Pieces ── */
-  /* Cells are on a 1.0 grid, so a 0.94 cube leaves a 0.06 seam between
-     neighbours. Against the old black ground those seams read as shadow and
-     the slab looked solid; against a lit room they show the bright floor
-     through every joint, and the stack turned into a sheet of separate tiles
-     with white halos. At 0.99 the faces meet and only the chamfer groove
-     remains, which is the seam the design actually wanted. */
-  const CUBE = roundedBox(0.99, 0.06, 3);
+  /* Cells are on a 1.0 grid, so the visible joint between two of them is the
+     leftover space PLUS both chamfers — and the chamfer is the part that
+     catches you out. 0.94 left a 0.06 seam; against the old black ground
+     those read as shadow and the slab looked solid, but against a lit room
+     they showed the floor through every joint and the stack became a sheet of
+     separate tiles. 0.99 closed most of it and still left 0.13 of daylight
+     once both 0.06 chamfers were counted, visible as pale lines across the
+     finished slab and between neighbouring pieces.
+
+     The joint is (1 - size) + 2 * chamfer, and the chamfer is the dominant
+     term — going 0.99/0.06 to 1.01/0.07 changed it from 0.13 to 0.13 and
+     looked identical, because widening the chamfer gave back exactly what
+     overlapping the cubes had won. 1.015 with a 0.045 chamfer puts it at
+     0.075: neighbours overlap so nothing shows through, and the groove is
+     half what it was. Adjust the chamfer first if this needs tightening
+     again. */
+  const CUBE = roundedBox(1.015, 0.045, 3);
   // Edge overlay is taken from a plain box so the wireframe stays crisp —
   // running EdgesGeometry over the chamfered mesh produces a mess of facets.
-  const EDGES = new THREE.EdgesGeometry(new THREE.BoxGeometry(0.99, 0.99, 0.99));
+  const EDGES = new THREE.EdgesGeometry(new THREE.BoxGeometry(1.015, 1.015, 1.015));
 
   const pieces = items.map((item, i) => {
     const cells = cellsFor(i);
