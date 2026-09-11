@@ -613,7 +613,7 @@ export function mountWell(opts) {
 
      The last gate sits at 0.82, leaving the tail of the track for the camera
      to finish its pull-back after the final piece lands. */
-  const GATE = 0.09;      // ~10vh of scroll on the shortened track
+  const GATE = 0.06;      // ~11vh of scroll on the shortened track
   const LAST_GATE = 1.0;  // the last gate lands at 0.81, leaving a short tail
   const RELEASE = 0.02;
   const gates = pieces.map((_, i) => GATE + (i / pieces.length) * (LAST_GATE - GATE));
