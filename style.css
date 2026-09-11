@@ -1794,10 +1794,11 @@ footer {
 /* The track length IS the scroll distance between drops: with five gates
    spread across it, 560vh put roughly 72vh — most of a screen — between one
    piece landing and the next being released, which is a lot of scrolling for
-   not much happening. 280vh puts it at about 34vh, so a drop follows roughly
-   every third of a screen and they chain while you are still scrolling.
-   Anything shorter and the whole build goes past in one flick. */
-.well-track { position: relative; height: 280vh; }
+   not much happening. 210vh puts it at about 20vh: a drop every fifth of a
+   screen, so they chain continuously under an ordinary scroll rather than
+   each needing its own deliberate push. Measured, not derived — the gate
+   fractions look reasonable at any track length. */
+.well-track { position: relative; height: 210vh; }
 .well-stage {
   position: sticky;
   top: 0;
@@ -2022,7 +2023,7 @@ footer {
 [data-mode="dev"] footer { border-top: 1px solid var(--rule); }
 
 @media (max-width: 760px) {
-  .well-track { height: 240vh; }
+  .well-track { height: 185vh; }
   .hud-label { max-width: 10rem; }
   .hud-label:not(.is-left) { margin-left: -10rem; }
   .well-meter { right: 0.7rem; height: 24vh; }
