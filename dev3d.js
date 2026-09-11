@@ -583,6 +583,27 @@ export function mountWell(opts) {
   const clamp01 = v => Math.min(1, Math.max(0, v));
   const easeOut = t => 1 - Math.pow(1 - t, 3);
 
+  /* ── Committing to the build ──
+
+     Scroll used to map one-to-one onto the whole sequence, which meant the
+     first piece hung in mid-air at whatever height your scroll position
+     happened to land on. Nothing about the page said it was waiting for more
+     scroll, so it just looked stuck.
+
+     So the first drop is a commitment rather than a scrub. Cross GATE and the
+     piece falls the rest of the way on its own clock, about three quarters of
+     a second, whether or not you keep scrolling — that is the moment the page
+     changes from a title card into the build. From there scroll takes over
+     again for the remaining pieces, remapped so the rest of the track covers
+     them and there is no dead zone where scrolling does nothing.
+
+     EXIT sits below GATE on purpose. With a single threshold, a scroll
+     resting exactly on it would commit and un-commit on alternate frames. */
+  const GATE = 0.035;
+  const EXIT = 0.012;
+  const FIRST = 0.78 / pieces.length;     // where piece one finishes its fall
+  let committed = false, commit = 0, gateAt = GATE, lastFrame = performance.now();
+
   /* The headline's exclusion zone, measured from the real elements.
 
      Hard-coding an ellipse would drift out of register the moment the type
@@ -746,22 +767,48 @@ export function mountWell(opts) {
     }
   }
 
-  function frame() {
+  function frame(now) {
     raf = requestAnimationFrame(frame);
     readScroll();
+
+    const dt = Math.min(0.05, Math.max(0.001, ((now || performance.now()) - lastFrame) / 1000));
+    lastFrame = now || performance.now();
+
+    if (!committed && progress >= GATE) { committed = true; gateAt = progress; }
+    else if (committed && progress <= EXIT) committed = false;
+    const before = commit;
+    commit += ((committed ? 1 : 0) - commit) * (1 - Math.exp(-3.4 * dt));
+    if (Math.abs(commit - before) > 0.0002) dirty = true;
+
+    /* What actually drives the build.
+
+       Multiplying by `commit` rather than taking a max is what keeps this
+       continuous. At commit 0 the drive is 0 and every piece waits above the
+       frame; as commit runs to 1 the drive rises to FIRST and piece one
+       completes its fall on the clock; past that, scroll owns it. Taking a
+       max instead would snap the piece straight to locked the instant the
+       gate was crossed, because the remapped scroll term already equals
+       FIRST there. */
+    /* Measured from where the scroll actually was when it committed, not
+       from GATE. Counting from GATE meant any overshoot past the threshold —
+       and a single wheel notch is several times the threshold — was already
+       banked as progress into piece two, so it started falling at the same
+       moment piece one landed and then hung there. */
+    const past = clamp01((progress - gateAt) / Math.max(0.05, 1 - gateAt));
+    const drive = commit * (FIRST + past * (1 - FIRST));
 
     parX += (tgtX - parX) * 0.07;
     parY += (tgtY - parY) * 0.07;
     if (Math.abs(tgtX - parX) > 0.001 || Math.abs(tgtY - parY) > 0.001) dirty = true;
 
-    // Pieces drop in sequence across the first 80% of the scroll.
+    // Pieces drop in sequence across the first 80% of the drive.
     const n = pieces.length;
     for (let i = 0; i < n; i++) {
       const p = pieces[i];
       const u = p.userData;
       const from = (i / n) * 0.78;
       const to = from + 0.78 / n;
-      const t = easeOut(clamp01((progress - from) / (to - from)));
+      const t = easeOut(clamp01((drive - from) / (to - from)));
 
       u.lock = t;
       p.position.y = u.startY + (u.restY - u.startY) * t;
@@ -787,12 +834,12 @@ export function mountWell(opts) {
     // Camera rises with the build and pulls back only enough to keep the
     // whole slab in frame. Sized against stackTop so it stays framed if the
     // number of projects changes.
-    const cy = 1.6 + progress * (stackTop * 0.62);
+    const cy = 1.6 + drive * (stackTop * 0.62);
     // Closer than it was: the slab sat small in a large empty room once the
     // ground went light, because there is no longer a dark surround to make
     // it feel big.
-    let cz = stackTop * 1.24 + progress * stackTop * 0.40;
-    const orbit = -0.62 + progress * 1.15 + parX * 0.45;
+    let cz = stackTop * 1.24 + drive * stackTop * 0.40;
+    const orbit = -0.62 + drive * 1.15 + parX * 0.45;
 
     /* Hero lift: pitch the camera up while the blanks are on screen, so the
        floor sits far lower in frame.
@@ -804,7 +851,7 @@ export function mountWell(opts) {
        the hero drops the floor down the frame and opens the space around the
        type; it eases back to the signed-off build framing well before the
        first piece lands, so the build itself is untouched. */
-    const hero = clamp01(1 - progress / 0.14);
+    const hero = 1 - commit;
     const heroLift = 1.7 * hero;
     /* Stand further back for the hero too. The cloud spans radius 3.6 to 13
        around the origin while the build camera sits only about 8 out, so a
@@ -813,7 +860,7 @@ export function mountWell(opts) {
        camera, which is what makes it read as a room rather than a pile-up. */
     cz += 5.6 * hero;
     camera.position.set(Math.sin(orbit) * cz, cy + parY * 1.6 + heroLift * 0.30, Math.cos(orbit) * cz);
-    camera.lookAt(0, 0.7 + progress * stackTop * 0.42 + heroLift, 0);
+    camera.lookAt(0, 0.7 + drive * stackTop * 0.42 + heroLift, 0);
     camera.updateMatrixWorld();
     camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
 
@@ -905,8 +952,11 @@ export function mountWell(opts) {
   }
 
   if (reduced) {
-    // Land everything immediately and render one frame.
+    // Land everything immediately and render one frame. `commit` has to be
+    // set too, or the drive stays at zero and the frame that renders shows an
+    // empty well.
     progress = 1;
+    committed = true; commit = 1;
     for (const p of pieces) {
       p.position.set(p.userData.restX, p.userData.restY, 0);
       p.rotation.set(0, 0, 0);
