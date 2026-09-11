@@ -347,7 +347,7 @@ export function mountWell(opts) {
       baseColor: new THREE.Color(item.color || look.color),
       startY: restY + 20 + i * 1.6,
       spin: (i % 2 ? 1 : -1) * (0.6 + (i % 3) * 0.35),
-      hover: 0, lock: 0
+      hover: 0, lock: 0, committed: false, commit: 0
     };
     group.position.set(restX, group.userData.startY, 0);
     scene.add(group);
@@ -585,24 +585,29 @@ export function mountWell(opts) {
 
   /* ── Committing to the build ──
 
-     Scroll used to map one-to-one onto the whole sequence, which meant the
-     first piece hung in mid-air at whatever height your scroll position
-     happened to land on. Nothing about the page said it was waiting for more
-     scroll, so it just looked stuck.
+     Scroll used to map one-to-one onto the whole sequence, so a piece hung in
+     mid-air at whatever height your scroll position happened to land on.
+     Nothing about the page said it was waiting for more scroll; it just
+     looked stuck, and it looked stuck once per project.
 
-     So the first drop is a commitment rather than a scrub. Cross GATE and the
-     piece falls the rest of the way on its own clock, about three quarters of
-     a second, whether or not you keep scrolling — that is the moment the page
-     changes from a title card into the build. From there scroll takes over
-     again for the remaining pieces, remapped so the rest of the track covers
-     them and there is no dead zone where scrolling does nothing.
+     Every piece is now a commitment rather than a scrub. Each has its own
+     gate on the scroll track; cross it and that piece falls the rest of the
+     way on its own clock, about three quarters of a second, whether or not
+     you keep scrolling. Scroll decides *when* a piece is released, never how
+     far down it is — so the stack is only ever mid-drop while a drop is
+     actually playing, and never parks halfway.
 
-     EXIT sits below GATE on purpose. With a single threshold, a scroll
-     resting exactly on it would commit and un-commit on alternate frames. */
+     RELEASE is the hysteresis. With a bare threshold a scroll resting exactly
+     on one would commit and un-commit on alternate frames; scrolling back
+     past gate minus RELEASE sends that piece home again.
+
+     The last gate sits at 0.82, leaving the tail of the track for the camera
+     to finish its pull-back after the final piece lands. */
   const GATE = 0.035;
-  const EXIT = 0.012;
-  const FIRST = 0.78 / pieces.length;     // where piece one finishes its fall
-  let committed = false, commit = 0, gateAt = GATE, lastFrame = performance.now();
+  const LAST_GATE = 0.82;
+  const RELEASE = 0.02;
+  const gates = pieces.map((_, i) => GATE + (i / pieces.length) * (LAST_GATE - GATE));
+  let lastFrame = performance.now();
 
   /* The headline's exclusion zone, measured from the real elements.
 
@@ -774,42 +779,28 @@ export function mountWell(opts) {
     const dt = Math.min(0.05, Math.max(0.001, ((now || performance.now()) - lastFrame) / 1000));
     lastFrame = now || performance.now();
 
-    if (!committed && progress >= GATE) { committed = true; gateAt = progress; }
-    else if (committed && progress <= EXIT) committed = false;
-    const before = commit;
-    commit += ((committed ? 1 : 0) - commit) * (1 - Math.exp(-3.4 * dt));
-    if (Math.abs(commit - before) > 0.0002) dirty = true;
-
-    /* What actually drives the build.
-
-       Multiplying by `commit` rather than taking a max is what keeps this
-       continuous. At commit 0 the drive is 0 and every piece waits above the
-       frame; as commit runs to 1 the drive rises to FIRST and piece one
-       completes its fall on the clock; past that, scroll owns it. Taking a
-       max instead would snap the piece straight to locked the instant the
-       gate was crossed, because the remapped scroll term already equals
-       FIRST there. */
-    /* Measured from where the scroll actually was when it committed, not
-       from GATE. Counting from GATE meant any overshoot past the threshold —
-       and a single wheel notch is several times the threshold — was already
-       banked as progress into piece two, so it started falling at the same
-       moment piece one landed and then hung there. */
-    const past = clamp01((progress - gateAt) / Math.max(0.05, 1 - gateAt));
-    const drive = commit * (FIRST + past * (1 - FIRST));
-
     parX += (tgtX - parX) * 0.07;
     parY += (tgtY - parY) * 0.07;
     if (Math.abs(tgtX - parX) > 0.001 || Math.abs(tgtY - parY) > 0.001) dirty = true;
 
-    // Pieces drop in sequence across the first 80% of the drive.
+    /* Each piece runs its own gate and its own clock. `drive` is gone: there
+       is no longer one number mapping scroll onto the whole sequence, because
+       that is exactly what let a piece sit half-fallen. */
     const n = pieces.length;
+    const fall = 1 - Math.exp(-3.4 * dt);          // frame-rate independent
+    let built = 0;
     for (let i = 0; i < n; i++) {
       const p = pieces[i];
       const u = p.userData;
-      const from = (i / n) * 0.78;
-      const to = from + 0.78 / n;
-      const t = easeOut(clamp01((drive - from) / (to - from)));
 
+      if (!u.committed && progress >= gates[i]) u.committed = true;
+      else if (u.committed && progress <= gates[i] - RELEASE) u.committed = false;
+      const was = u.commit;
+      u.commit += ((u.committed ? 1 : 0) - u.commit) * fall;
+      if (Math.abs(u.commit - was) > 0.0002) dirty = true;
+      built += u.commit;
+
+      const t = easeOut(u.commit);
       u.lock = t;
       p.position.y = u.startY + (u.restY - u.startY) * t;
       p.position.x = u.restX + (1 - t) * u.spin * 3.2;
@@ -830,16 +821,23 @@ export function mountWell(opts) {
       // under the pointer keeps the hover affordance and drops the halo.
       u.edge.opacity = u.hover * 0.34;
     }
+    built /= n;
+
+    /* `commit` is the first piece's, and it is what the front-page elements
+       fade on — the handover belongs to that one landing. `built` is the mean
+       across all pieces and is what the camera follows, so the framing settles
+       as each piece lands rather than sliding with raw scroll. */
+    const commit = pieces[0].userData.commit;
 
     // Camera rises with the build and pulls back only enough to keep the
     // whole slab in frame. Sized against stackTop so it stays framed if the
     // number of projects changes.
-    const cy = 1.6 + drive * (stackTop * 0.62);
+    const cy = 1.6 + built * (stackTop * 0.62);
     // Closer than it was: the slab sat small in a large empty room once the
     // ground went light, because there is no longer a dark surround to make
     // it feel big.
-    let cz = stackTop * 1.24 + drive * stackTop * 0.40;
-    const orbit = -0.62 + drive * 1.15 + parX * 0.45;
+    let cz = stackTop * 1.24 + built * stackTop * 0.40;
+    const orbit = -0.62 + built * 1.15 + parX * 0.45;
 
     /* Hero lift: pitch the camera up while the blanks are on screen, so the
        floor sits far lower in frame.
@@ -860,7 +858,7 @@ export function mountWell(opts) {
        camera, which is what makes it read as a room rather than a pile-up. */
     cz += 5.6 * hero;
     camera.position.set(Math.sin(orbit) * cz, cy + parY * 1.6 + heroLift * 0.30, Math.cos(orbit) * cz);
-    camera.lookAt(0, 0.7 + drive * stackTop * 0.42 + heroLift, 0);
+    camera.lookAt(0, 0.7 + built * stackTop * 0.42 + heroLift, 0);
     camera.updateMatrixWorld();
     camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
 
@@ -963,11 +961,12 @@ export function mountWell(opts) {
     // set too, or the drive stays at zero and the frame that renders shows an
     // empty well.
     progress = 1;
-    committed = true; commit = 1;
     for (const p of pieces) {
       p.position.set(p.userData.restX, p.userData.restY, 0);
       p.rotation.set(0, 0, 0);
       p.userData.lock = 1;
+      p.userData.committed = true;
+      p.userData.commit = 1;
     }
     dirty = true;
     start();
