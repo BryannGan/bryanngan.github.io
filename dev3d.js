@@ -867,19 +867,26 @@ export function mountWell(opts) {
     /* The blanks hold the room before the build and clear out once it starts,
        so they never compete with the labelled stack.
 
+       Keyed to `commit`, not to raw scroll. They used to fade across a span of
+       scroll position, which stopped matching the moment the first drop got
+       its own clock: the piece would land while the room was still half full
+       of blanks, and everything only cleared when the SECOND piece landed. The
+       handover belongs to the first landing, so it is tied to the same
+       commitment that drives it — gone by 0.75, which is where easeOut has
+       already put the piece on the floor.
+
        This is the one thing on the page that animates without being driven by
        scroll or pointer, so it has to force a redraw while it is visible —
-       the renderer is otherwise strictly on-demand. It stops as soon as the
-       fade completes, which is well inside the first screen of scrolling. */
-    const ambFade = clamp01(1 - (progress - 0.02) / 0.18);
+       the renderer is otherwise strictly on-demand. */
+    const ambFade = clamp01(1 - (commit - 0.04) / 0.71);
     updateAmbient((performance.now() - T0) / 1000, ambFade);
     if (!reduced && ambFade > 0.004) dirty = true;
 
     dust.rotation.y += 0.0006;
 
-    // The head yields to the scene once building starts.
+    // The head yields as the first piece comes down, on the same clock.
     if (opts.head) {
-      const fade = clamp01((progress - 0.06) / 0.16);
+      const fade = clamp01((commit - 0.04) / 0.66);
       opts.head.style.opacity = String(1 - fade);
       opts.head.style.transform = 'translateY(calc(-50% - ' + (fade * 26) + 'px))';
     }
