@@ -611,13 +611,20 @@ export function mountWell(opts) {
      on one would commit and un-commit on alternate frames; scrolling back
      past gate minus RELEASE sends that piece home again.
 
-     The last gate sits at 0.82, leaving the tail of the track for the camera
-     to finish its pull-back after the final piece lands. */
-  const GATE = 0.06;      // ~11vh of scroll on the shortened track
-  const LAST_GATE = 1.0;  // the last gate lands at 0.81, leaving a short tail
+     GATE and STEP are separate on purpose. The lead-in from the title card to
+     the first drop wants to be longer than the gaps between drops — the hero
+     is a thing to look at, and dropping the first piece the moment a scroll
+     starts skips past it. Deriving every gate from one span tied the two
+     together, so lengthening the lead-in compressed everything after it.
+
+     Measured on the 280vh track: ~29vh of lead-in, then ~32vh between each
+     drop. */
+  const GATE = 0.16;      // lead-in before the first piece commits
+  const STEP = 0.175;     // between every gate after that
   const RELEASE = 0.02;
-  const gates = pieces.map((_, i) => GATE + (i / pieces.length) * (LAST_GATE - GATE));
+  const gates = pieces.map((_, i) => GATE + i * STEP);
   let lastFrame = performance.now();
+  const cueEl = document.getElementById('well-cue');
 
   /* The headline's exclusion zone, measured from the real elements.
 
@@ -838,6 +845,13 @@ export function mountWell(opts) {
        across all pieces and is what the camera follows, so the framing settles
        as each piece lands rather than sliding with raw scroll. */
     const commit = pieces[0].userData.commit;
+
+    /* The scroll cue goes when the build commits, not at a fixed scroll
+       position. dev-boot.js used to hide it at 4% of the track, which was
+       fine while GATE was 6% and became wrong the moment the lead-in grew:
+       the cue vanished and then nothing happened for another 20vh. Driving it
+       from the same state as the drop keeps the two honest whatever GATE is. */
+    if (cueEl) cueEl.classList.toggle('is-gone', commit > 0.02);
 
     // Camera rises with the build and pulls back only enough to keep the
     // whole slab in frame. Sized against stackTop so it stays framed if the

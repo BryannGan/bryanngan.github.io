@@ -62,11 +62,11 @@ if (sw) sw.addEventListener('toggle', () => { if (sw.open) load().catch(() => {}
 addEventListener('scroll', () => {
   const track = document.getElementById('well-track');
   const fill = document.getElementById('well-meter-fill');
-  const cue = document.getElementById('well-cue');
   if (!track || !fill) return;
   const r = track.getBoundingClientRect();
   const span = r.height - innerHeight;
   const p = span > 0 ? Math.min(1, Math.max(0, -r.top / span)) : 0;
   fill.style.transform = 'scaleY(' + p + ')';
-  if (cue) cue.classList.toggle('is-gone', p > 0.04);
+  // The scroll cue is hidden by dev3d.js when the build commits — a fixed
+  // scroll threshold here drifted out of step with GATE.
 }, { passive: true });
