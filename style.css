@@ -1299,6 +1299,40 @@ footer {
   position: relative;
   flex: none;
 }
+
+/* ── Narrow screens: the section links must never push the mode switch out ──
+
+   On a phone in portrait the five section links measure 422px inside a 390px
+   bar. A flex item will not shrink below its content width unless it is told
+   it may, so .nav-links kept its full size, the switch was laid out at x=446
+   — past the right edge — and because the document does not scroll sideways
+   there was no way to reach it at all. It only appeared if you turned the
+   phone landscape, which is exactly what was reported.
+
+   The switch is the only way to change mode, so it wins: it keeps its size,
+   and the links take whatever is left and scroll inside it. `min-width: 0` is
+   the part that actually fixes this; the rest is presentation. */
+@media (max-width: 760px) {
+  .nav-container { gap: 0.75rem; }
+  .nav-links {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 1.15rem;
+    /* Fade the right edge so it reads as "there is more", since the
+       scrollbar is hidden. */
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 18px), transparent);
+            mask-image: linear-gradient(to right, #000 calc(100% - 18px), transparent);
+  }
+  .nav-links::-webkit-scrollbar { display: none; }
+  .nav-links li { flex: none; }
+  /* The menu is 232px wide and anchored to the switch's right edge; on a
+     320px screen that still clears the left edge. */
+  .mode-menu { max-width: calc(100vw - 1.5rem); }
+}
 .mode-switch summary {
   display: flex;
   align-items: center;
