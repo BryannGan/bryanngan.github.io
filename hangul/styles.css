@@ -700,7 +700,7 @@ kbd{
 .fold-head .fc{
   margin-left:auto;font-size:11px;font-weight:700;color:var(--ink-3);
   background:var(--panel-2);border:1px solid var(--line);border-radius:9px;
-  padding:2px 8px;font-variant-numeric:tabular-nums;
+  padding:2px 8px;font-variant-numeric:tabular-nums;white-space:nowrap;
 }
 .fold-body{
   background:var(--panel);border:1px solid var(--line);border-top:0;
@@ -718,3 +718,93 @@ kbd{
 .fold-body .pcard.flat:first-child{padding-top:2px}
 /* folded sections keep their body in the DOM so a fold costs nothing */
 .fold.shut > .fold-body{display:none}
+
+/* ═══════════════════════════════════════════════════════ songs ═══ */
+.song-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;
+  flex-wrap:wrap;margin-bottom:16px}
+.song-top .cat-blurb{margin:0;flex:1;min-width:240px}
+.song-top .listen{flex:none;text-decoration:none;margin-left:auto}
+.stanza + .stanza{margin-top:18px}
+
+/* one lyric line: Korean chunks | the English they become */
+.lrow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:4px 24px;
+  padding:5px 8px;border-radius:9px;transition:background .13s}
+.lrow:hover{background:var(--panel-2)}
+.lk{display:flex;align-items:flex-start;gap:6px;min-width:0}
+.lplay{flex:none;width:26px;height:26px;margin-top:5px;border-radius:50%;
+  background:var(--panel);border:1px solid var(--line);color:var(--ink-3);
+  font-size:9px;line-height:1;padding:0 0 0 2px;transition:.13s}
+.lplay:hover,.lplay.playing{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.lchunks{display:flex;flex-wrap:wrap;gap:2px 3px;min-width:0}
+.lc{background:none;border:0;border-radius:7px;padding:2px 6px;text-align:left;
+  display:inline-flex;flex-direction:column;align-items:flex-start;transition:.13s}
+.lc-k{font-family:var(--kr);font-size:19px;font-weight:500;line-height:1.45}
+.lc .r{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);font-weight:650;line-height:1.2}
+/* hidden romanization keeps its line but not its width, so chunks sit at their
+   Korean spacing; turned on, it takes the room it needs */
+.lc .r.hidden{width:0;min-width:100%;white-space:nowrap}
+.lc.lit,.lc.playing{background:var(--accent-soft);color:var(--accent)}
+.lc.lit .r{color:var(--accent)}
+.lc.open{box-shadow:inset 0 -2px 0 var(--accent)}
+.lc:hover .r.hidden,.sbw-w:hover .r.hidden{opacity:.34}
+.le{font-size:14.5px;color:var(--ink-2);line-height:1.6;padding-top:5px;min-width:0}
+.ls{border-radius:5px;padding:1px 2px;margin:0 -2px;cursor:pointer;transition:.13s;
+  -webkit-box-decoration-break:clone;box-decoration-break:clone}
+.ls.lit{background:var(--accent-soft);color:var(--accent)}
+@media(max-width:640px){
+  .lrow{grid-template-columns:1fr;gap:0;padding:6px 4px}
+  .le{padding:0 0 2px 38px}
+}
+
+/* the breakdown under a line */
+.sbreak{margin:4px 8px 12px 40px;padding:12px 15px 6px;background:var(--panel-2);
+  border:1px solid var(--line);border-radius:var(--radius-sm)}
+.sb-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+.sb-k{font-family:var(--kr);font-size:17px;font-weight:600;color:var(--accent)}
+.sb-e{font-size:13px;color:var(--ink-2)}
+.sb-none{font-size:13px;color:var(--ink-3);padding-bottom:8px}
+.sbw{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:start;
+  padding:9px 0;border-top:1px solid var(--line-2)}
+.sbw-w{font-family:var(--kr);font-size:18px;font-weight:500;line-height:1.35;min-width:68px;
+  background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:4px 10px;
+  display:flex;flex-direction:column;align-items:flex-start;text-align:left;transition:.13s}
+.sbw-w:hover,.sbw-w.playing{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.sbw-w .r{font-family:var(--mono);font-size:10px;color:var(--ink-3);font-weight:650}
+.sbw-body{display:flex;flex-direction:column;gap:2px;min-width:0}
+.sbw-p{font-family:var(--kr);font-size:13px;font-weight:600;color:var(--ink-3)}
+.sbw-h{font:inherit;color:var(--ink-2);background:none;border:0;border-radius:5px;
+  padding:0 3px;margin:0 -3px;transition:.13s}
+.sbw-h:hover,.sbw-h.playing{background:var(--accent-soft);color:var(--accent)}
+.sbw-m{font-size:13.5px;color:var(--ink)}
+.sbw-g{font-size:12.5px;color:var(--ink-2)}
+.sbw-links{display:flex;flex-wrap:wrap;gap:6px;margin-top:5px}
+.sbw-link{background:var(--panel);border:1px solid var(--line);border-radius:20px;
+  padding:2px 10px;font-size:11.5px;font-weight:540;color:var(--ink-2);transition:.13s}
+.sbw-link:hover{border-color:var(--accent);color:var(--accent)}
+@media(max-width:640px){.sbreak{margin-left:4px;margin-right:4px}}
+
+/* the chunk spelled out, letter by letter */
+.sb-letters{display:flex;flex-wrap:wrap;align-items:flex-end;gap:8px 6px;padding:6px 0 4px}
+.sp{display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 5px 5px;
+  background:var(--panel);border:1px solid var(--line);border-radius:9px}
+.sp-gap{width:8px}
+.sp-syl{font-family:var(--kr);font-size:22px;font-weight:500;line-height:1.15;
+  background:none;border:0;border-radius:6px;padding:1px 8px;transition:.13s}
+.sp-syl:hover,.sp-syl.playing{background:var(--accent-soft);color:var(--accent)}
+.sp-js{display:flex;gap:2px}
+.sp-j{display:flex;flex-direction:column;align-items:center;min-width:25px;padding:2px 3px 1px;
+  background:var(--panel-2);border:1px solid var(--line-2);border-radius:6px;color:var(--ink-2);
+  transition:.13s}
+.sp-ch{font-family:var(--kr);font-size:15px;line-height:1.25}
+.sp-j .r{font-family:var(--mono);font-size:9.5px;font-weight:650;color:var(--ink-3);line-height:1.2}
+.sp-j:hover,.sp-j.playing{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+/* a batchim sits at the bottom of its block, so it is underlined */
+.sp-j.fin{box-shadow:inset 0 -2px 0 var(--accent-line)}
+.sp-j.mute .sp-ch{opacity:.45}
+.sp:hover .r.hidden{opacity:.34}
+.sb-lhint{font-size:11.5px;color:var(--ink-3);margin:2px 0 8px;max-width:640px;line-height:1.5}
+
+/* where a link from a song lands */
+@keyframes spot{0%,45%{box-shadow:0 0 0 3px var(--accent-line);border-color:var(--accent)}
+  100%{box-shadow:0 0 0 0 transparent}}
+.spot{animation:spot 1.8s ease}

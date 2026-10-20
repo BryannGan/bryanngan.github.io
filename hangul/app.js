@@ -804,19 +804,23 @@ function renderRules() {
 /* ── stacked foldable sections ──────────────────────────────────────
    Words and Verbs both lay every section out down the page rather than
    hiding them behind one-at-a-time tabs, so you can scroll straight
-   through. Fold state is remembered. */
+   through. Fold state is remembered, and only departures from a section's
+   default are stored: songs start folded, everything else starts open. */
+const foldedByDefault = key => key.startsWith('song:');
 function folded(key) {
   const f = S.settings.folded || (S.settings.folded = {});
-  return !!f[key];
+  return key in f ? !!f[key] : foldedByDefault(key);
+}
+function storeFold(f, key, v) {
+  if (v === foldedByDefault(key)) delete f[key]; else f[key] = v ? 1 : 0;
 }
 function setFolded(key, v) {
-  const f = S.settings.folded || (S.settings.folded = {});
-  if (v) f[key] = 1; else delete f[key];
+  storeFold(S.settings.folded || (S.settings.folded = {}), key, v);
   Store.save();
 }
 function foldAll(keys, v) {
   const f = S.settings.folded || (S.settings.folded = {});
-  keys.forEach(k => { if (v) f[k] = 1; else delete f[k]; });
+  keys.forEach(k => storeFold(f, k, v));
   Store.save();
 }
 /* Section bodies are always in the DOM; folding toggles a class. That keeps a
@@ -859,6 +863,16 @@ function jumpTo(key) {
   if (n) window.scrollTo({ top: n.getBoundingClientRect().top + window.scrollY - 70, behavior: 'smooth' });
 }
 function applyFoldAll(keys) { keys.forEach(applyFold); }
+/* Land on one item in another tab: unfold its section, bring it into view and
+   flash it, so a link from a song's breakdown shows exactly what it meant. */
+function spotlight(node) {
+  if (!node) return;
+  const sec = node.closest('.fold');
+  if (sec && folded(sec.dataset.sec)) { setFolded(sec.dataset.sec, false); applyFold(sec.dataset.sec); }
+  node.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  node.classList.remove('spot'); void node.offsetWidth; node.classList.add('spot');
+  node.addEventListener('animationend', () => node.classList.remove('spot'), { once: true });
+}
 
 /* ═════════════════════════════════════════════════════ view: words ═══ */
 let wordQuery = '';
@@ -1104,7 +1118,7 @@ function paintSent() {
     inner.innerHTML = sectionShell(key, 'Particles',
       'the words that say what each part is doing', D.particles.length,
       D.particles.map(p => `
-        <div class="pcard flat">
+        <div class="pcard flat" data-pk="${esc(p.p)}">
           <div class="pcard-head"><span class="pk">${esc(p.p)}</span>
             <span class="pn">${esc(p.name)}</span></div>
           <p class="prule">${esc(p.rule)}</p>
@@ -1126,7 +1140,7 @@ function paintSent() {
       </div>` + groups.map(g => {
       return sectionShell(g.key, g.name, '', g.items.length,
         g.items.map(p => `
-          <div class="pcard flat">
+          <div class="pcard flat" data-pid="${esc(p.id)}">
             <div class="pcard-head"><span class="rule-n">${p.order}</span>
               <h3>${esc(p.title)}</h3><span class="pform">${esc(p.form)}</span></div>
             <p class="prule">${esc(p.rule)}</p>
@@ -1150,6 +1164,200 @@ function exRow(e) {
       <span class="r ${ROM ? '' : 'hidden'}" data-hideable="1">${esc(e.r)}</span>
       ${e.note ? `<span class="ex-note">${esc(e.note)}</span>` : ''}
     </div></div>`;
+}
+
+/* ═════════════════════════════════════════════════════ view: songs ═══
+   Each line is a row: Korean chunks on the left, the English they become on
+   the right. Chunk k on either side carries data-c="k", which is all the
+   hover link needs. One breakdown is open at a time, anywhere on the page. */
+let songBreak = null;      // "songId|row|chunk" of the open breakdown
+
+function renderSongs() {
+  const host = $('#songsBody');
+  const songs = D.songs || [];
+  const keys = songs.map(s => 'song:' + s.id);
+  host.innerHTML = `
+    <div class="fold-actions" style="margin-bottom:14px">
+      <button class="ghost sm" id="expandAllSo">Expand all</button>
+      <button class="ghost sm" id="collapseAllSo">Collapse all</button>
+    </div>` + songs.map(songSection).join('');
+  $('#expandAllSo').onclick = () => { foldAll(keys, false); applyFoldAll(keys); };
+  $('#collapseAllSo').onclick = () => { foldAll(keys, true); applyFoldAll(keys); };
+  wireFolds(host);
+
+  $$('.lplay', host).forEach(b => b.onclick = () => Sound.play(b.dataset.t, b));
+  $$('.lc', host).forEach(b => b.onclick = () => { Sound.play(b.dataset.t, b); toggleBreak(b); });
+  // The English side is a way in too: clicking it opens the chunk it came from.
+  $$('.ls', host).forEach(n => n.onclick = () =>
+    $(`.lc[data-c="${n.dataset.c}"]`, n.closest('.lrow')).click());
+
+  let lit = null;
+  const light = t => {
+    if (t === lit) return;
+    $$('.lit', host).forEach(n => n.classList.remove('lit'));
+    lit = t;
+    if (t) $$(`[data-c="${t.dataset.c}"]`, t.closest('.lrow')).forEach(n => n.classList.add('lit'));
+  };
+  host.onpointerover = e => light(e.target.closest('.lrow [data-c]'));
+  host.onpointerleave = () => light(null);
+  host.onfocusin = e => light(e.target.closest('.lrow [data-c]'));
+
+  // Coming back from a link, or re-rendering for R, keeps the breakdown open.
+  if (songBreak) {
+    const [id, row, c] = songBreak.split('|');
+    const b = $(`.lyrics[data-song="${CSS.escape(id)}"] .lrow[data-row="${row}"] .lc[data-c="${c}"]`, host);
+    songBreak = null;
+    if (b) {
+      toggleBreak(b);
+      if (!folded('song:' + id)) requestAnimationFrame(() => b.scrollIntoView({ block: 'center' }));
+    }
+  }
+}
+
+function songSection(s) {
+  const lines = s.stanzas.reduce((n, st) => n + st.length, 0);
+  const body = `
+    <div class="song-top">
+      ${s.blurb ? `<p class="cat-blurb">${esc(s.blurb)}</p>` : ''}
+      ${s.link ? `<a class="ghost sm listen" href="${esc(s.link)}" target="_blank" rel="noopener">▶ Listen on YouTube</a>` : ''}
+    </div>
+    ${lines
+      ? `<div class="lyrics" data-song="${esc(s.id)}">${s.stanzas.map((st, i) =>
+          `<div class="stanza">${st.map((ln, j) => lyricRow(ln, i + '.' + j)).join('')}</div>`).join('')}</div>`
+      : `<div class="empty"><div class="big">가사</div>No lyrics yet. They go in <code>build/songs.py</code>.</div>`}`;
+  return sectionShell('song:' + s.id, `${s.title} · ${s.en}`,
+    [s.artist, s.year].filter(Boolean).join(' · '),
+    lines ? `${lines} lines` : 'no lyrics yet', body);
+}
+
+function lyricRow(ln, row) {
+  return `<div class="lrow" data-row="${row}">
+    <div class="lk">
+      <button class="lplay" data-t="${esc(ln.s)}" title="Play the whole line" aria-label="Play the whole line">▶</button>
+      <span class="lchunks">${ln.c.map((c, k) =>
+        `<button class="lc" data-c="${k}" data-t="${esc(c.s)}"><span class="lc-k">${esc(c.s)}</span>${romSpan(c.r, 'r')}</button>`).join('')}</span>
+    </div>
+    <div class="le">${ln.en.map(g => g.c == null ? esc(g.t)
+      : `<span class="ls" data-c="${g.c}">${esc(g.t)}</span>`).join('')}</div>
+  </div>`;
+}
+
+function toggleBreak(btn) {
+  const row = btn.closest('.lrow'), lyr = btn.closest('.lyrics');
+  const key = [lyr.dataset.song, row.dataset.row, btn.dataset.c].join('|');
+  $$('.sbreak').forEach(n => n.remove());
+  $$('.lc.open').forEach(n => n.classList.remove('open'));
+  if (songBreak === key) { songBreak = null; return; }
+  songBreak = key;
+  btn.classList.add('open');
+
+  const song = D.songs.find(s => s.id === lyr.dataset.song);
+  const chunk = btn.dataset.t;
+  const en = $$(`.ls[data-c="${btn.dataset.c}"]`, row).map(n => n.textContent).join(' … ');
+  const words = song.notes[chunk] || [];
+  row.insertAdjacentHTML('afterend', `<div class="sbreak">
+    <div class="sb-head"><span class="sb-k">${esc(chunk)}</span><span class="sb-e">${esc(en)}</span></div>
+    <div class="sb-letters">${spellOut(chunk)}</div>
+    <p class="sb-lhint">Every letter plays as it does on the Chart. Underlined ones are batchim,
+      and play their name instead — each name ends on its own batchim sound.</p>
+    ${words.length ? words.map(breakWord).join('')
+                   : `<p class="sb-none">No breakdown written for this chunk yet.</p>`}
+  </div>`);
+  const panel = row.nextElementSibling;
+  $$('[data-t]', panel).forEach(b => b.onclick = () => Sound.play(b.dataset.t, b));
+  $$('[data-link]', panel).forEach(b => b.onclick = () => followLink(b.dataset.link, b.dataset.id, b.dataset.cat));
+  applyRom();
+}
+
+/* ── a chunk spelled out letter by letter ───────────────────────────
+   Every block split into the letters the Chart teaches. Romanization follows
+   the letter's position: a batchim shows its sound (ㅅ → t), unless a silent
+   ㅇ in the next block pulls it across, when it keeps its full value
+   (빛이 → bi-chi). Assimilation beyond that is left to the line's own
+   romanization. */
+const CLUSTER = { 'ㄳ':'ㄱㅅ', 'ㄵ':'ㄴㅈ', 'ㄶ':'ㄴㅎ', 'ㄺ':'ㄹㄱ', 'ㄻ':'ㄹㅁ', 'ㄼ':'ㄹㅂ',
+                  'ㄽ':'ㄹㅅ', 'ㄾ':'ㄹㅌ', 'ㄿ':'ㄹㅍ', 'ㅀ':'ㄹㅎ', 'ㅄ':'ㅂㅅ' };
+const ASPIRATES = { 'ㄱ':'ㅋ', 'ㄷ':'ㅌ', 'ㅂ':'ㅍ', 'ㅈ':'ㅊ' };
+
+function spellOut(text) {
+  const chars = [...text];
+  return chars.map((ch, k) => {
+    const d = decomposeSyl(ch);
+    if (!d) return /\s/.test(ch) ? '<span class="sp-gap"></span>' : '';
+    const next = decomposeSyl(chars[k + 1] || '');
+    const cells = [
+      jamoCell(d.i, 'ini', D.grid.romInitials[d.i] || '–',
+               d.i === 'ㅇ' ? 'silent at the top of a block' : ''),
+      jamoCell(d.m, 'vow', D.grid.romMedials[d.m]),
+    ];
+    if (d.f) {
+      const group = D.batchim.find(b => b.letters.includes(d.f));
+      const parts = [...(CLUSTER[d.f] || d.f)];
+      parts.forEach((p, n) => {
+        const last = n === parts.length - 1;
+        let rom, note;
+        if (p === 'ㅎ' && last && next && ASPIRATES[next.i]) {
+          rom = '–'; note = `blends into the next ${next.i}, making it ${ASPIRATES[next.i]}`;
+        } else if (next && next.i === 'ㅇ' && d.f !== 'ㅇ' && last) {
+          if (p === 'ㅎ') { rom = '–'; note = 'drops before a vowel'; }
+          else { rom = D.grid.romInitials[p]; note = 'batchim, carried into the next block by its silent ㅇ'; }
+        } else if (parts.length > 1 && next && next.i === 'ㅇ') {
+          rom = finalRom(p); note = `batchim, sounds ${rom}`;
+        } else if (parts.length > 1 && !group.letters.includes(p)) {
+          rom = '–'; note = 'silent — only one letter of the pair is said';
+        } else {
+          rom = group.rom; note = `batchim, sounds ${group.rom}`;
+        }
+        cells.push(jamoCell(p, 'fin', rom, note));
+      });
+    }
+    return `<div class="sp"><button class="sp-syl" data-t="${esc(ch)}">${esc(ch)}</button>
+      <div class="sp-js">${cells.join('')}</div></div>`;
+  }).join('');
+}
+
+/* A consonant on top plays its 가-form and a vowel plays itself, as on the
+   Chart. A batchim plays its name (시옷), which ends on it. */
+function jamoCell(ch, role, rom, note) {
+  const j = JAMO_BY_CH[ch], o = j.o;
+  const plays = role === 'ini' ? o.demo : o.name;
+  const about = note || (j.kind === 'vowel' && !o.basic ? o.build : '');
+  const title = `${ch} ${o.name}${about ? ' — ' + about : ''}`;
+  const mute = role === 'fin' && rom === '–';
+  return `<button class="sp-j ${role}${mute ? ' mute' : ''}" data-t="${esc(plays)}" title="${esc(title)}">` +
+         `<span class="sp-ch">${ch}</span>${romSpan(rom, 'r')}</button>`;
+}
+
+function breakWord(w) {
+  // Make the dictionary form playable where it appears in `parts`.
+  const parts = w.p ? w.p.split(' + ').map((p, i) => i === 0 && w.h
+      ? `<button class="sbw-h" data-t="${esc(w.h)}">${esc(p)}</button>` : esc(p)).join(' + ') : '';
+  const LINK = { verb: () => 'In Verbs', word: () => 'In Words',
+                 pattern: l => 'Pattern: ' + l.t, particle: l => 'Particle ' + l.t };
+  return `<div class="sbw">
+    <button class="sbw-w" data-t="${esc(w.w)}">${esc(w.w)}${romSpan(w.r, 'r')}</button>
+    <div class="sbw-body">
+      ${parts ? `<span class="sbw-p">${parts}</span>` : ''}
+      <span class="sbw-m">${esc(w.m)}</span>
+      ${w.g ? `<span class="sbw-g">${esc(w.g)}</span>` : ''}
+      ${w.links.length ? `<span class="sbw-links">${w.links.map(l =>
+        `<button class="sbw-link" data-link="${l.k}" data-id="${esc(l.id)}" data-cat="${esc(l.cat || '')}">${esc(LINK[l.k](l))} →</button>`).join('')}</span>` : ''}
+    </div>
+  </div>`;
+}
+
+function followLink(kind, id, cat) {
+  if (kind === 'verb') {
+    verbQuery = ''; verbOpen = id; go('verbs');
+    spotlight($(`.verb[data-w="${CSS.escape(id)}"]`, $('#verbList')));
+  } else if (kind === 'word') {
+    wordQuery = ''; go('words');
+    spotlight($(`.fold[data-sec="${CSS.escape('w:vocab:' + cat)}"] .word[data-t="${CSS.escape(id)}"]`, $('#wordResult')));
+  } else {
+    sentTab = kind === 'particle' ? 'particles' : 'patterns'; go('sent');
+    spotlight($(kind === 'particle' ? `.pcard[data-pk="${CSS.escape(id)}"]`
+                                    : `.pcard[data-pid="${CSS.escape(id)}"]`, $('#sentBodyInner')));
+  }
 }
 
 /* ══════════════════════════════════════════════════ view: practice ═══ */
@@ -1482,7 +1690,7 @@ function renderStats() {
 const RENDER = {
   learn: renderLearn, chart: renderChart, build: renderBuild,
   batchim: renderBatchim, rules: renderRules, words: renderWords,
-  verbs: renderVerbs, sent: renderSent,
+  verbs: renderVerbs, sent: renderSent, songs: renderSongs,
   drill: renderDrillHome, stats: renderStats,
 };
 let view = 'learn';

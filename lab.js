@@ -44,7 +44,7 @@ window.LAB = [
   },
   {
     title: 'Hangul Trainer',
-    tagline: 'An offline Korean reading trainer. Forty letters taught as a system rather than a list, 2,400 recorded clips, spaced repetition, and a Pinyin bridge for Mandarin readers.',
+    tagline: 'An offline Korean reading trainer. Forty letters taught as a system rather than a list, 2,600 recorded clips, spaced repetition, and a Pinyin bridge for Mandarin readers.',
     tags: ['Vanilla JS', 'Python', 'Spaced repetition', 'Offline'],
     status: 'LIVE',
     year: '2026',
